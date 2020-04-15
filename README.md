@@ -1,0 +1,2 @@
+# MasterCollector
+WoW collection addon
