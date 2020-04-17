@@ -1,0 +1,9 @@
+## Author: Pr3vention
+## Interface: 80300
+## Title: Master Collector
+## Notes: Tracks collection completion
+## Version: 0.0.1
+
+frame.lua
+settings.lua
+main.lua
