@@ -1,0 +1,9 @@
+# harvester client settings files. Contains user secrets so it should NEVER be committed
+clientSettings.txt
+
+# standard directories for visual studio's build objects and NuGet package restorations
+.vs
+bin
+obj
+packages
+*.user
