@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web;
 
-namespace WoWQuestHarvester
+namespace APIConnectivity
 {
     public static class URIExtensions
     {

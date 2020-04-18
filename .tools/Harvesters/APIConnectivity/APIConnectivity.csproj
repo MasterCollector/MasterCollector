@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9CDD3DCE-0024-48D0-A3F6-C8C04C5AA393}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>WoWQuestHarvester</RootNamespace>
-    <AssemblyName>WoWQuestHarvester</AssemblyName>
+    <ProjectGuid>{9F7FDDEC-961B-4E2D-9284-B3F439DC66D4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>APIConnectivity</RootNamespace>
+    <AssemblyName>APIConnectivity</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -49,18 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="APIClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="URIExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)Newtonsoft.Json.dll" "$(SolutionDir)..\Newtonsoft.Json.dll"
-copy /Y "$(TargetDir)WoWQuestHarvester.exe" "$(SolutionDir)..\WoWQuestHarvester.exe"
-copy /Y "$(TargetDir)WoWQuestHarvester.exe.config" "$(SolutionDir)..\WoWQuestHarvester.exe.config"</PostBuildEvent>
-  </PropertyGroup>
 </Project>
