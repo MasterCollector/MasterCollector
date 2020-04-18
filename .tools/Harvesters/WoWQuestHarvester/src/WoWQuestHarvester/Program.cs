@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -22,7 +23,7 @@ namespace WoWQuestHarvester
         private static readonly string region = ConfigurationManager.AppSettings["region"];
         private static readonly string locale = ConfigurationManager.AppSettings["locale"];
         private static readonly string nameSpace = ConfigurationManager.AppSettings["namespace"];
-        private static readonly Dictionary<int, object> QuestDB = new Dictionary<int, object>();
+        private static readonly List<object> QuestDB = new List<object>();
         private static readonly int SleepTimeInSeconds = Convert.ToInt32(ConfigurationManager.AppSettings["SleepTimeInSeconds"]);
 
         private static void Main(string[] args)
@@ -55,19 +56,14 @@ namespace WoWQuestHarvester
                         JObject questData = JObject.Parse(response.Content.ReadAsStringAsync().Result);
                         if (questData.ContainsKey("id") && questData.ContainsKey("title"))
                         {
-                            int id = Convert.ToInt32(questData["id"]);
-                            QuestDB.Add(id, new
-                            {
-                                text = questData["title"],
-                                lvl = questData.ContainsKey("reqLevel") ? questData["reqLevel"] : 0,
-                            });
+                            var data = ProcessResponse(questData);
+                            QuestDB.Add(data);
                             Console.Out.WriteLine($"Quest {currentID}: {questData["title"]}");
                         }
                         currentID++;
                         break;
 
                     case 404:   // no quest info for this ID, we're okay to move on the the next one
-                        QuestDB.Add(currentID, new { });
                         currentID++;
                         break;
 
@@ -88,6 +84,56 @@ namespace WoWQuestHarvester
             var finalData = new { questDB = QuestDB };
             File.WriteAllText("questDB.json", JsonConvert.SerializeObject(finalData));
             Exit();
+        }
+
+        private static IDictionary<string, object> ProcessResponse(JObject QuestData)
+        {
+            IDictionary<string, object> data = new Dictionary<string, object>();
+            // we always want the ID and title when initiating the questDB
+            data.Add("id", QuestData["id"]);
+            data.Add("title", QuestData["title"]);
+
+            // quests can have a "category" defined -- possibly for quest storylines? Is this worth tracking at all?
+
+            // now we can check if other valueable properties are present
+            if (QuestData.ContainsKey("requirements"))
+            {
+                var requirements = QuestData["requirements"];
+                // determine the minimum level. If it's 1 or less, there's no need to store it
+                int minLevel = requirements.SelectToken("min_character_level")?.Value<int>() ?? 0;
+                if (minLevel > 1)
+                    data.Add("lvl", minLevel);
+
+                // is there a faction requirement? If so, add it.
+                var faction = requirements.SelectToken("$.faction.type")?.Value<string>();
+                if (!string.IsNullOrWhiteSpace(faction))
+                    data.Add("faction", faction);
+
+                // are there race restrictions? If so, add them
+                var races = requirements.SelectTokens("$.races[*].id")?.Values<int>();
+                if (races?.Count() > 0)
+                    data.Add("races", races);
+
+                // are there class restrictions? If so, add them
+                var classes = requirements.SelectTokens("$.classes[*].id")?.Values<int>();
+                if (classes?.Count() > 0)
+                    data.Add("classes", classes);
+            }
+
+            if (QuestData.ContainsKey("rewards"))
+            {
+                // is there one or more item available as a reward? If so, add the list
+                var choiceItems = QuestData.SelectTokens("rewards.items.choice_of[*].item.id")?.Values<int>();
+                if (choiceItems.Count() > 0)
+                    data.Add("itemRewards", choiceItems);
+
+                // is a spell granted as a reward? This is useful for tracking quests that provide a profession recipe/rank
+                var singleSpell = QuestData.SelectTokens("rewards.spell.id")?.Values<int>();
+                if (singleSpell?.Count() == 1)
+                    data.Add("spellRewards", singleSpell);
+            }
+
+            return data;
         }
 
         private static void Exit()
