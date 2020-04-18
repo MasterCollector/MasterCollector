@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIConnectivity", "APIConne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WoWQuestHarvester", "WoWQuestHarvester\WoWQuestHarvester.csproj", "{9CDD3DCE-0024-48D0-A3F6-C8C04C5AA393}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItemHarvester", "ItemHarvester\ItemHarvester.csproj", "{8461CFC8-3532-479A-BBCF-D58577D83C52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9CDD3DCE-0024-48D0-A3F6-C8C04C5AA393}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CDD3DCE-0024-48D0-A3F6-C8C04C5AA393}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9CDD3DCE-0024-48D0-A3F6-C8C04C5AA393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8461CFC8-3532-479A-BBCF-D58577D83C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8461CFC8-3532-479A-BBCF-D58577D83C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8461CFC8-3532-479A-BBCF-D58577D83C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8461CFC8-3532-479A-BBCF-D58577D83C52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,5 +1,8 @@
 # harvester client settings files. Contains user secrets so it should NEVER be committed
 clientSettings.txt
+# harvester result files
+.tools/questDB.json
+.tools/itemDB.json
 
 # standard directories for visual studio's build objects and NuGet package restorations
 .vs
