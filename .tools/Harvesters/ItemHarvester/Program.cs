@@ -95,7 +95,7 @@ namespace ItemHarvester
             data.Add("id", ItemData["id"]);
             data.Add("name", ItemData["name"]);
 
-            int requiredLevel = ItemData.TryGetValue("required_level", out JToken lvl) ? lvl.Value<int>() : 0;
+            long requiredLevel = ItemData.TryGetValue("required_level", out JToken lvl) ? lvl.Value<long>() : 0;
             if (requiredLevel > 1)
                 data.Add("lvl", ItemData["required_level"]);
 
