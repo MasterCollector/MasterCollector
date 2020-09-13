@@ -71,13 +71,11 @@ function MasterCollector:UnregisterEvent(event, func)
 			for k,v in pairs(eventFrame.events[event]) do
 				if v == func then
 					eventFrame.events[event][k]=nil
-					print('successfully unregistered tabled event ' .. event)
 					return
 				end
 			end
 		else
 			eventFrame.events[event]=nil
-			print('successfully unregistered single event ' .. event)
 		end
 	end
 end
