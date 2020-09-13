@@ -3,7 +3,10 @@
 ## Title: Master Collector
 ## Notes: Tracks collection completion
 ## Version: 0.0.1
+## SavedVariables: MCAppearanceHarvestData
+
+settings.lua
+dbcore.lua
 
 frame.lua
-settings.lua
 main.lua
