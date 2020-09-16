@@ -47,102 +47,103 @@ end
 local FRAME_WIDTH = 300
 local FRAME_HEIGHT = 500
 local function CloseCascadeFrame(targetFrame)
-   if targetFrame then
-      if targetFrame.cascadeWindow then
-         CloseCascadeFrame(targetFrame.cascadeWindow)
-      end
-      targetFrame:Hide()
-   end
+    if targetFrame then
+        if targetFrame.cascadeWindow then
+            CloseCascadeFrame(targetFrame.cascadeWindow)
+        end
+        targetFrame:Hide()
+    end
 end
 local function OpenCascadingWindow(anchorFrame)
-   local cascadeFrame = anchorFrame.cascadeWindow or CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame)
-   if not anchorFrame.cascadeWindow then anchorFrame.cascadeWindow = cascadeFrame end
-   cascadeFrame:SetHeight(100)
-   cascadeFrame:SetWidth(100)
-   cascadeFrame:SetPoint("TOPLEFT", anchorFrame, "TOPRIGHT")
-   cascadeFrame:EnableMouse(true)
-   
-   local bd = {
-      bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-      edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-      tile = true,
-      edgeSize = 16,
-      tileSize = 32,
-      insets = {
-         left = 2.5,
-         right = 2.5,
-         top = 2.5,
-         bottom = 2.5
-      }
-   }
-   cascadeFrame:SetBackdrop(bd)
-   cascadeFrame:SetScript("OnLeave", function(self, motion)
-         local frameUnderMouse = GetMouseFocus()
-         if frameUnderMouse ~= anchorFrame then
-            CloseCascadeFrame(self)
-         end
-   end)
-   cascadeFrame:Show()
+    local cascadeFrame = anchorFrame.cascadeWindow or CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame)
+    if not anchorFrame.cascadeWindow then anchorFrame.cascadeWindow = cascadeFrame end
+    cascadeFrame:SetHeight(100)
+    cascadeFrame:SetWidth(100)
+    cascadeFrame:SetPoint("TOPLEFT", anchorFrame, "TOPRIGHT", -2, 0)
+    cascadeFrame:EnableMouse(true)
+    
+    local bd = {
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        edgeSize = 16,
+        tileSize = 32,
+        insets = {
+            left = 2.5,
+            right = 2.5,
+            top = 2.5,
+            bottom = 2.5
+        }
+    }
+    cascadeFrame:SetBackdrop(bd)
+    cascadeFrame:SetScript("OnLeave", function(self, motion)
+            local frameUnderMouse = GetMouseFocus()
+            if frameUnderMouse ~= anchorFrame then
+                CloseCascadeFrame(self)
+            end
+    end)
+    anchorFrame:SetScript("OnLeave", function(s, motion)
+            -- If the frame the mouse goes to isn't the cascade frame, then we want to close the cascade frame instead
+            local frameUnderMouse = GetMouseFocus()
+            if anchorFrame.cascadeWindow and not frameUnderMouse:GetName():find('^MasterCollector.*CascadeFrame.*$') then
+                CloseCascadeFrame(anchorFrame.cascadeWindow)
+            end
+    end)
+    cascadeFrame:Show()
 end
 -- TODO: this function needs to be made more flexible so we can create windows on demand with unique names
 local CreateWindow = function(windowName)
-   if _G[windowName] then
-      _G[windowName]:Hide()
-      _G[windowName] = nil
-   end
-   window = CreateFrame("FRAME", windowName, UIParent)
-   window:SetMovable(true)
-   window:SetToplevel(true)
-   window:EnableMouse(true)
-   window:SetPoint("CENTER") -- this line is responsible for the window position reseting on /reloadui
-   window:SetWidth(FRAME_WIDTH)
-   window:SetHeight(FRAME_HEIGHT)
-   
-   local bd = {
-      bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-      edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-      tile = true,
-      edgeSize = 16,
-      tileSize = 32,
-      insets = {
-         left = 2.5,
-         right = 2.5,
-         top = 2.5,
-         bottom = 2.5
-      }
-   }
-   window:SetBackdrop(bd)
-   
-   -- Top row is the map header.
-   window.titleLabel = CreateFrame('Button', windowName..'TitleLabel', window)
-   window.titleLabel:SetWidth(window:GetWidth())
-   window.titleLabel:SetHeight(20)
-   window.titleLabel:SetPoint("TOPLEFT", window, "TOPLEFT")
-   window.titleLabel:RegisterForDrag("LeftButton")
-   window.titleLabel:SetScript("OnDragStart", function() window:StartMoving() end)
-   window.titleLabel:SetScript("OnDragStop", function() window:StopMovingOrSizing() end)
-   
-   local fnt = window.titleLabel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-   fnt:SetHeight(16)
-   fnt:SetWidth(200)
-   fnt:SetPoint("LEFT", window.titleLabel, "LEFT", 8, -2)
-   fnt:SetJustifyH("LEFT")
-   local mapName = C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP"
-   fnt:SetText(mapName)
-   window.titleLabel:RegisterForClicks("RightButtonUp")
-   window.titleLabel:SetScript("OnClick", function(s, button, down)
-         if button == 'RightButton' then
-            OpenCascadingWindow(window.titleLabel)
-         end
-   end)
-   window.titleLabel:SetScript("OnLeave", function(s, motion)
-         -- If the frame the mouse goes to isn't the cascade frame, then we want to close the cascade frame instead
-         local frameUnderMouse = GetMouseFocus()
-         if window.titleLabel.cascadeWindow and not frameUnderMouse:GetName():find('^MasterCollector.*CascadeFrame.*$') then
-            CloseCascadeFrame(window.titleLabel.cascadeWindow)
-         end
-   end)
+    if _G[windowName] then
+        _G[windowName]:Hide()
+        _G[windowName] = nil
+    end
+    window = CreateFrame("FRAME", windowName, UIParent)
+    window:SetMovable(true)
+    window:SetToplevel(true)
+    window:EnableMouse(true)
+    window:SetPoint("CENTER") -- this line is responsible for the window position reseting on /reloadui
+    window:SetWidth(FRAME_WIDTH)
+    window:SetHeight(FRAME_HEIGHT)
+    
+    local bd = {
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        edgeSize = 16,
+        tileSize = 32,
+        insets = {
+            left = 2.5,
+            right = 2.5,
+            top = 2.5,
+            bottom = 2.5
+        }
+    }
+    window:SetBackdrop(bd)
+    
+    -- Top row is the map header.
+    window.titleLabel = CreateFrame('Button', windowName..'TitleLabel', window)
+    window.titleLabel:SetWidth(window:GetWidth())
+    window.titleLabel:SetHeight(20)
+    window.titleLabel:SetPoint("TOPLEFT", window, "TOPLEFT")
+    window.titleLabel:RegisterForDrag("LeftButton")
+    window.titleLabel:SetScript("OnDragStart", function() window:StartMoving() end)
+    window.titleLabel:SetScript("OnDragStop", function() window:StopMovingOrSizing() end)
+    
+    local fnt = window.titleLabel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    fnt:SetHeight(16)
+    fnt:SetWidth(200)
+    fnt:SetPoint("LEFT", window.titleLabel, "LEFT", 8, -2)
+    fnt:SetJustifyH("LEFT")
+    local mapName = C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP"
+    fnt:SetText(mapName)
+    window.titleLabel:RegisterForClicks("RightButtonUp")
+    window.titleLabel:SetScript("OnClick", function(s, button, down)
+            if button == 'RightButton' then
+                OpenCascadingWindow(window.titleLabel)
+            end
+    end)
 end
+-- TODO: creating the window before the player finishes loading into the world will cause an error if setting the titleLabel with the current zone text
 CreateWindow("MasterCollectorCurrentZone")
 
 
