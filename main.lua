@@ -54,52 +54,38 @@ local ICON_WIDTH = 16
 local INDENT_LEVEL_SPACING = 16
 local SCROLLBAR_WIDTH = 18
 --[[
-local function CreateRow(anchor, previous, rowType, indent)
-    local row = CreateFrame("BUTTON", nil, anchor)
+local function CreateRow(container, rowType, indent)
+    local row = CreateFrame("BUTTON", nil, container)
     row:SetHeight(ROW_HEIGHT)
-    row:SetWidth(anchor:GetWidth())
-    if not previous then
-        row:SetPoint("TOPLEFT", anchor)
+    row:SetPoint("RIGHT", container, "RIGHT")
+    row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
+    local knownRows = #container.rows
+    if knownRows == 0 then
+        row:SetPoint("TOPLEFT", container)
     else
-        row:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", INDENT_LEVEL_SPACING * indent, 0)
+        row:SetPoint("TOPLEFT", container.rows[knownRows], "BOTTOMLEFT", INDENT_LEVEL_SPACING * ((indent and 1) or 0), 0)
     end
+    container.rows[knownRows+1]=row
     
-    local lbl = row:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    lbl:SetWidth(WINDOW_WIDTH)
-    lbl:SetHeight(ROW_HEIGHT)
-    lbl:SetPoint("TOPLEFT", row, "TOPLEFT", WINDOW_LEFT_MARGIN, 0)
-    lbl:SetJustifyH("LEFT")
-    lbl:SetText("DUMMY LABEL FOR " .. rowType .. ".")
+    -- TODO: is a collected icon desirable for a panel? It makes sense on individual items
+    local collectedIcon = row:CreateTexture(nil, "ARTWORK")
+    collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH) -- a texture must have at least a 1x1 size, otherwise no other frames can use it as a setpoint anchor
+    collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
+    collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
     
-    if rowType == "data" then
-        -- 16*indentLevel pixel space per indent level
-        -- 16 pixel collection status icon, left align
-        -- maybe a 16 pixel block for a row icon?
-        -- X pixel width content area
-    elseif rowType == "panel" then
-        row.Expandable = true
-        row.Expanded = true
-        
-        -- 16*indentLevel pixel space per indent level
-        local icon = row:CreateTexture(nil, "ARTWORK")
-        icon:SetSize(ICON_WIDTH, ICON_WIDTH)
-        icon:SetPoint("TOPRIGHT", row, "TOPRIGHT", WINDOW_RIGHT_MARGIN, 0)
-        icon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collapse") -- Expand.blp if the panel can be opened, Collapse.blp if it can be closed
-        -- X pixel width content area
-        -- 16 pixel panel expand/collapse icon, right align
-        icon:Show()
-        
-        row:RegisterForClicks("LeftButtonUp")
-        row:SetScript("OnClick", function(self, button)
-                row.Expanded = not row.Expanded
-                if row.Expanded then
-                    icon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collapse")
-                else
-                    icon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Expand")
-                end
-        end)
-    end
-    row:Show()
+    local expandableIcon = row:CreateTexture(nil, "ARTWORK")
+    expandableIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
+    expandableIcon:SetPoint("TOPRIGHT", row, "TOPRIGHT", WINDOW_RIGHT_MARGIN, 0)
+    expandableIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collapse") -- Expand.blp if the panel can be opened, Collapse.blp if it can be closed
+    
+    -- TODO: fix the label text to be the remaining width between the row icon and expandable icon
+    local label = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    label:SetHeight(ROW_HEIGHT)
+    label:SetPoint("LEFT", collectedIcon, "RIGHT")
+    label:SetPoint("RIGHT", expandableIcon, "LEFT")
+    label:SetJustifyH("LEFT")
+    label:SetText("DUMMY LABEL " .. #container.rows)
+    
     return row
 end
 local function CloseCascadeFrame(targetFrame)
@@ -149,12 +135,12 @@ local function OpenCascadingWindow(anchorFrame)
     cascadeFrame:Show()
 end
 -- TODO: this function needs to be made more flexible so we can create windows on demand with unique names
-local CreateWindow = function(windowName, windowType)
+local CreateWindow = function(windowName)
     if _G[windowName] then
         _G[windowName]:Hide()
         _G[windowName] = nil
     end
-    window = CreateFrame("FRAME", windowName, UIParent)
+    local window = CreateFrame("FRAME", windowName, UIParent)
     window:SetMovable(true)
     window:SetToplevel(true)
     window:EnableMouse(true)
@@ -228,22 +214,50 @@ local CreateWindow = function(windowName, windowType)
     
     local dataArea = CreateFrame('FRAME', windowName .. 'dataArea', scrollFrame)
     dataArea:SetPoint("TOPLEFT", window.titleLabel, "BOTTOMLEFT")
-    dataArea:SetPoint("BOTTOMRIGHT", scrollbar, "BOTTOMLEFT")
+    dataArea:SetPoint("BOTTOMRIGHT", grip, "BOTTOMLEFT")
+    dataArea.rows = {}
     window.dataArea = dataArea
     
-    
-    -- Map events based on the type of window
-    if windowType == "currentZone" then
-        window:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-        window:SetScript("OnEvent", function(self, event, ...)
-                fnt:SetText(C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP")
-        end)
+    -- TODO: populate the dataArea with rows equal the maximum number of rows that could exist within the size limit
+    local maxRows = math.floor(dataArea:GetHeight() / ROW_HEIGHT)
+    for i=1,maxRows do
+        CreateRow(dataArea, "data", false)
     end
+    
+    local resizing = false
+    window:SetScript("OnSizeChanged", function(s, width, height)
+            local newMaxRows = math.floor(dataArea:GetHeight()/ROW_HEIGHT)
+            if newMaxRows ~= maxRows and not resizing then
+                resizing = true
+                if newMaxRows > maxRows then
+                    for i=1, newMaxRows do
+                        local row = dataArea.rows[i] or CreateRow(dataArea, "data", false)
+                        row:Show()
+                    end
+                elseif newMaxRows < maxRows then
+                    for i=maxRows,#dataArea.rows do
+                        dataArea.rows[i]:Hide()
+                    end
+                end
+                maxRows = newMaxRows
+                resizing = false
+            end
+    end)
+    
+    window.SetData = function(dataTable, title)
+        -- do something with the dataTable
+        fnt:SetText(title)
+    end
+    
+    return window
 end
 -- TODO: creating the window before the player finishes loading into the world will cause an error if setting the titleLabel with the current zone text
-CreateWindow("MasterCollectorCurrentZone", "currentZone")
+local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone")
+currentZoneWindow:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
+        currentZoneWindow.SetData(nil, C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP")
+end)
 ]]--
-
 
 --------------------
 -- Event Handling --
