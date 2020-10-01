@@ -1,5 +1,6 @@
 local addonName = select(1,...)
 MasterCollector = select(2,...)
+MasterCollector.Modules = {}
 
 MasterCollector.harvest = function()
 	MCAppearanceHarvestData = {}
