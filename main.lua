@@ -450,10 +450,13 @@ local data = {
 }
 local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
 -- temporary data preload here
-currentZoneWindow.SetData(data, "TODO: set this on player load in")
+currentZoneWindow:RegisterEvent("PLAYER_ENTERING_WORLD")
 currentZoneWindow:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
+	-- the current zone list should perform the same initial load as it does with zone map changes
+	if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED_NEW_AREA" then
 		currentZoneWindow.SetData(data, C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP")
+	end
 end)
 --------------------
 -- Event Handling --
