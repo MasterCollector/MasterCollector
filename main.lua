@@ -281,7 +281,7 @@ local CreateWindow = function(windowName, windowType)
 		local targetRowCounter = 1
 		local skipCounter = 0
 		-- Update the scrollbar's max and min values
-		local visibleDataEntries = window.dataArea.countVisibleDataEntries(dataTable)
+		local visibleDataEntries = window.dataArea.countVisibleDataEntries()
 		if visibleDataEntries >= maxRowsVisible then
 			scrollbar:SetMinMaxValues(0, visibleDataEntries - maxRowsVisible)
 		else
@@ -333,7 +333,7 @@ local CreateWindow = function(windowName, windowType)
 	window.dataArea.countVisibleDataEntries = function(tbl)
 		if not window.dataArea.rows then return 0 end
 		local visibleEntries = 0
-		for _,v in pairs(tbl or window.dataArea.data) do
+		for _,v in pairs(tbl or window.dataArea.data or {}) do
 			if v.visible then visibleEntries = visibleEntries + 1 end
 			if v.children then visibleEntries = visibleEntries + window.dataArea.countVisibleDataEntries(v.children) end
 		end
