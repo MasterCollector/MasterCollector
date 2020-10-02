@@ -266,8 +266,9 @@ local CreateWindow = function(windowName, windowType)
 		end
 		if data.type == "panel" then
 			row.expanded = data.expanded
-			row.collectedIcon:SetSize(1,1) -- we can't just hide the icon because it'll still take space in the row and a 0-point size breaks anchors
 			row.collectedIcon:Hide()
+			row.objectIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
+			row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
 			
 			SetExpandedTexture(row, data)
 			row.expandableIcon:Show()
@@ -305,7 +306,6 @@ local CreateWindow = function(windowName, windowType)
 			-- clear and disable all rows
 			for _,row in pairs(dataArea.rows) do
 				row.label:SetText('')
-				row.collectedIcon:SetSize(1,1)
 				row.collectedIcon:Hide()
 				row.objectIcon:Hide()
 				row.expandableIcon:Hide() -- we can't actually remove textures, so hiding is our best option
@@ -344,10 +344,11 @@ local CreateWindow = function(windowName, windowType)
 				end
 			end
 			
-			if dataArea.data then
+			-- if there is information to show
+			if dataArea.data and visibleDataEntries > 0 then
 				renderRowData(dataArea.data)
 			else
-				print('TODO: empty the list and present some kind of message indicating no data')
+				DrawRow(dataArea.rows[1], {type="textonly",text='No collectible things found for this area.'})
 			end
 			refreshing = false
 		end
