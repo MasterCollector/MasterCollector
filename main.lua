@@ -369,36 +369,58 @@ for k,v in pairs(MasterCollector.L.Panels) do
 	panelCache[k] = setmetatable({id=k},MasterCollector.structs.panel)
 end
 
-local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
--- temporary data preload here
-currentZoneWindow:RegisterEvent("PLAYER_ENTERING_WORLD")
-currentZoneWindow:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
-	-- the current zone list should perform the same initial load as it does with zone map changes
-	if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED_NEW_AREA" then
-		local mapID = C_Map.GetBestMapForUnit("player") -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
-		local data, workingItem = {}
-		for mod,modTable in pairs(MasterCollector.Modules) do
-			if modTable.mapData and modTable.mapData[mapID] then
-				for _,entry in pairs(modTable.mapData[mapID]) do
-					local panelID = entry[1]
-					local items = entry[2]
-					for i=1,#items do
-						-- TODO: if the map data has something that isn't in the DB, how should we handle it? ignoring it for now, but this really shouldn't happen so an error message may be more appropriate
-						workingItem = modTable.DB[panelID][items[i]] or nil
-						if workingItem then
-							if not data[panelID] then
-								data[panelID] = setmetatable({id=panelID,children={},expanded=true},MasterCollector.structs.panel)
-							end
-							data[panelID].children[items[i]] = workingItem
+local function GetCurrentZoneData()
+	local mapID = C_Map.GetBestMapForUnit("player") -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
+	local data, workingItem = {}
+	for mod,modTable in pairs(MasterCollector.Modules) do
+		if modTable.mapData and modTable.mapData[mapID] then
+			for _,entry in pairs(modTable.mapData[mapID]) do
+				local panelID = entry[1]
+				local items = entry[2]
+				for i=1,#items do
+					-- TODO: if the map data has something that isn't in the DB, how should we handle it? ignoring it for now, but this really shouldn't happen so an error message may be more appropriate
+					workingItem = modTable.DB[panelID][items[i]] or nil
+					if workingItem then
+						if not data[panelID] then
+							data[panelID] = setmetatable({id=panelID,children={},expanded=true},MasterCollector.structs.panel)
 						end
+						data[panelID].children[items[i]] = workingItem
 					end
 				end
 			end
 		end
-		currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
 	end
-end)
+	return mapID, data
+end
+
+function MasterCollector:FlagModAsLoaded(modName)
+	if MasterCollector.Modules and MasterCollector.Modules[modName] then
+		MasterCollector.Modules[modName].loaded = true
+	end
+	-- do a quick scan of registered modules. If we detect a
+	for mod,modTable in pairs(MasterCollector.Modules) do
+		if not modTable.loaded then return end
+	end
+	-- if all registered modules have finished loading, then we can finish the start-up process and open windows
+	MasterCollector:Start()
+end
+
+function MasterCollector:Start()
+	-- TODO: check if all modules have finished loading before opening windows
+	local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
+	local mapID, data = GetCurrentZoneData()
+	currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
+	-- temporary data preload here
+	currentZoneWindow:RegisterEvent("PLAYER_ENTERING_WORLD")
+	currentZoneWindow:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+	currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
+		-- the current zone list should perform the same initial load as it does with zone map changes
+		if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED_NEW_AREA" then
+			local mapID, data = GetCurrentZoneData()
+			currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
+		end
+	end)
+end
 --------------------
 -- Event Handling --
 --------------------
@@ -437,12 +459,13 @@ function MasterCollector:UnregisterEvent(event, func)
 		end
 	end
 end
-function MasterCollector:RegisterModule(ModuleName, mod)
-	if MasterCollector.Modules[ModuleName] then
-		print('Module "'..ModuleName..'" cannot be registered twice.')
+function MasterCollector:RegisterModule(mod)
+	if MasterCollector.Modules[mod.name] then
+		print('Module "'..mod.name..'" cannot be registered twice.')
 		return
 	end
-	MasterCollector.Modules[ModuleName]={
+	MasterCollector.Modules[mod.name]={
+		loaded = mod.loaded,
 		DB = mod.DB,
 		mapData = mod.mapData
 	}
@@ -455,5 +478,5 @@ function MasterCollector:RegisterModule(ModuleName, mod)
 			table.insert(eventFrame.events[k], v)
 		end
 	end
-	print(ModuleName .. ' registered successfully')
+	print('MasterCollector ' .. mod.name .. ' module registered successfully')
 end
