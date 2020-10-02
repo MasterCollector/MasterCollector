@@ -267,6 +267,7 @@ local CreateWindow = function(windowName, windowType)
 			row:SetScript("OnClick", function(self, button)
 					data.expanded = not data.expanded
 					SetExpandedTexture(row, data)
+					window.Refresh()
 			end)
 		else
 			row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
@@ -325,7 +326,7 @@ local CreateWindow = function(windowName, windowType)
 						else
 							DrawRow(dataArea.rows[targetRowCounter], v)
 							targetRowCounter = targetRowCounter + 1
-							if v.children then
+							if v.expanded and v.children then
 								renderRowData(v.children, true)
 							end
 						end
@@ -387,8 +388,7 @@ currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
 						workingItem = modTable.DB[panelID][items[i]] or nil
 						if workingItem then
 							if not data[panelID] then
-								data[panelID] = panelCache[panelID]
-								data[panelID].children = {}
+								data[panelID] = setmetatable({id=panelID,children={},expanded=true},MasterCollector.structs.panel)
 							end
 							data[panelID].children[items[i]] = workingItem
 						end
