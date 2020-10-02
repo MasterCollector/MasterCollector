@@ -6,7 +6,7 @@
 ## SavedVariables: MCAppearanceHarvestData
 
 settings.lua
-dbcore.lua
+datastructures.lua
 
 frame.lua
 main.lua
