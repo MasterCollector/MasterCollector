@@ -70,6 +70,11 @@ local function CreateRow(container, rowType, indent)
 	collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
 	row.collectedIcon = collectedIcon
 	
+	local objectIcon = row:CreateTexture(nil, "ARTWORK")
+	objectIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
+	objectIcon:SetPoint("LEFT", collectedIcon, "RIGHT")
+	row.objectIcon = objectIcon
+	
 	local expandableIcon = row:CreateTexture(nil, "ARTWORK")
 	expandableIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
 	expandableIcon:SetPoint("TOPRIGHT", row, "TOPRIGHT", WINDOW_RIGHT_MARGIN, 0)
@@ -77,7 +82,7 @@ local function CreateRow(container, rowType, indent)
 	
 	local label = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
 	label:SetHeight(ROW_HEIGHT)
-	label:SetPoint("LEFT", collectedIcon, "RIGHT")
+	label:SetPoint("LEFT", objectIcon, "RIGHT", 4, 0)
 	label:SetPoint("RIGHT", expandableIcon, "LEFT")
 	label:SetJustifyH("LEFT")
 	row.label = label
@@ -255,6 +260,10 @@ local CreateWindow = function(windowName, windowType)
 	
 	local DrawRow = function(row, data)
 		row.label:SetText(data.text)
+		if data.icon then
+			row.objectIcon:SetTexture(data.icon)
+			row.objectIcon:Show()
+		end
 		if data.type == "panel" then
 			row.expanded = data.expanded
 			row.collectedIcon:SetSize(1,1) -- we can't just hide the icon because it'll still take space in the row and a 0-point size breaks anchors
@@ -298,6 +307,7 @@ local CreateWindow = function(windowName, windowType)
 				row.label:SetText('')
 				row.collectedIcon:SetSize(1,1)
 				row.collectedIcon:Hide()
+				row.objectIcon:Hide()
 				row.expandableIcon:Hide() -- we can't actually remove textures, so hiding is our best option
 				row:Disable()
 			end
