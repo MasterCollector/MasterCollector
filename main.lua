@@ -277,57 +277,68 @@ local CreateWindow = function(windowName, windowType)
 		row:Enable()
 	end
 	
+	local refreshing = false
 	window.Refresh = function()
-		local offset = scrollbar:GetValue()
-		local targetRowCounter = 1
-		local skipCounter = 0
-		-- Update the scrollbar's max and min values
-		local visibleDataEntries = window.dataArea.countVisibleDataEntries()
-		if visibleDataEntries >= maxRowsVisible then
-			scrollbar:SetMinMaxValues(0, visibleDataEntries - maxRowsVisible)
-		else
-			scrollbar:SetMinMaxValues(0, 0)
-		end
-		
-		-- clear and disable all rows
-		for _,row in pairs(dataArea.rows) do
-			row.label:SetText('')
-			row.collectedIcon:SetSize(1,1)
-			row.collectedIcon:Hide()
-			row.expandableIcon:Hide() -- we can't actually remove textures, so hiding is our best option
-			row:Disable()
-		end
-		
-		local minValue,maxValue = scrollbar:GetMinMaxValues()
-		if minValue == maxValue then -- if the window fits all content, the scrollbar is effectively useless
-			scrollbar.ScrollUpButton:Disable()
-			scrollbar.ScrollDownButton:Disable()
-		elseif offset <= minValue then -- if the scrollbar is at min position but there are more rows than the window will allow, allow only downward motion
-			scrollbar.ScrollUpButton:Disable()
-			scrollbar.ScrollDownButton:Enable()
-		elseif offset >= maxValue then -- if the scrollbar is at max position, allow only upward motion
-			scrollbar.ScrollUpButton:Enable()
-			scrollbar.ScrollDownButton:Disable()
-		else -- the scrollbar is somewhere between min and max so both directions should be enabled
-			scrollbar.ScrollUpButton:Enable()
-			scrollbar.ScrollDownButton:Enable()
-		end
-		
-		if dataArea.data then
-			for k,v in pairs(dataArea.data) do
-				if targetRowCounter > maxRowsVisible then return end
-				-- todo: need to set this up as a recursive function because of multiple nested rows
-				if v.visible then
-					if skipCounter < offset then
-						skipCounter = skipCounter + 1
-					else
-						DrawRow(dataArea.rows[targetRowCounter], v)
-						targetRowCounter = targetRowCounter + 1
+		if not refreshing then
+			refreshing = true
+			local offset = scrollbar:GetValue()
+			local targetRowCounter = 1
+			local skipCounter = 0
+			-- Update the scrollbar's max and min values
+			local visibleDataEntries = window.dataArea.countVisibleDataEntries()
+			if visibleDataEntries >= maxRowsVisible then
+				scrollbar:SetMinMaxValues(0, visibleDataEntries - maxRowsVisible)
+			else
+				scrollbar:SetMinMaxValues(0, 0)
+			end
+			
+			-- clear and disable all rows
+			for _,row in pairs(dataArea.rows) do
+				row.label:SetText('')
+				row.collectedIcon:SetSize(1,1)
+				row.collectedIcon:Hide()
+				row.expandableIcon:Hide() -- we can't actually remove textures, so hiding is our best option
+				row:Disable()
+			end
+			
+			local minValue,maxValue = scrollbar:GetMinMaxValues()
+			if minValue == maxValue then -- if the window fits all content, the scrollbar is effectively useless
+				scrollbar.ScrollUpButton:Disable()
+				scrollbar.ScrollDownButton:Disable()
+			elseif offset <= minValue then -- if the scrollbar is at min position but there are more rows than the window will allow, allow only downward motion
+				scrollbar.ScrollUpButton:Disable()
+				scrollbar.ScrollDownButton:Enable()
+			elseif offset >= maxValue then -- if the scrollbar is at max position, allow only upward motion
+				scrollbar.ScrollUpButton:Enable()
+				scrollbar.ScrollDownButton:Disable()
+			else -- the scrollbar is somewhere between min and max so both directions should be enabled
+				scrollbar.ScrollUpButton:Enable()
+				scrollbar.ScrollDownButton:Enable()
+			end
+			
+			local function renderRowData(data, ischild)
+				for k,v in pairs(data or {}) do
+					if targetRowCounter > maxRowsVisible then return end
+					if v.visible then
+						if skipCounter < offset then
+							skipCounter = skipCounter + 1
+						else
+							DrawRow(dataArea.rows[targetRowCounter], v)
+							targetRowCounter = targetRowCounter + 1
+							if v.children then
+								renderRowData(v.children, true)
+							end
+						end
 					end
 				end
 			end
-		else
-			print('TODO: empty the list and present some kind of message indicating no data')
+			
+			if dataArea.data then
+				renderRowData(dataArea.data)
+			else
+				print('TODO: empty the list and present some kind of message indicating no data')
+			end
+			refreshing = false
 		end
 	end
 	
@@ -345,109 +356,18 @@ local CreateWindow = function(windowName, windowType)
 		dataArea.data = dataTable
 		fnt:SetText(title)
 		scrollbar:SetValue(0)
+		window.Refresh()
 	end
 	
 	return window
 end
--- TODO: creating the window before the player finishes loading into the world will cause an error if setting the titleLabel with the current zone text
-local data = {
-	{
-		text="Battle Pets",
-		visible=true,
-		type="panel",
-		expanded=true,
-		children = {
-			[635] = {collected=false},
-			[448] = {collected=false},
-			[1330] = {collected=false},
-			[2468] = {collected=false}
-		},
-	},
-	{
-		text="Panel test #1",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #2",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #3",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #4",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #5",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #6",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #7",
-		visible=true,
-		type="panel",
-		expanded=true,
-	},
-	{
-		text="Panel test #8",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #9",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #10",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #11",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #12",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #13",
-		visible=true,
-		type="panel",
-		expanded=false,
-	},
-	{
-		text="Panel test #14",
-		visible=true,
-		type="panel",
-		expanded=false,
-	}
-}
+
+-- create a panel cache from the localization file
+local panelCache = {}
+for k,v in pairs(MasterCollector.L.Panels) do
+	panelCache[k] = setmetatable({id=k},MasterCollector.structs.panel)
+end
+
 local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
 -- temporary data preload here
 currentZoneWindow:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -455,7 +375,28 @@ currentZoneWindow:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 currentZoneWindow:SetScript("OnEvent", function(self, event, ...)
 	-- the current zone list should perform the same initial load as it does with zone map changes
 	if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED_NEW_AREA" then
-		currentZoneWindow.SetData(data, C_Map.GetMapInfo(C_Map.GetBestMapForUnit("player")).name or "UNKNOWN MAP")
+		local mapID = C_Map.GetBestMapForUnit("player") -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
+		local data, workingItem = {}
+		for mod,modTable in pairs(MasterCollector.Modules) do
+			if modTable.mapData and modTable.mapData[mapID] then
+				for _,entry in pairs(modTable.mapData[mapID]) do
+					local panelID = entry[1]
+					local items = entry[2]
+					for i=1,#items do
+						-- TODO: if the map data has something that isn't in the DB, how should we handle it? ignoring it for now, but this really shouldn't happen so an error message may be more appropriate
+						workingItem = modTable.DB[panelID][items[i]] or nil
+						if workingItem then
+							if not data[panelID] then
+								data[panelID] = panelCache[panelID]
+								data[panelID].children = {}
+							end
+							data[panelID].children[items[i]] = workingItem
+						end
+					end
+				end
+			end
+		end
+		currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
 	end
 end)
 --------------------
@@ -477,9 +418,6 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
-eventFrame.events.VARIABLES_LOADED = function()
-	print('MASTERCOLLECTOR VARIABLES_LOADED')
-end
 eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName:find('^'..addonName..'%-') then
 		print('MASTERCOLLECTOR: ' .. loadedAddonName)
@@ -505,7 +443,8 @@ function MasterCollector:RegisterModule(ModuleName, mod)
 		return
 	end
 	MasterCollector.Modules[ModuleName]={
-		DB = mod.DB
+		DB = mod.DB,
+		mapData = mod.mapData
 	}
 	if mod.events then
 		for k,v in pairs(mod.events) do
