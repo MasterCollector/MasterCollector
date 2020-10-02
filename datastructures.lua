@@ -43,17 +43,20 @@ addonTable.structs.panel = {
 }
 addonTable.structs.pet = {
 	__index = function(self, key)
-		local name, _, petTypeID, companionID, _, _, _, _, _, _, _, displayID = GetPetInfoBySpeciesID(self.id)
-		self["text"] = name
-		self["displayID"] = companionID
-		if key == "text" then
-			return name
-		elseif key == "type" then
+		-- if the pet hasn't had its data loaded yet, then we want to set some of the static content
+		if not rawget(self, loaded) then
+			local name, icon, _, npcID = GetPetInfoBySpeciesID(self.id)
+			self.text = name
+			self.npcID = npcID
+			self.icon = icon
+			self.loaded = true
+		end
+		if key == "type" then
 			return "data"
 		elseif key == "visible" then
 			return determineVisibility(self)
 		else
-			return nil
+			return rawget(self, key)
 		end
 	end
 }
