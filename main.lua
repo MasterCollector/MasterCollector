@@ -225,7 +225,7 @@ local CreateWindow = function(windowName, windowType)
 	local resizing = false
 	window:SetScript("OnSizeChanged", function(s, width, height)
 			local newMaxRows = math.floor(dataArea:GetHeight()/ROW_HEIGHT)
-			if newMaxRows ~= maxRows and not resizing then
+			if newMaxRows ~= maxRowsVisible and not resizing then
 				resizing = true
 				if newMaxRows > maxRowsVisible then
 					for i=1, newMaxRows do
