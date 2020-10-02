@@ -5,6 +5,8 @@
 ## Version: 0.0.1
 ## SavedVariables: MCAppearanceHarvestData
 
+localizationBase.lua
+
 settings.lua
 datastructures.lua
 
