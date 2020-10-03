@@ -52,8 +52,7 @@ addonTable.structs.panel = {
 }
 addonTable.structs.pet = {
 	__index = function(self, key)
-		-- if the pet hasn't had its data loaded yet, then we want to set some of the static content
-		if not rawget(self, loaded) then
+		if not rawget(self, "loaded") then
 			local name, icon, _, npcID = GetPetInfoBySpeciesID(self.id)
 			self.text = name
 			self.npcID = npcID
@@ -69,7 +68,7 @@ addonTable.structs.pet = {
 }
 addonTable.structs.quest = {
 	__index = function(self, key)
-		if not rawget(self, loaded) then
+		if not rawget(self, "loaded") then
 			self.text = GetQuestName(self.id)
 			self.icon = "Interface\\gossipframe\\availablequesticon" -- TODO: temporary
 			self.loaded = true
@@ -84,7 +83,7 @@ addonTable.structs.quest = {
 local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 addonTable.structs.treasure = {
 	__index = function(self, key)
-		if not rawget(self, loaded) then
+		if not rawget(self, "loaded") then
 			self.text = "Treasure " .. self.id
 			--self.icon = "Interface\\minimap\\objecticons"
 			--self.txcoord = { left = 0.25, right = 0.25, top = 0.625, bottom = 0.75 }
