@@ -1,6 +1,9 @@
 local addonTable = select(2, ...)
 local L = addonTable.L
+-- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
+local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
+local GetQuestInfo = C_QuestLog.GetQuestInfo
 
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
@@ -22,6 +25,10 @@ local function determineVisibility(tbl)
 	end
 	
 	return true
+end
+local function GetQuestName(questID)
+	RequestLoadQuestByID(questID)
+	return GetQuestInfo(questID) or ('Quest #' .. questID)
 end
 
 -- All metatables describing data structures should be added below
@@ -51,9 +58,21 @@ addonTable.structs.pet = {
 			self.icon = icon
 			self.loaded = true
 		end
-		if key == "type" then
-			return "data"
-		elseif key == "visible" then
+		if key == "visible" then
+			return determineVisibility(self)
+		else
+			return rawget(self, key)
+		end
+	end
+}
+addonTable.structs.quest = {
+	__index = function(self, key)
+		if not rawget(self, loaded) then
+			self.text = GetQuestName(self.id)
+			self.icon = "Interface\\gossipframe\\availablequesticon" -- TODO: temporary
+			self.loaded = true
+		end
+		if key == "visible" then
 			return determineVisibility(self)
 		else
 			return rawget(self, key)
