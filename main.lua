@@ -420,18 +420,6 @@ local function GetCurrentZoneData()
 	return mapID, data
 end
 
-function MasterCollector:FlagModAsLoaded(modName)
-	if MasterCollector.Modules and MasterCollector.Modules[modName] then
-		MasterCollector.Modules[modName].loaded = true
-	end
-	-- do a quick scan of registered modules. If we detect a
-	for mod,modTable in pairs(MasterCollector.Modules) do
-		if not modTable.loaded then return end
-	end
-	-- if all registered modules have finished loading, then we can finish the start-up process and open windows
-	MasterCollector:Start()
-end
-
 function MasterCollector:Start()
 	local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
 	local mapID, data = GetCurrentZoneData()
