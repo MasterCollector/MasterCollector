@@ -4,6 +4,7 @@ local L = addonTable.L
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local GetQuestInfo = C_QuestLog.GetQuestInfo
+local MaxQuestNameRetry = 10
 
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
@@ -27,8 +28,18 @@ local function determineVisibility(tbl)
 	return true
 end
 local function GetQuestName(questID)
-	RequestLoadQuestByID(questID)
-	return GetQuestInfo(questID) or ('Quest #' .. questID)
+	local name = GetQuestInfo(questID)
+	if not name then
+		-- TODO: this can be improved. When RequestLoadQuestByID is called, the QUEST_DATA_LOAD_RESULT event fires with two args: questID, success.
+		--       shortly after receiving the QUEST_DATA_LOAD_RESULT event, QUEST_LOG_UPDATE fires indicating the name is now available
+		RequestLoadQuestByID(questID)
+		for i=1,MaxQuestNameRetry do
+			name = GetQuestInfo(questID)
+			if name then return name end
+		end
+		return 'Quest #' .. questID
+	end
+	return name
 end
 
 -- All metatables describing data structures should be added below
