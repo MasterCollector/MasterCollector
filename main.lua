@@ -288,7 +288,11 @@ local CreateWindow = function(windowName, windowType)
 			row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
 			if data.collected then
 				row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
+			else
+				row.collectedIcon:SetTexture(nil)
 			end
+			row.collectedIcon:Show()
+			row.objectIcon:SetPoint("LEFT", row.collectedIcon, "RIGHT")
 		end
 		row:Enable()
 	end
@@ -314,6 +318,7 @@ local CreateWindow = function(windowName, windowType)
 				row.collectedIcon:Hide()
 				row.objectIcon:Hide()
 				row.expandableIcon:Hide() -- we can't actually remove textures, so hiding is our best option
+				row:SetScript("OnClick", nil)
 				row:Disable()
 			end
 			
