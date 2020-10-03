@@ -11,4 +11,9 @@ MasterCollector.L.Panels = {
 		text = QUESTS_LABEL,
 		icon = "Interface\\gossipframe\\availablequesticon",
 	},
+	["treasure"] = {
+		text = "Treasure Chests",
+		icon = "Interface\\minimap\\objecticons",
+		txcoord = { left = 0.26953125, right = 0.35546875, top = 0.64453125, bottom = 0.734375 }
+	}
 }

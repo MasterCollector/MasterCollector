@@ -14,5 +14,7 @@ modManager.lua
 
 modules/pets/data.lua
 modules/pets/module.lua
+modules/treasures/data.lua
+modules/treasures/module.lua
 
 main.lua

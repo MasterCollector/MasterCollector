@@ -260,6 +260,14 @@ local CreateWindow = function(windowName, windowType)
 		row.label:SetText(data.text)
 		if data.icon then
 			row.objectIcon:SetTexture(data.icon)
+			-- if the object icon is using a single file with multiple icons, then we can define a relative position in the image to display
+			-- however, this isn't always done so we want to default to a full-size image if texture coords are not provided
+			if data.txcoord then
+				print(data.txcoord.left, data.txcoord.right, data.txcoord.top, data.txcoord.bottom)
+				row.objectIcon:SetTexCoord(data.txcoord.left, data.txcoord.right, data.txcoord.top, data.txcoord.bottom)
+			else
+				row.objectIcon:SetTexCoord(0,1,0,1)
+			end
 			row.objectIcon:Show()
 		end
 		if data.type == "panel" then
