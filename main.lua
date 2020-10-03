@@ -279,6 +279,11 @@ local CreateWindow = function(windowName, windowType)
 					SetExpandedTexture(row, data)
 					window.Refresh()
 			end)
+		elseif data.type == "textonly" then
+			row.collectedIcon:Hide()
+			row.objectIcon:Hide()
+			row.expandableIcon:Hide()
+			row.label:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
 		else
 			row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
 			if data.collected then
