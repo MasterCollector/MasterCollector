@@ -3,8 +3,6 @@
 local MasterCollector = select(2,...)
 MasterCollector.Modules.Treasures = {}
 MasterCollector.Modules.Treasures.DB={
-	["treasure"] = {
-	},
 }
 MasterCollector.Modules.Treasures.mapData={
 }

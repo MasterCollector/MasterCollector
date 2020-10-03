@@ -49,3 +49,30 @@ function MasterCollector:FlagModAsLoaded(modName)
 	-- if all registered modules have finished loading, then we can finish the start-up process and open windows
 	MasterCollector:Start()
 end
+
+local function LoadPanel(mod, tbl)
+	local workingItem
+	for _,data in pairs(tbl) do
+		-- initialize the datatype table if it doesn't exist
+		if not mod.DB[data[1]] then mod.DB[data[1]] = {} end
+		 -- iterate each item in the panel
+		for _, item in pairs(data[2]) do
+			-- if the item we're looking at is a table, then we need to go into it to retrieve the appropriate IDs
+			if type(item) == 'table' then
+				LoadPanel(mod, item)
+			else
+				workingItem = mod.DB[data[1]][item] or {}
+				workingItem.id = item
+				-- if the item hasn't been initialized with a metatable for behavior, do so now
+				if not getmetatable(workingItem) then
+					mod.DB[data[1]][item] = setmetatable(workingItem, MasterCollector.structs[data[1]])
+				end
+			end
+		end
+	end
+end
+function MasterCollector:InitializeDatabases(mod)
+	for mapID,data in pairs(mod.mapData) do
+		LoadPanel(mod, data)
+	end
+end

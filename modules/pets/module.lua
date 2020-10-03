@@ -1,14 +1,8 @@
 local MasterCollector = select(2,...)
 local mod = MasterCollector.Modules.Pets
 if mod then
-	-- scan through mapData and initialize the known objects by key
-	for mod,items in pairs(mod.DB) do
-		for id,tbl in pairs(items) do
-			tbl.id = id
-			tbl = setmetatable(tbl,MasterCollector.structs[mod])
-		end
-	end
-
+	MasterCollector:InitializeDatabases(mod)
+	
 	local function loadCollectedStates()
 		for id in pairs(mod.DB.pet) do
 			rawset(mod.DB.pet[id], 'collected', C_PetJournal.GetNumCollectedInfo(id) > 0)
