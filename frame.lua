@@ -1,5 +1,2 @@
-local name, addonTable = ...
-
-addonTable.Frames = {
-	Windows = {}
-} -- maybe rename this to "Windows" ?
+local MasterCollector = select(2, ...)
+MasterCollector.Modules = {}

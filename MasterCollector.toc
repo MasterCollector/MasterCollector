@@ -9,6 +9,10 @@ localizationBase.lua
 
 settings.lua
 datastructures.lua
-
 frame.lua
+modManager.lua
+
+modules/pets/data.lua
+modules/pets/module.lua
+
 main.lua

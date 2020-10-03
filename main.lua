@@ -1,6 +1,4 @@
-local addonName = select(1,...)
 MasterCollector = select(2,...)
-MasterCollector.Modules = {}
 
 MasterCollector.harvest = function()
 	MCAppearanceHarvestData = {}
@@ -427,7 +425,6 @@ function MasterCollector:FlagModAsLoaded(modName)
 end
 
 function MasterCollector:Start()
-	-- TODO: check if all modules have finished loading before opening windows
 	local currentZoneWindow = CreateWindow("MasterCollectorCurrentZone", "currentZone")
 	local mapID, data = GetCurrentZoneData()
 	currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
@@ -441,63 +438,4 @@ function MasterCollector:Start()
 			currentZoneWindow.SetData(data, C_Map.GetMapInfo(mapID).name or "UNKNOWN MAP")
 		end
 	end)
-end
---------------------
--- Event Handling --
---------------------
--- Events must be registered to a frame. Since we only want these to fire once, we'll create an invisible
--- dummy frame to intercept and handle collection events
-local eventFrame = CreateFrame("FRAME", "MasterCollectorEventFrame", UIParent)
-eventFrame.events = {}
-eventFrame:RegisterEvent("VARIABLES_LOADED")
-eventFrame:RegisterEvent("ADDON_LOADED")
-eventFrame:SetScript("OnEvent", function(self, event, ...)
-	if eventFrame.events[event] then
-		-- each event can have multiple handlers due to modules, so we want to fire each handler
-		if type(eventFrame.events[event]) == 'table' then
-			for k,v in pairs(eventFrame.events[event]) do v(...) end
-		else
-			eventFrame.events[event](...)
-		end
-	end
-end)
-eventFrame.events.ADDON_LOADED = function(loadedAddonName)
-	if loadedAddonName:find('^'..addonName..'%-') then
-		print('MASTERCOLLECTOR: ' .. loadedAddonName)
-	end
-end
-function MasterCollector:UnregisterEvent(event, func)
-	if eventFrame.events[event] then
-		if type(eventFrame.events[event]) == 'table' then
-			for k,v in pairs(eventFrame.events[event]) do
-				if v == func then
-					eventFrame.events[event][k]=nil
-					return
-				end
-			end
-		else
-			eventFrame.events[event]=nil
-		end
-	end
-end
-function MasterCollector:RegisterModule(mod)
-	if MasterCollector.Modules[mod.name] then
-		print('Module "'..mod.name..'" cannot be registered twice.')
-		return
-	end
-	MasterCollector.Modules[mod.name]={
-		loaded = mod.loaded,
-		DB = mod.DB,
-		mapData = mod.mapData
-	}
-	if mod.events then
-		for k,v in pairs(mod.events) do
-			if not eventFrame.events[k] then
-				eventFrame.events[k] = {}
-				eventFrame:RegisterEvent(k)
-			end
-			table.insert(eventFrame.events[k], v)
-		end
-	end
-	print('MasterCollector ' .. mod.name .. ' module registered successfully')
 end
