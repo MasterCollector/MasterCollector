@@ -263,7 +263,6 @@ local CreateWindow = function(windowName, windowType)
 			-- if the object icon is using a single file with multiple icons, then we can define a relative position in the image to display
 			-- however, this isn't always done so we want to default to a full-size image if texture coords are not provided
 			if data.txcoord then
-				print(data.txcoord.left, data.txcoord.right, data.txcoord.top, data.txcoord.bottom)
 				row.objectIcon:SetTexCoord(data.txcoord.left, data.txcoord.right, data.txcoord.top, data.txcoord.bottom)
 			else
 				row.objectIcon:SetTexCoord(0,1,0,1)
@@ -312,9 +311,13 @@ local CreateWindow = function(windowName, windowType)
 			local skipCounter = 0
 			-- Update the scrollbar's max and min values
 			local visibleDataEntries = window.dataArea.countVisibleDataEntries()
+			-- if the number of rows that could be rendered exceeds the number of rows allowed by the window, set the scrollbar with a max offset
 			if visibleDataEntries >= maxRowsVisible then
 				scrollbar:SetMinMaxValues(0, visibleDataEntries - maxRowsVisible)
 			else
+				-- if there are more available rows than visible entries, we want to force the scrollbar back to a 0 position before rendering
+				offset = 0
+				scrollbar:SetValue(0)
 				scrollbar:SetMinMaxValues(0, 0)
 			end
 			
@@ -343,7 +346,7 @@ local CreateWindow = function(windowName, windowType)
 				scrollbar.ScrollDownButton:Enable()
 			end
 			
-			local function renderRowData(data, ischild)
+			local function renderRowData(data)
 				for k,v in pairs(data or {}) do
 					if targetRowCounter > maxRowsVisible then return end
 					if v.visible then
@@ -352,9 +355,11 @@ local CreateWindow = function(windowName, windowType)
 						else
 							DrawRow(dataArea.rows[targetRowCounter], v)
 							targetRowCounter = targetRowCounter + 1
-							if v.expanded and v.children then
-								renderRowData(v.children, true)
-							end
+						end
+						
+						-- if the skipped section was an expanded panel, we need to still inspect the children to render their data
+						if v.expanded and v.children then
+							renderRowData(v.children)
 						end
 					end
 				end
@@ -375,7 +380,7 @@ local CreateWindow = function(windowName, windowType)
 		local visibleEntries = 0
 		for _,v in pairs(tbl or window.dataArea.data or {}) do
 			if v.visible then visibleEntries = visibleEntries + 1 end
-			if v.children then visibleEntries = visibleEntries + window.dataArea.countVisibleDataEntries(v.children) end
+			if v.children and v.expanded then visibleEntries = visibleEntries + window.dataArea.countVisibleDataEntries(v.children) end
 		end
 		return visibleEntries
 	end
