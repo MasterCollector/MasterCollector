@@ -440,3 +440,9 @@ function MasterCollector:Start()
 		end
 	end)
 end
+
+-- temporary function. This should find its way into a frame manager script
+function MasterCollector:RefreshWindows()
+	local currentZoneWindow = _G["MasterCollectorCurrentZone"]
+	if currentZoneWindow then currentZoneWindow.Refresh() end
+end
