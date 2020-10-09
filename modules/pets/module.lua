@@ -13,6 +13,12 @@ if mod then
 
 	-- Set up all the events that this module will use
 	local events = {}
+	events.QUEST_TURNED_IN = function(questID)
+		if mod.DB.quest[questID] then
+			mod.DB.quest[questID].collected = true
+			MasterCollector:RefreshWindows()
+		end
+	end
 	-- During the login/reload process, pets appear to be available after the first SPELLS_CHANGED event fires. We don't need to listen to it after its first run
 	events.SPELLS_CHANGED = function()
 		MasterCollector:UnregisterEvent('SPELLS_CHANGED', events.SPELLS_CHANGED)

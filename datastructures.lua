@@ -2,8 +2,9 @@ local addonTable = select(2, ...)
 local L = addonTable.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
-local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local GetQuestInfo = C_QuestLog.GetQuestInfo
+local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
+local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local MaxQuestNameRetry = 10
 
 -- supporting functions for the data structure metatables
@@ -86,12 +87,16 @@ addonTable.structs.quest = {
 		end
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "collected" then
+			if not rawget(self, key) then
+				self.collected = IsQuestComplete(self.id)
+			end
+			return self.collected
 		else
 			return rawget(self, key)
 		end
 	end
 }
-local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 addonTable.structs.treasure = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
