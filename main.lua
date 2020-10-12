@@ -401,8 +401,16 @@ for k,v in pairs(MasterCollector.L.Panels) do
 	panelCache[k] = setmetatable({id=k},MasterCollector.structs.panel)
 end
 
+local function GetClosestZoneMapFromMapID(mapID)
+	local mapInfo = C_Map.GetMapInfo(mapID)
+	if mapInfo and mapInfo.mapType == 5 and mapInfo.parentMapID then
+		return GetClosestZoneMapFromMapID(mapInfo.parentMapID)
+	end
+	return mapInfo.mapID
+end
+
 local function GetCurrentZoneData()
-	local mapID = C_Map.GetBestMapForUnit("player") -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
+	local mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player")) -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
 	local data, workingItem = {}
 	for mod,modTable in pairs(MasterCollector.Modules) do
 		if modTable.mapData and modTable.mapData[mapID] then
