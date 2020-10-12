@@ -10,13 +10,12 @@ localizationBase.lua
 settings.lua
 datastructures.lua
 frame.lua
-modManager.lua
+main.lua
 
+modManager.lua
 modules/pets/data.lua
 modules/pets/module.lua
 modules/quests/data.lua
 modules/quests/module.lua
 modules/treasures/data.lua
 modules/treasures/module.lua
-
-main.lua
