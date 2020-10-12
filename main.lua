@@ -143,6 +143,7 @@ local CreateWindow = function(windowName, windowType)
 	window:SetMovable(true)
 	window:SetToplevel(true)
 	window:EnableMouse(true)
+	window:EnableMouseWheel(true)
 	window:SetPoint("RIGHT", -400, 0) -- this line is responsible for the window position reseting on /reloadui
 	window:SetWidth(WINDOW_WIDTH)
 	window:SetHeight(WINDOW_HEIGHT)
@@ -212,6 +213,11 @@ local CreateWindow = function(windowName, windowType)
 	scrollbar.scrollStep = 1
 	scrollbar:SetScript("OnValueChanged", function() window.Refresh() end)
 	scrollFrame.bar = scrollbar
+	
+	-- need to set the script after scrollbar is defined, otherwise you get nil without exposing a non-local variable
+	window:SetScript("OnMouseWheel", function(self, delta)
+		scrollbar:SetValue(scrollbar:GetValue()-delta)
+	end)
 	
 	local dataArea = CreateFrame('FRAME', windowName .. 'dataArea', scrollFrame)
 	dataArea:SetPoint("TOPLEFT", window.titleLabel, "BOTTOMLEFT")
