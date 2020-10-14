@@ -95,7 +95,7 @@ local function CloseCascadeFrame(targetFrame)
 	end
 end
 local function OpenCascadingWindow(anchorFrame)
-	local cascadeFrame = anchorFrame.cascadeWindow or CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame)
+	local cascadeFrame = anchorFrame.cascadeWindow or CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame, BackdropTemplateMixin and "BackdropTemplate")
 	if not anchorFrame.cascadeWindow then anchorFrame.cascadeWindow = cascadeFrame end
 	cascadeFrame:SetHeight(100)
 	cascadeFrame:SetWidth(100)
@@ -139,7 +139,7 @@ local CreateWindow = function(windowName, windowType)
 		_G[windowName]:Hide()
 		_G[windowName] = nil
 	end
-	local window = CreateFrame("FRAME", windowName, UIParent)
+	local window = CreateFrame("FRAME", windowName, UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	window:SetMovable(true)
 	window:SetToplevel(true)
 	window:EnableMouse(true)
