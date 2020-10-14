@@ -2,7 +2,7 @@ local addonTable = select(2, ...)
 local L = addonTable.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
-local GetQuestInfo = C_QuestLog.GetQuestInfo
+local GetQuestInfo = C_QuestLog.GetTitleForQuestID
 local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local MaxQuestNameRetry = 10
