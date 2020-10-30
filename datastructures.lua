@@ -19,6 +19,19 @@ local function determineVisibility(tbl)
 		-- if no children are visible, then the panel doesn't need to be shown
 		return false
 	else
+		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
+		if not optionIgnoreRaces and tbl.races then
+			if type(tbl.races) == 'table' then
+				local matched = false
+				for i=1,#tbl.races do
+					if tbl.races[i] == addonTable.playerData.race then matched = true break end
+				end
+				if not matched then return false end
+			else
+				return tbl.races == addonTable.playerData.faction or tbl.races == addonTable.playerData.race
+			end
+		end
+	
 		local optionShowCollected = false -- TODO: replace with addon setting when the settings panel is written
 		-- if the object has already been collected and the user has chosen not to show collected items, then don't show the object
 		if tbl.collected and not optionShowCollected then
