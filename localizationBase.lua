@@ -1,4 +1,4 @@
-MasterCollector = select(2,...)
+local MasterCollector = select(2,...)
 MasterCollector.L = {}
 
 -- panel info

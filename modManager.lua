@@ -1,10 +1,11 @@
-local MasterCollector = select(2,...)
+MasterCollector = select(2,...)	-- Intentionally made non-local
 
 --------------------
 -- Event Handling --
 --------------------
 local eventFrame = CreateFrame("FRAME", "MasterCollectorEventFrame", UIParent)
 eventFrame.events = {}
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:SetScript("OnEvent", function(self, event, ...)
 	if eventFrame.events[event] then
 		-- each event can have multiple handlers due to modules, so we want to fire each handler
@@ -15,6 +16,19 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
+eventFrame.events.PLAYER_ENTERING_WORLD = function()
+	MasterCollector.playerData = {
+		class = select(3, UnitClass("player")),
+		race = select(3, UnitRace("player")),
+	}
+	-- set a faction identifier. We translate blizzard's english code value to a number to compare against faction-level race restrictions
+	local factionCode = select(1, UnitFactionGroup("player"))
+	if factionCode == 'Horde' then
+		MasterCollector.playerData.faction = -2
+	elseif factionCode == 'Alliance' then
+		MasterCollector.playerData.faction = -1
+	end
+end
 function MasterCollector:UnregisterEvent(event, func)
 	if eventFrame.events[event] then
 		if type(eventFrame.events[event]) == 'table' then
