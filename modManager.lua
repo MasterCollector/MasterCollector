@@ -49,7 +49,7 @@ function MasterCollector:RegisterModuleEvents(events)
 			eventFrame.events[k] = {}
 			eventFrame:RegisterEvent(k)
 		end
-		eventFrame.events[k] = v
+		table.insert(eventFrame.events[k],v)
 	end
 end
 function MasterCollector:FlagModAsLoaded(modName)
