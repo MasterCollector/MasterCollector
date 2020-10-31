@@ -83,6 +83,7 @@ addonTable.structs.pet = {
 			self.npcID = npcID
 			self.icon = icon
 			self.loaded = true
+			self.collected = C_PetJournal.GetNumCollectedInfo(self.id) > 0
 		end
 		if key == "visible" then
 			return determineVisibility(self)

@@ -5,7 +5,7 @@ if mod then
 	local GetNumPetsOwned = C_PetJournal.GetNumPets
 	MasterCollector:InitializeDatabases(mod)
 	
-	local function loadCollectedStates()
+	local function reloadCollectedStates()
 		for id in pairs(mod.DB.pet) do
 			rawset(mod.DB.pet[id], 'collected', C_PetJournal.GetNumCollectedInfo(id) > 0)
 		end
@@ -22,7 +22,6 @@ if mod then
 	-- During the login/reload process, pets appear to be available after the first SPELLS_CHANGED event fires. We don't need to listen to it after its first run
 	events.SPELLS_CHANGED = function()
 		MasterCollector:UnregisterEvent('SPELLS_CHANGED', events.SPELLS_CHANGED)
-		loadCollectedStates()
 		MasterCollector:FlagModAsLoaded("Pets")
 		numPetsOwned = select(2, GetNumPetsOwned())
 	end
@@ -30,7 +29,7 @@ if mod then
 		-- we can't use C_PetJournal.GetPetInfoByPetID here because it depends on the pet being in your journal
 		-- since it isn't in the journal anymore, we have no choice but to scan the pets you do know to update the collected states
 		numPetsOwned = select(2, GetNumPetsOwned())
-		loadCollectedStates()
+		reloadCollectedStates()
 		MasterCollector:RefreshWindows()
 	end
 	events.PET_JOURNAL_LIST_UPDATE = function()
@@ -39,7 +38,7 @@ if mod then
 		-- check if the number of owned pets is less than the last known number of pets. If so, that means we lost a pet somehow and need to refresh
 		if numPetsOwned and nowNumPetsOwned < numPetsOwned then
 			numPetsOwned = nowNumPetsOwned
-			loadCollectedStates()
+			reloadCollectedStates()
 			MasterCollector:RefreshWindows()
 		end
 	end
