@@ -68,7 +68,7 @@ pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 			else
 				rawset(quest, 'text', string.format(L.Text.QUEST_PENDING_NAME, questID))
 			end
-			MasterCollector:RefreshWindows()
+			MasterCollector:RefreshWindows(true)
 		end
 	end
 end)

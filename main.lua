@@ -395,27 +395,31 @@ local CreateWindow = function(windowName, windowType)
 		dataArea.data = dataTable
 		fnt:SetText(title)
 		scrollbar:SetValue(0)
+		window.Sort()
+	end
+	
+	local function sortData(dataSet)
+		local sortedSet = {}
+		-- sort the current dataSet keys
+		local keys={}
+		for k in pairs(dataSet or {}) do keys[#keys+1]=k end
+		table.sort(keys, function(a,b) return dataSet[a].text < dataSet[b].text end)
+		-- rebuild the data as a sorted set
+		for idx,key in pairs(keys) do
+			sortedSet[idx] = dataSet[key]
+			-- if the dataset for the given key has children, then we want to run the sort on the child set too
+			if dataSet[key].children then
+				sortedSet[idx].children = sortData(dataSet[key].children)
+			end
+		end
+		return sortedSet
+	end
+	window.Sort = function()
+		dataArea.data = sortData(dataArea.data)
 		window.Refresh()
 	end
 	
 	return window
-end
-
-local function sortData(dataSet)
-    local sortedSet = {}
-    -- sort the current dataSet keys
-    local keys={}
-    for k in pairs(dataSet) do keys[#keys+1]=k end
-    table.sort(keys, function(a,b) return dataSet[a].text < dataSet[b].text end)
-    -- rebuild the data as a sorted set
-    for idx,key in pairs(keys) do
-        sortedSet[idx] = dataSet[key]
-        -- if the dataset for the given key has children, then we want to run the sort on the child set too
-        if dataSet[key].children then
-            sortedSet[idx].children = sortData(dataSet[key].children)
-        end
-    end
-    return sortedSet
 end
 
 -- create a panel cache from the localization file
@@ -453,7 +457,6 @@ local function GetCurrentZoneData()
 			end
 		end
 	end
-	data = sortData(data)
 	return mapID, data
 end
 
@@ -474,7 +477,10 @@ function MasterCollector:Start()
 end
 
 -- temporary function. This should find its way into a frame manager script
-function MasterCollector:RefreshWindows()
+function MasterCollector:RefreshWindows(resort)
 	local currentZoneWindow = _G["MasterCollectorCurrentZone"]
-	if currentZoneWindow then currentZoneWindow.Refresh() end
+	if currentZoneWindow then
+		if resort then currentZoneWindow.Sort() end
+		currentZoneWindow.Refresh()
+	end
 end
