@@ -2,10 +2,9 @@ local addonTable = select(2, ...)
 local L = addonTable.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
-local GetQuestInfo = C_QuestLog.GetTitleForQuestID
+local GetQuestTitle = C_QuestLog.GetTitleForQuestID
 local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
-local MaxQuestNameRetry = 10
 
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
@@ -41,20 +40,46 @@ local function determineVisibility(tbl)
 	
 	return true
 end
-local function GetQuestName(questID)
-	local name = GetQuestInfo(questID)
-	if not name then
-		-- TODO: this can be improved. When RequestLoadQuestByID is called, the QUEST_DATA_LOAD_RESULT event fires with two args: questID, success.
-		--       shortly after receiving the QUEST_DATA_LOAD_RESULT event, QUEST_LOG_UPDATE fires indicating the name is now available
-		RequestLoadQuestByID(questID)
-		for i=1,MaxQuestNameRetry do
-			name = GetQuestInfo(questID)
-			if name then return name end
-		end
-		return 'Quest #' .. questID
+
+
+-- set a background frame that listens to load requests for quest data
+local pendingQuestTitles = CreateFrame("FRAME", 'MasterCollectorQuestTitleQueueFrame', UIParent)
+pendingQuestTitles.data = {}
+pendingQuestTitles.AddPendingQuestTitle = function(questData)
+	if not pendingQuestTitles.data[questData.id] then
+		questData.text = SEARCH_LOADING_TEXT
+		RequestLoadQuestByID(questData.id)
+		pendingQuestTitles.data[questData.id] = questData
 	end
-	return name
 end
+pendingQuestTitles:RegisterEvent("QUEST_DATA_LOAD_RESULT")
+pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
+	-- Once blizzard returns the quest data, we can inspect the result to see if it's a valid entry or not
+	-- Quests that have a nil or false "success" return tell us that either blizzard has removed the quest completely OR
+	--   the quest itself doesn't have a name (e.g. tracking quests). 
+	if event == "QUEST_DATA_LOAD_RESULT" then
+		local questID, success = ...
+		-- Only handle quest load results for the ones we're waiting on a response for
+		if pendingQuestTitles.data[questID] then
+			local quest = pendingQuestTitles.data[questID]
+			pendingQuestTitles.data[questID] = nil
+			if success then
+				rawset(quest, 'text', GetQuestTitle(questID))
+			else
+				rawset(quest, 'text', string.format(L.Text.QUEST_PENDING_NAME, questID))
+			end
+			MasterCollector:RefreshWindows()
+		end
+	end
+end)
+-- If the client has already cached the quest name, GetQuestTitle returns immediately. If it doesn't set a name, add the quest to the queue so it can be loaded in the background
+local function TrySetQuestName(questData)
+	rawset(questData, 'text', GetQuestTitle(questData.id))
+	if not rawget(questData, 'text') then
+		pendingQuestTitles.AddPendingQuestTitle(questData)
+	end
+end
+
 
 -- All metatables describing data structures should be added below
 addonTable.structs = {}
@@ -95,7 +120,7 @@ addonTable.structs.pet = {
 addonTable.structs.quest = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
-			self.text = GetQuestName(self.id)
+			TrySetQuestName(self)
 			self.icon = "Interface\\gossipframe\\availablequesticon" -- TODO: temporary
 			self.loaded = true
 		end

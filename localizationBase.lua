@@ -2,6 +2,9 @@ local MasterCollector = select(2,...)
 MasterCollector.L = {}
 
 -- panel info
+MasterCollector.L.Text = {
+	QUEST_PENDING_NAME = LOOT_JOURNAL_LEGENDARIES_SOURCE_QUEST .. ' #%d' -- Using a known global constant here will auto-translate. Not the best key but it works
+}
 MasterCollector.L.Panels = {
 	["pet"] = {
 		text = AUCTION_CATEGORY_BATTLE_PETS,
