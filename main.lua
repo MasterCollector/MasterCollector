@@ -437,7 +437,7 @@ local function GetClosestZoneMapFromMapID(mapID)
 end
 
 local function GetCurrentZoneData()
-	local mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player")) -- TODO: this won't work if you're logging in from a sub-map. Need to determine the parent zone map instead. May be able to do this exclusively with API calls
+	local mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player"))
 	local data, workingItem = {}
 	for mod,modTable in pairs(MasterCollector.Modules) do
 		if modTable.mapData and modTable.mapData[mapID] then
