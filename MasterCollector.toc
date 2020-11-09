@@ -3,7 +3,7 @@
 ## Title: Master Collector
 ## Notes: Tracks collection completion
 ## Version: 0.0.1
-## SavedVariables: MCAppearanceHarvestData
+## SavedVariables: MCItemHarvestData
 
 localizationBase.lua
 

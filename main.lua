@@ -1,35 +1,61 @@
 local MasterCollector = select(2,...)
 
 MasterCollector.harvest = function()
-	MCAppearanceHarvestData = {}
 	local TMogGetItemInfo = C_TransmogCollection.GetItemInfo
+	local GetItemInfo = GetItemInfo
 	local items = {}
-	local modIDs = {
-	   0,	-- no mods
-	   1,	-- normal dungeon
-	   2,	-- heroic dungeon
-	   3,	-- normal raid
-	   4,	-- lfr raid
-	   5,	-- heroic raid
-	   6,	-- mythic raid
-	   22,	-- timewalking
-	   23	-- 'mythic dungeon'
-	}
-	for itemID=1,180784,1--175000,175100,1--1,178015,1
+	local minModID = 0   -- default appearance
+	local maxModID = 156 -- covenants
+	local pendingCounter = 0
+	print('[MasterCollector] Harvesting all items with appearances...')
+	for itemID=1,185000,1
 	do
-	   local id,_,_,loc,_,classID,subclassID = GetItemInfoInstant(itemID)
-	   if id and (classID == 4 or (classID == 2 and (subclassID ~= 0 and subclassID ~= 11))) then
-		  for idx=1,#modIDs,1 do
-			 local appearanceID,sourceID = TMogGetItemInfo(itemID, modIDs[idx])
-			 if appearanceID then
-				if not items[itemID] then items[itemID] = {} end
-				table.insert(items[itemID], { modIDs[idx], appearanceID, sourceID})
-			 end
-		  end
-	   end
+		local id,_,_,loc,_,classID,subclassID = GetItemInfoInstant(itemID)
+		-- if the itemID exists and (is weapon OR (is armor and not a trinket/ring/neck/etc or relic))
+		if id and (classID == 2 or (classID == 4 and(subclassID ~= 0 and subclassID ~= 11))) then
+			local item = Item:CreateFromItemID(id)
+			-- it must be a valid itemID. the item mixin will tell us this easily
+			if not item:IsItemEmpty() then
+				pendingCounter = pendingCounter + 1
+				item:ContinueOnItemLoad(function()
+						local name,_,rarity,_,_,_,_,_,_,_,_,_,_,bindType = GetItemInfo(id)
+						-- don't care about grey or white quality items. they don't grant appearances so they aren't worth going further
+						if (rarity or 0) > 1 then
+							for mod=minModID,maxModID,1 do
+								local appearanceID,sourceID = TMogGetItemInfo(itemID, mod)
+								if appearanceID then
+									if not items[itemID] then
+										local itemData = {}
+										itemData.name = name
+										itemData.rarity = rarity
+										itemData.bindType = bindType
+										itemData.classID = classID
+										itemData.subclassID = subclassID
+										itemData.appearanceData = {}
+										items[itemID] = itemData
+									end
+									table.insert(items[itemID].appearanceData, { mod, appearanceID, sourceID})
+								end
+							end
+						end
+						pendingCounter = pendingCounter - 1
+				end)
+			end
+		end
 	end
-	MCAppearanceHarvestData = items
-	print('Appearance data has been collected. /reload or close your client and inspect SavedVariables for the collected data.')
+	MCItemHarvestData = items
+	-- Output to chat window as progress is made. Since it can take a few seconds for harvesting to finish, this makes it a bit more clear when it's safe to refresh/logout
+	local function pendingItemCheck()
+		print('[MasterCollector] Items remaining: ' .. pendingCounter)
+		if pendingCounter > 0 then
+			C_Timer.After(1, function()
+				pendingItemCheck()
+			end)
+		else
+			print('[MasterCollector] Item and appearance data has been collected. /reload or close your client and inspect SavedVariables for the collected data.')
+		end
+	end
+	pendingItemCheck()
 end
 
 ---------------------
