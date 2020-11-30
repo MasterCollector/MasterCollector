@@ -100,6 +100,21 @@ addonTable.structs.panel = {
 		end
 	end
 }
+addonTable.structs.ach = {
+	__index = function(self, key)
+		if key == "text" then
+			return select(2, GetAchievementInfo(self.id)) or 'Achievement #' .. self.id
+		elseif key == "visible" then
+			return determineVisibility(self)
+		elseif key == "collected" then
+			return select(4, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
+		elseif key == "icon" then
+			return select(10, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
+		else
+			return rawget(self, key)
+		end
+	end
+}
 addonTable.structs.pet = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
