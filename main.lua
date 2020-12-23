@@ -102,6 +102,7 @@ function MasterCollector:Start()
 		currentZoneWindow = MasterCollector.Window:New("MasterCollectorCurrentZone", "currentZone")
 	end
 	local mapID, data = GetCurrentZoneData()
+	if not mapID then return end
 	currentZoneWindow:SetTitle(((mapID and C_Map.GetMapInfo(mapID).name) or "UNKNOWN MAP" ) .. ' ('..mapID..')')
 	currentZoneWindow:SetData(data, true)
 	-- temporary data preload here
