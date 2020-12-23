@@ -115,6 +115,15 @@ addonTable.structs.ach = {
 		end
 	end
 }
+addonTable.structs.map = {
+	__index = function(self, key)
+		if key == "visible" then
+			return true
+		else
+			return rawget(self, key)
+		end
+	end
+}
 addonTable.structs.pet = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then

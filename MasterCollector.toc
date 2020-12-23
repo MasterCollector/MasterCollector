@@ -4,6 +4,7 @@
 ## Notes: Tracks collection completion
 ## Version: 0.0.1
 ## SavedVariables: MCItemHarvestData
+## SavedVariablesPerCharacter: MCGathererDataPC
 
 localizationBase.lua
 
@@ -21,3 +22,6 @@ modules/quests/data.lua
 modules/quests/module.lua
 modules/treasures/data.lua
 modules/treasures/module.lua
+
+# OMIT_BELOW
+devtools.lua

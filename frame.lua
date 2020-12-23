@@ -366,7 +366,9 @@ function Window:Refresh()
 		if self.data and visibleDataEntries > 0 then
 			renderRowData(self.data)
 		else
-			DrawRow(self.displayFrame.dataArea.rows[1], {type="textonly",text='No collectible things found for this area.'})
+			if self.type ~= "debug" then
+				DrawRow(self.displayFrame.dataArea.rows[1], {type="textonly",text='No collectible things found for this area.'})
+			end
 		end
 		self.refreshing = false
 	end
