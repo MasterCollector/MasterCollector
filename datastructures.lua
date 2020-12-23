@@ -88,7 +88,7 @@ addonTable.structs.panel = {
 		if key == "text" then
 			return L.Panels[self.id].text
 		elseif key == "icon" then
-			return L.Panels[self.id].icon
+			return (L.Panels[self.id] and L.Panels[self.id].icon) or nil
 		elseif key == "txcoord" then
 			return L.Panels[self.id].txcoord
 		elseif key == "type" then
