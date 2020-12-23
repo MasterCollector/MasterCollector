@@ -3,6 +3,36 @@ local debugWindow = MasterCollector.Window:New("MasterCollectorHarvester", "debu
 local function SaveDebugData()
 	MCGathererDataPC = debugWindow.data
 end
+local function CreateMap(id, name)
+	local mapPanel = {
+		id = id,
+		text = (name or "Unknown Map") .. " (" .. id .. ")",
+		type = "map",
+		children = {},
+		expanded = true
+	}
+	setmetatable(mapPanel, MasterCollector.structs.map)
+	return mapPanel
+end
+local function FindMapOrParent(mapID)
+	if debugWindow.data[mapID] then
+		return debugWindow.data[mapID]
+	end
+	local parent
+	local mapInfo = C_Map.GetMapInfo(mapID)
+	if (mapInfo.mapType == 3 or mapInfo.mapType == 5) and mapInfo.parentMapID then
+		parent = FindMapOrParent(mapInfo.parentMapID)
+	end
+	if parent then
+		if parent.children[mapID] then
+			return parent.children[mapID]
+		end
+		parent.children[mapID] = CreateMap(mapID, mapInfo.name)
+		return parent.children[mapID]
+	end
+	debugWindow.data[mapID] = CreateMap(mapID, mapInfo.name)
+	return debugWindow.data[mapID]
+end
 
 local events = {}
 -- LOOT_OPENED works for treasures since they contain loot, but it doesn't work for non-loot treasures
@@ -19,6 +49,12 @@ end
 events.QUEST_DETAIL = function(questStartItemID)
 	local questID = GetQuestID()
 	if questID == 0 then return end
+	local quest = {
+		id = questID,
+		visible = true,
+		type = "quest"
+	}
+	setmetatable(quest, MasterCollector.structs.quest)
 	local npc = "questnpc"
 	local guid = UnitGUID(npc)
 	if not guid then
@@ -36,11 +72,23 @@ events.QUEST_DETAIL = function(questStartItemID)
 	
 	if type and npc_id then
 		print('Granted by ' .. UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')')
+		quest.provider = UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')'
 	end
 	
 	local posX, posY = C_Map.GetPlayerMapPosition(C_Map.GetBestMapForUnit("player"), "player"):GetXY()
 	if posX and posY then
 		print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')')
+		quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')'
+	end
+	local mapID = C_Map.GetBestMapForUnit("player")
+	if mapID then
+		local map = FindMapOrParent(mapID)
+		if map then
+			-- TODO: detect and prevent duplicates
+			table.insert(map.children, quest)
+			SaveDebugData()
+			debugWindow:Refresh()
+		end
 	end
 end
 -- quests that immediately show the completion window (e.g. companion/follower quests) skip QUEST_DETAIL and only fire QUEST_COMPLETE
@@ -61,38 +109,6 @@ end
 events.ZONE_CHANGED_NEW_AREA = function()
 	local mapID = C_Map.GetBestMapForUnit("player")
 	if not mapID then return end
-	
-	local function CreateMap(id, name)
-		local mapPanel = {
-			id = id,
-			text = (name or "Unknown Map") .. " (" .. id .. ")",
-			type = "map",
-			children = {},
-			expanded = true
-		}
-		setmetatable(mapPanel, MasterCollector.structs.map)
-		return mapPanel
-	end
-	local function FindMapOrParent(mapID)
-		if debugWindow.data[mapID] then
-			return debugWindow.data[mapID]
-		end
-		local parent
-		local mapInfo = C_Map.GetMapInfo(mapID)
-		if (mapInfo.mapType == 3 or mapInfo.mapType == 5) and mapInfo.parentMapID then
-			parent = FindMapOrParent(mapInfo.parentMapID)
-		end
-		if parent then
-			if parent.children[mapID] then
-				return parent.children[mapID]
-			end
-			parent.children[mapID] = CreateMap(mapID, mapInfo.name)
-			return parent.children[mapID]
-		end
-		debugWindow.data[mapID] = CreateMap(mapID, mapInfo.name)
-		return debugWindow.data[mapID]
-	end
-	
 	local mapInfo = C_Map.GetMapInfo(mapID)
 	local parent = FindMapOrParent(mapID)
 	if not parent then
