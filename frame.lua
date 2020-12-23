@@ -10,7 +10,7 @@ local WINDOW_LEFT_MARGIN = 8
 local WINDOW_RIGHT_MARGIN = -8
 local ROW_HEIGHT = 16
 local ICON_WIDTH = 16
-local INDENT_LEVEL_SPACING = 16
+local INDENT_LEVEL_SPACING = 10
 local SCROLLBAR_WIDTH = 18
 
 local Window, Windows = {}, {}
@@ -63,7 +63,7 @@ local function OpenCascadingWindow(anchorFrame)
 	end)
 	cascadeFrame:Show()
 end
-local function CreateRow(container, rowType, indent)
+local function CreateRow(container, rowType)
 	local row = CreateFrame("BUTTON", nil, container)
 	row:SetHeight(ROW_HEIGHT)
 	row:SetPoint("RIGHT", container, "RIGHT")
@@ -72,7 +72,7 @@ local function CreateRow(container, rowType, indent)
 	if knownRows == 0 then
 		row:SetPoint("TOPLEFT", container)
 	else
-		row:SetPoint("TOPLEFT", container.rows[knownRows], "BOTTOMLEFT", INDENT_LEVEL_SPACING * ((indent and 1) or 0), 0)
+		row:SetPoint("TOPLEFT", container.rows[knownRows], "BOTTOMLEFT", 0, 0)
 	end
 	container.rows[knownRows+1]=row
 	
@@ -107,7 +107,7 @@ local function SetExpandedTexture(row, data)
 		row.expandableIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Expand") -- down arrow
 	end
 end
-local function DrawRow(row, data)
+local function DrawRow(row, data, indentSize)
 	row.label:SetText(data.text)
 	if data.icon then
 		row.objectIcon:SetTexture(data.icon)
@@ -120,10 +120,10 @@ local function DrawRow(row, data)
 		end
 		row.objectIcon:Show()
 	end
-	if data.type == "panel" then
+	if data.type == "panel" or data.type == "map" then
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()
-		row.objectIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
+		row.objectIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize or 0)*INDENT_LEVEL_SPACING), 0)
 		row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
 		
 		SetExpandedTexture(row, data)
@@ -343,20 +343,20 @@ function Window:Refresh()
 			scrollbar.ScrollDownButton:Enable()
 		end
 		
-		local function renderRowData(data)
+		local function renderRowData(data, indentLevel)
 			for k,v in pairs(data or {}) do
 				if targetRowCounter > self.maxVisibleRows then return end
 				if v.visible then
 					if skipCounter < offset then
 						skipCounter = skipCounter + 1
 					else
-						DrawRow(self.displayFrame.dataArea.rows[targetRowCounter], v)
+						DrawRow(self.displayFrame.dataArea.rows[targetRowCounter], v, (indentLevel or 0))
 						targetRowCounter = targetRowCounter + 1
 					end
 					
 					-- if the skipped section was an expanded panel, we need to still inspect the children to render their data
 					if v.expanded and v.children then
-						renderRowData(v.children)
+						renderRowData(v.children, (indentLevel or 0) + 1)
 					end
 				end
 			end
