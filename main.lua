@@ -65,6 +65,7 @@ for k,v in pairs(MasterCollector.L.Panels) do
 end
 
 local function GetClosestZoneMapFromMapID(mapID)
+	if not mapID then return end
 	local mapInfo = C_Map.GetMapInfo(mapID)
 	if mapInfo and mapInfo.mapType == 5 and mapInfo.parentMapID then
 		return GetClosestZoneMapFromMapID(mapInfo.parentMapID)
