@@ -33,6 +33,14 @@ local function FindMapOrParent(mapID)
 	debugWindow.data[mapID] = CreateMap(mapID, mapInfo.name)
 	return debugWindow.data[mapID]
 end
+local function ObjectExistsInContainer(container, type, key)
+	for _,v in pairs(container.children or {}) do
+		if v.type == type and v.id == key then
+			return true
+		end
+	end
+	return false
+end
 
 local events = {}
 -- LOOT_OPENED works for treasures since they contain loot, but it doesn't work for non-loot treasures
@@ -86,8 +94,7 @@ events.QUEST_DETAIL = function(questStartItemID)
 	end
 	if mapID then
 		local map = FindMapOrParent(mapID)
-		if map then
-			-- TODO: detect and prevent duplicates
+		if map and not ObjectExistsInContainer(map, quest.type, quest.id) then
 			table.insert(map.children, quest)
 			SaveDebugData()
 			debugWindow:Refresh()
