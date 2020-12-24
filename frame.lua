@@ -11,7 +11,7 @@ local WINDOW_RIGHT_MARGIN = -8
 local ROW_HEIGHT = 16
 local ICON_WIDTH = 16
 local INDENT_LEVEL_SPACING = 10
-local SCROLLBAR_WIDTH = 18
+local SCROLLBAR_WIDTH = 20
 
 local Window, Windows = {}, {}
 Window.__index = Window
@@ -227,6 +227,12 @@ function Window:New(name, type, title)
 	end)
 	window.titleBar.label = titleLabel
 	
+	window.closeButton = CreateFrame("Button", nil, window.titleBar, "UIPanelCloseButton");
+	window.closeButton:SetPoint("TOPRIGHT", window.titleBar, "TOPRIGHT", 4, 3);
+	window.closeButton:SetScript("OnClick", function()
+		wnd:Hide()
+	end);
+	
 	local scrollFrame = CreateFrame('ScrollFrame', name .. 'scrollframe', window)
 	window.scrollFrame = scrollFrame
 	scrollFrame:SetPoint("TOPLEFT", window.titleBar, "BOTTOMLEFT")
@@ -243,7 +249,7 @@ function Window:New(name, type, title)
 	
 	local scrollbar = CreateFrame('Slider', name .. 'scrollBar', scrollFrame, "UIPanelScrollBarTemplate")
 	scrollbar:SetWidth(SCROLLBAR_WIDTH)
-	scrollbar:SetPoint("TOPLEFT", scrollFrame, "TOPRIGHT", -SCROLLBAR_WIDTH, -16)
+	scrollbar:SetPoint("TOPLEFT", scrollFrame, "TOPRIGHT", -SCROLLBAR_WIDTH, -19)
 	scrollbar:SetPoint("BOTTOMRIGHT", grip, "TOPRIGHT", 0, 16)
 	scrollbar:SetValue(0)
 	scrollbar:SetValueStep(1)
@@ -284,7 +290,6 @@ function Window:New(name, type, title)
 				resizing = false
 			end
 	end)
-	
 	
 	wnd.displayFrame = window
 	-- populate the dataArea with the maximum number of visible rows
