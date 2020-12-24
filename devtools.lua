@@ -75,12 +75,15 @@ events.QUEST_DETAIL = function(questStartItemID)
 		quest.provider = UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')'
 	end
 	
-	local posX, posY = C_Map.GetPlayerMapPosition(C_Map.GetBestMapForUnit("player"), "player"):GetXY()
-	if posX and posY then
-		print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')')
-		quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')'
-	end
 	local mapID = C_Map.GetBestMapForUnit("player")
+	local mapPosition = C_Map.GetPlayerMapPosition(mapID, "player")
+	if mapPosition then
+		local posX, posY = mapPosition:GetXY()
+		if posX and posY then
+			quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')'
+			print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')')
+		end
+	end
 	if mapID then
 		local map = FindMapOrParent(mapID)
 		if map then
