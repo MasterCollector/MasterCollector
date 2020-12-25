@@ -79,8 +79,8 @@ events.QUEST_DETAIL = function(questStartItemID)
 	end
 	
 	if type and npc_id then
-		print('Granted by ' .. UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')')
-		quest.provider = UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')'
+		quest.provider = UnitName(npc) .. ' (' .. type .. ': ' .. tonumber(npc_id) .. ')'
+		print('Granted by ' .. UnitName(npc) .. ' (' .. type .. ': ' .. tonumber(npc_id) .. ')')
 	end
 	
 	local mapID = C_Map.GetBestMapForUnit("player")
