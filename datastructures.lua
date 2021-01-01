@@ -1,5 +1,5 @@
-local addonTable = select(2, ...)
-local L = addonTable.L
+local MasterCollector = select(2, ...)
+local L = MasterCollector.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
 local GetQuestTitle = C_QuestLog.GetTitleForQuestID
@@ -23,12 +23,19 @@ local function determineVisibility(tbl)
 			if type(tbl.races) == 'table' then
 				local matched = false
 				for i=1,#tbl.races do
-					if tbl.races[i] == addonTable.playerData.race then matched = true break end
+					if tbl.races[i] == MasterCollector.playerData.race then matched = true break end
 				end
 				if not matched then return false end
 			else
-				return tbl.races == addonTable.playerData.faction or tbl.races == addonTable.playerData.race
+				return tbl.races == MasterCollector.playerData.faction or tbl.races == MasterCollector.playerData.race
 			end
+		end
+		
+		local ignoreLevel = false
+		local lvl = UnitLevel("player")
+		-- the player must be between the min and max level of the object. If either is not defined, compare against a default value
+		if not ignoreLevel and not (lvl >= (tbl.minLevel or 1)) and (lvl <= (tbl.maxLevel or lvl)) then
+			return false
 		end
 	
 		local optionShowCollected = false -- TODO: replace with addon setting when the settings panel is written
@@ -40,7 +47,6 @@ local function determineVisibility(tbl)
 	
 	return true
 end
-
 
 -- set a background frame that listens to load requests for quest data
 local pendingQuestTitles = CreateFrame("FRAME", 'MasterCollectorQuestTitleQueueFrame', UIParent)
@@ -82,8 +88,8 @@ end
 
 
 -- All metatables describing data structures should be added below
-addonTable.structs = {}
-addonTable.structs.panel = {
+MasterCollector.structs = {}
+MasterCollector.structs.panel = {
 	__index = function(self, key)
 		if key == "text" then
 			return L.Panels[self.id].text
@@ -100,7 +106,7 @@ addonTable.structs.panel = {
 		end
 	end
 }
-addonTable.structs.ach = {
+MasterCollector.structs.ach = {
 	__index = function(self, key)
 		if key == "text" then
 			return select(2, GetAchievementInfo(self.id)) or 'Achievement #' .. self.id
@@ -115,7 +121,7 @@ addonTable.structs.ach = {
 		end
 	end
 }
-addonTable.structs.map = {
+MasterCollector.structs.map = {
 	__index = function(self, key)
 		if key == "visible" then
 			return true
@@ -124,7 +130,7 @@ addonTable.structs.map = {
 		end
 	end
 }
-addonTable.structs.pet = {
+MasterCollector.structs.pet = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
 			local name, icon, _, npcID = GetPetInfoBySpeciesID(self.id)
@@ -141,7 +147,7 @@ addonTable.structs.pet = {
 		end
 	end
 }
-addonTable.structs.quest = {
+MasterCollector.structs.quest = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
 			TrySetQuestName(self)
@@ -160,7 +166,7 @@ addonTable.structs.quest = {
 		end
 	end
 }
-addonTable.structs.treasure = {
+MasterCollector.structs.treasure = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
 			self.text = "Treasure " .. self.id
