@@ -102,18 +102,12 @@ function MasterCollector:Start()
 	if not currentZoneWindow then
 		currentZoneWindow = MasterCollector.Window:New("MasterCollectorCurrentZone", "currentZone")
 	end
-	local mapID, data = GetCurrentZoneData()
-	if not mapID then return end
-	currentZoneWindow:SetTitle(((mapID and C_Map.GetMapInfo(mapID).name) or "UNKNOWN MAP" ) .. ' ('..mapID..')')
-	currentZoneWindow:SetData(data, true)
-	-- temporary data preload here
 	currentZoneWindow.displayFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	currentZoneWindow.displayFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 	currentZoneWindow.displayFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
 	currentZoneWindow.displayFrame:RegisterEvent("ZONE_CHANGED")
 	currentZoneWindow.displayFrame:SetScript("OnEvent", function(self, event, ...)
 		-- the current zone list should perform the same initial load as it does with zone map changes
-		-- TODO: add listender for ZONE_CHANGED_INDOOR. check micro zone map, then select parent if exists. This will resolve the 1550-1671 map transition (shadowlands to oribos)
 		if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED" or "ZONE_CHANGED_NEW_AREA" or "ZONE_CHANGED_INDOORS" then
 			local mapID, data = GetCurrentZoneData()
 			if mapID then

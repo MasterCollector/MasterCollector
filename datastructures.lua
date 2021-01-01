@@ -32,9 +32,8 @@ local function determineVisibility(tbl)
 		end
 		
 		local ignoreLevel = false
-		local lvl = UnitLevel("player")
 		-- the player must be between the min and max level of the object. If either is not defined, compare against a default value
-		if not ignoreLevel and not (lvl >= (tbl.minLevel or 1)) and (lvl <= (tbl.maxLevel or lvl)) then
+		if not ignoreLevel and not (MasterCollector.playerData.level >= (tbl.minLevel or 1)) and (MasterCollector.playerData.level <= (tbl.maxLevel or MasterCollector.playerData.level)) then
 			return false
 		end
 	
