@@ -38,6 +38,14 @@ local function determineVisibility(tbl)
 		if not ignoreLevel and not (MasterCollector.playerData.level >= (tbl.minLevel or 1)) and (MasterCollector.playerData.level <= (tbl.maxLevel or MasterCollector.playerData.level)) then
 			return false
 		end
+		
+		-- special requirements inspection
+		if tbl.requirements then
+			local ignoreCovenant = false
+			if not ignoreCovenant and tbl.requirements.covenant and tbl.requirements.covenant ~= MasterCollector.playerData.covenant then
+				return false
+			end
+		end
 	
 		local optionShowCollected = false -- TODO: replace with addon setting when the settings panel is written
 		-- if the object has already been collected and the user has chosen not to show collected items, then don't show the object
