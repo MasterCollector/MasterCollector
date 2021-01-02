@@ -27,7 +27,9 @@ local function determineVisibility(tbl)
 				end
 				if not matched then return false end
 			else
-				return tbl.races == MasterCollector.playerData.faction or tbl.races == MasterCollector.playerData.race
+				if tbl.races == MasterCollector.playerData.faction or tbl.races == MasterCollector.playerData.race then
+					return false
+				end
 			end
 		end
 		
