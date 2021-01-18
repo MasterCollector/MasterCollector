@@ -88,8 +88,8 @@ events.QUEST_DETAIL = function(questStartItemID)
 	if mapPosition then
 		local posX, posY = mapPosition:GetXY()
 		if posX and posY then
-			quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')'
-			print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ')')
+			quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')'
+			print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')')
 		end
 	end
 	if mapID then
