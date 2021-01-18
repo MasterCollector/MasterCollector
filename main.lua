@@ -73,8 +73,10 @@ local function GetClosestZoneMapFromMapID(mapID)
 	return mapInfo.mapID
 end
 
-local function GetCurrentZoneData()
-	local mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player"))
+local function GetCurrentZoneData(mapID)
+	if not mapID then
+		mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player"))
+	end
 	local data, workingItem = {}
 	for mod,modTable in pairs(MasterCollector.Modules) do
 		if modTable.mapData and modTable.mapData[mapID] then
