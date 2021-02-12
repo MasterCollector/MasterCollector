@@ -13,60 +13,13 @@ local ICON_WIDTH = 16
 local INDENT_LEVEL_SPACING = 10
 local SCROLLBAR_WIDTH = 20
 local cascadeFrame
+local MapPins = MasterCollector.MapPins
+
 local Window, Windows = {}, {}
 Window.__index = Window
 MasterCollector.Window = Window
 
-local function CloseCascadeFrame(targetFrame)
-	if targetFrame then
-		if targetFrame.cascadeWindow then
-			CloseCascadeFrame(targetFrame.cascadeWindow)
-		end
-		targetFrame:Hide()
-	end
-end
-local function OpenCascadingWindow(anchorFrame, options)
-	if not cascadeFrame then
-		cascadeFrame = CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame, BackdropTemplateMixin and "BackdropTemplate")
-	end
-	local mouseLeft, mouseTop = GetCursorPosition()
-	
-	cascadeFrame.anchor = anchorFrame
-	cascadeFrame:SetHeight(100)
-	cascadeFrame:SetWidth(100)
-	cascadeFrame:SetPoint("TOPLEFT", 0, 0)
-	cascadeFrame:EnableMouse(true)
-	cascadeFrame:SetFrameLevel(10) -- not a fan of setting an arbitrary level here, but it works
-	
-	local bd = {
-		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-		tile = true,
-		edgeSize = 16,
-		tileSize = 32,
-		insets = {
-			left = 2.5,
-			right = 2.5,
-			top = 2.5,
-			bottom = 2.5
-		}
-	}
-	cascadeFrame:SetBackdrop(bd)
-	cascadeFrame:SetScript("OnLeave", function(self, motion)
-		CloseCascadeFrame(self)
-	end)
-	-- If the frame the mouse goes to isn't the new cascade frame, then we want to close it instead
-	anchorFrame:SetScript("OnLeave", function(s, motion)
-			local frameUnderMouse = GetMouseFocus()
-			if frameUnderMouse ~= cascadeFrame then
-				CloseCascadeFrame(cascadeFrame)
-				anchorFrame.cascadeWindow = nil
-				anchorFrame:SetScript("OnLeave", nil)
-			end
-	end)
-	cascadeFrame:Show()
-end
-local function CreateRow(container, rowType)
+local function CreateRow(container)
 	local row = CreateFrame("BUTTON", nil, container)
 	row:SetHeight(ROW_HEIGHT)
 	row:SetPoint("RIGHT", container, "RIGHT")
@@ -78,7 +31,7 @@ local function CreateRow(container, rowType)
 		row:SetPoint("TOPLEFT", container.rows[knownRows], "BOTTOMLEFT", 0, 0)
 	end
 	container.rows[knownRows+1]=row
-	
+
 	local collectedIcon = row:CreateTexture(nil, "ARTWORK")
 	collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH) -- a texture must have at least a 1x1 size, otherwise no other frames can use it as a setpoint anchor
 	collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
@@ -139,6 +92,11 @@ local function DrawRow(row, data, indentSize)
 				-- TODO: this abomination needs to addressed. If window frame layers change AT ALL, this will break
 				Windows[row:GetParent():GetParent():GetParent():GetName()]:Refresh()
 		end)
+	elseif data.type == "command" then
+		row.collectedIcon:Hide()
+		row.objectIcon:Hide()
+		row.expandableIcon:Hide()
+		row.label:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
 	elseif data.type == "textonly" then
 		row.collectedIcon:Hide()
 		row.objectIcon:Hide()
@@ -164,6 +122,85 @@ local function CountVisibleDataEntries(tbl)
 	end
 	return visibleEntries
 end
+
+local function ProcessWaypointsForData(data, remove)
+	if not data then return end
+	for _,v in pairs(data) do
+		if v.visible then
+			if v.children then ProcessWaypointsForData(v.children, remove) end
+			if remove then
+				MapPins:TryRemoveObjectPins(v)
+			else
+				MapPins:TryMapObject(v)
+			end
+		end
+	end
+end
+
+local function CloseCascadeFrame(targetFrame)
+	if targetFrame then
+		if targetFrame.cascadeWindow then
+			CloseCascadeFrame(targetFrame.cascadeWindow)
+		end
+		targetFrame:Hide()
+	end
+end
+local function OpenCascadingWindow(anchorFrame, options)
+	if not cascadeFrame then
+		cascadeFrame = CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame, BackdropTemplateMixin and "BackdropTemplate")
+		cascadeFrame:EnableMouse(true)
+		cascadeFrame:SetFrameLevel(10) -- not a fan of setting an arbitrary level here, but it works
+		local bd = {
+			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+			tile = true,
+			edgeSize = 16,
+			tileSize = 32,
+			insets = {
+				left = 2.5,
+				right = 2.5,
+				top = 2.5,
+				bottom = 2.5
+			}
+		}
+		cascadeFrame:SetBackdrop(bd)
+		cascadeFrame.rows = {}
+		cascadeFrame:SetScript("OnLeave", function(self, motion)
+			print('cascadeFrame onleave')
+			CloseCascadeFrame(self)
+		end)
+	end
+	
+	cascadeFrame.anchor = anchorFrame
+	cascadeFrame:SetWidth(200)
+	cascadeFrame:SetPoint("TOPLEFT", 0, 0)
+	
+	-- If the frame the mouse goes to isn't the new cascade frame or any of its children, then we want to close it instead
+	anchorFrame:SetScript("OnLeave", function(s, motion)
+			local frameUnderMouse = GetMouseFocus()
+			if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent() ~= cascadeFrame then
+				CloseCascadeFrame(cascadeFrame)
+				anchorFrame.cascadeWindow = nil
+				anchorFrame:SetScript("OnLeave", nil)
+			end
+	end)
+	
+	for k,v in pairs(options or {}) do
+		local row = cascadeFrame.rows[k]
+		if not row then
+			row = CreateRow(cascadeFrame)
+			row:RegisterForClicks("LeftButtonUp")
+			row:EnableMouse(true)
+		end
+		DrawRow(row, v, 0)
+		row:SetScript("OnClick", v.command)
+	end
+	
+	-- need to set height after visible rows were evaluated
+	cascadeFrame:SetHeight(#cascadeFrame.rows*ROW_HEIGHT + 4)
+	cascadeFrame:Show()
+end
+
 function Window:Get(name)
 	return Windows[name]
 end
@@ -225,7 +262,7 @@ function Window:New(name, type, title)
 	window.titleBar:RegisterForClicks("RightButtonUp")
 	window.titleBar:SetScript("OnClick", function(s, button, down)
 			if button == 'RightButton' then
-				OpenCascadingWindow(window.titleBar)
+				OpenCascadingWindow(window.titleBar, window.contextMenuOptions)
 			end
 	end)
 	window.titleBar.label = titleLabel
@@ -279,7 +316,7 @@ function Window:New(name, type, title)
 				resizing = true
 				if newMaxRows > wnd.maxVisibleRows then
 					for i=1, newMaxRows do
-						local row = dataArea.rows[i] or CreateRow(dataArea, "data", false)
+						local row = dataArea.rows[i] or CreateRow(dataArea)
 						row:Show()
 					end
 				elseif newMaxRows < wnd.maxVisibleRows then
@@ -298,8 +335,26 @@ function Window:New(name, type, title)
 	-- populate the dataArea with the maximum number of visible rows
 	wnd.maxVisibleRows = wnd:CalculateMaxVisibleRows()
 	for i=1,wnd.maxVisibleRows do
-		CreateRow(dataArea, "data", false)
+		CreateRow(dataArea)
 	end
+	
+	window.contextMenuOptions = {
+		{
+			text = "Show Waypoints",
+			type = "command",
+			command = function()
+				ProcessWaypointsForData(wnd.data)
+			end,
+		},
+		{
+			text = "Hide Waypoints",
+			type = "command",
+			command = function()
+				ProcessWaypointsForData(wnd.data, true)
+			end,
+		},
+	}
+	
 	Windows[name]=wnd
 	return wnd
 end
