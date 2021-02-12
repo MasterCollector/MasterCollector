@@ -6,12 +6,19 @@
 ## SavedVariables: MCItemHarvestData
 ## SavedVariablesPerCharacter: MCGathererDataPC
 
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\HereBeDragons\HereBeDragons-2.0.lua
+libs\HereBeDragons\HereBeDragons-Pins-2.0.lua
+
 localizationBase.lua
 
 settings.lua
 datastructures.lua
 frame.lua
 main.lua
+mappins.lua
 
 modManager.lua
 modules/core/data.lua
