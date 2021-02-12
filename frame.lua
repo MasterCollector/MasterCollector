@@ -12,7 +12,7 @@ local ROW_HEIGHT = 16
 local ICON_WIDTH = 16
 local INDENT_LEVEL_SPACING = 10
 local SCROLLBAR_WIDTH = 20
-
+local cascadeFrame
 local Window, Windows = {}, {}
 Window.__index = Window
 MasterCollector.Window = Window
@@ -25,13 +25,18 @@ local function CloseCascadeFrame(targetFrame)
 		targetFrame:Hide()
 	end
 end
-local function OpenCascadingWindow(anchorFrame)
-	local cascadeFrame = anchorFrame.cascadeWindow or CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame, BackdropTemplateMixin and "BackdropTemplate")
-	if not anchorFrame.cascadeWindow then anchorFrame.cascadeWindow = cascadeFrame end
+local function OpenCascadingWindow(anchorFrame, options)
+	if not cascadeFrame then
+		cascadeFrame = CreateFrame("FRAME", anchorFrame:GetName() .. 'CascadeFrame', anchorFrame, BackdropTemplateMixin and "BackdropTemplate")
+	end
+	local mouseLeft, mouseTop = GetCursorPosition()
+	
+	cascadeFrame.anchor = anchorFrame
 	cascadeFrame:SetHeight(100)
 	cascadeFrame:SetWidth(100)
-	cascadeFrame:SetPoint("TOPLEFT", anchorFrame, "TOPRIGHT", -2, 0)
+	cascadeFrame:SetPoint("TOPLEFT", 0, 0)
 	cascadeFrame:EnableMouse(true)
+	cascadeFrame:SetFrameLevel(10) -- not a fan of setting an arbitrary level here, but it works
 	
 	local bd = {
 		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -48,17 +53,15 @@ local function OpenCascadingWindow(anchorFrame)
 	}
 	cascadeFrame:SetBackdrop(bd)
 	cascadeFrame:SetScript("OnLeave", function(self, motion)
-			local frameUnderMouse = GetMouseFocus()
-			if frameUnderMouse ~= anchorFrame then
-				CloseCascadeFrame(self)
-			end
+		CloseCascadeFrame(self)
 	end)
+	-- If the frame the mouse goes to isn't the new cascade frame, then we want to close it instead
 	anchorFrame:SetScript("OnLeave", function(s, motion)
-			-- If the frame the mouse goes to isn't the new cascade frame, then we want to close it instead
-			-- TODO: make this work without depending on a name. It shouldn't be necessary since the anchor frame should know it has a child frame
 			local frameUnderMouse = GetMouseFocus()
-			if not frameUnderMouse:GetName() or (anchorFrame.cascadeWindow and not frameUnderMouse:GetName():find('^MasterCollector.*CascadeFrame.*$')) then
-				CloseCascadeFrame(anchorFrame.cascadeWindow)
+			if frameUnderMouse ~= cascadeFrame then
+				CloseCascadeFrame(cascadeFrame)
+				anchorFrame.cascadeWindow = nil
+				anchorFrame:SetScript("OnLeave", nil)
 			end
 	end)
 	cascadeFrame:Show()
