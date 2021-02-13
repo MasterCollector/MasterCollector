@@ -151,7 +151,7 @@ local function OpenCascadingWindow(anchorFrame, options)
 		cascadeFrame:EnableMouse(true)
 		cascadeFrame:SetFrameLevel(10) -- not a fan of setting an arbitrary level here, but it works
 		local bd = {
-			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+			bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
 			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 			tile = true,
 			edgeSize = 16,
@@ -166,19 +166,24 @@ local function OpenCascadingWindow(anchorFrame, options)
 		cascadeFrame:SetBackdrop(bd)
 		cascadeFrame.rows = {}
 		cascadeFrame:SetScript("OnLeave", function(self, motion)
-			print('cascadeFrame onleave')
 			CloseCascadeFrame(self)
 		end)
+		
+		local optionsFrame = CreateFrame("FRAME", nil, cascadeFrame)
+		optionsFrame:SetPoint("TOPLEFT", cascadeFrame, "TOPLEFT", 3, -3)
+		optionsFrame:SetPoint("BOTTOMRIGHT", cascadeFrame, "BOTTOMRIGHT", -3, 3)
+		optionsFrame.rows = {}
+		cascadeFrame.optionsFrame = optionsFrame
 	end
 	
 	cascadeFrame.anchor = anchorFrame
 	cascadeFrame:SetWidth(200)
 	cascadeFrame:SetPoint("TOPLEFT", 0, 0)
-	
+
 	-- If the frame the mouse goes to isn't the new cascade frame or any of its children, then we want to close it instead
 	anchorFrame:SetScript("OnLeave", function(s, motion)
 			local frameUnderMouse = GetMouseFocus()
-			if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent() ~= cascadeFrame then
+			if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent():GetParent() ~= cascadeFrame then
 				CloseCascadeFrame(cascadeFrame)
 				anchorFrame.cascadeWindow = nil
 				anchorFrame:SetScript("OnLeave", nil)
@@ -186,9 +191,9 @@ local function OpenCascadingWindow(anchorFrame, options)
 	end)
 	
 	for k,v in pairs(options or {}) do
-		local row = cascadeFrame.rows[k]
+		local row = cascadeFrame.optionsFrame.rows[k]
 		if not row then
-			row = CreateRow(cascadeFrame)
+			row = CreateRow(cascadeFrame.optionsFrame)
 			row:RegisterForClicks("LeftButtonUp")
 			row:EnableMouse(true)
 		end
@@ -197,7 +202,7 @@ local function OpenCascadingWindow(anchorFrame, options)
 	end
 	
 	-- need to set height after visible rows were evaluated
-	cascadeFrame:SetHeight(#cascadeFrame.rows*ROW_HEIGHT + 4)
+	cascadeFrame:SetHeight(#cascadeFrame.optionsFrame.rows*ROW_HEIGHT + 6)
 	cascadeFrame:Show()
 end
 
