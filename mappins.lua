@@ -10,7 +10,6 @@ local minimapParent = Minimap
 local worldMapOverlay
 
 do
-	print(WorldMapFrame.BorderFrame)
 	worldMapOverlay = CreateFrame("FRAME", "MCOverlay", WorldMapFrame.BorderFrame)
 	worldMapOverlay:SetFrameStrata("HIGH")
 	worldMapOverlay:SetFrameLevel(100)
