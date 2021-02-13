@@ -183,7 +183,7 @@ local function OpenCascadingWindow(anchorFrame, options)
 	-- If the frame the mouse goes to isn't the new cascade frame or any of its children, then we want to close it instead
 	anchorFrame:SetScript("OnLeave", function(s, motion)
 		local frameUnderMouse = GetMouseFocus()
-		if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent():GetParent() ~= cascadeFrame then
+		if frameUnderMouse ~= cascadeFrame and frameUnderMouse ~= cascadeFrame.optionsFrame and frameUnderMouse:GetParent() ~= cascadeFrame.optionsFrame then
 			CloseCascadeFrame(cascadeFrame)
 			anchorFrame.cascadeWindow = nil
 			anchorFrame:SetScript("OnLeave", nil)
