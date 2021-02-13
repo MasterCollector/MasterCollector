@@ -7,6 +7,15 @@ MasterCollector.MapPins = MapPins
 
 local pinFramePool = {}
 local minimapParent = Minimap
+local worldMapOverlay
+
+do
+	print(WorldMapFrame.BorderFrame)
+	worldMapOverlay = CreateFrame("FRAME", "MCOverlay", WorldMapFrame.BorderFrame)
+	worldMapOverlay:SetFrameStrata("HIGH")
+	worldMapOverlay:SetFrameLevel(100)
+	worldMapOverlay:SetAllPoints(true)
+end
 
 function MapPins:TryMapObject(obj)
 	if not obj or not obj.coordinates then return end
@@ -20,12 +29,18 @@ function MapPins:TryMapObject(obj)
 			if not point then
 				point = {}
 				local mm = CreateFrame("BUTTON", nil, minimapParent)
-				mm:SetHeight(16)
-				mm:SetWidth(16)
+				mm:SetSize(16,16)
 				mm.icon = mm:CreateTexture(nil, "OVERLAY")
 				mm.icon:SetPoint("CENTER", 0, 0)
 				mm.icon:SetBlendMode("BLEND")
 				point.mm = mm
+				
+				local wm = CreateFrame("BUTTON", nil, worldMapOverlay)
+				wm:SetSize(16, 16)
+				wm.icon = wm:CreateTexture(nil, "OVERLAY")
+				wm.icon:SetAllPoints()
+				wm.icon:SetBlendMode("BLEND")
+				point.wm = wm
 			end
 			
 			point.x = coord[1] / 100.00
@@ -35,12 +50,13 @@ function MapPins:TryMapObject(obj)
 			
 			if obj.icon then
 				point.mm.icon:SetTexture(obj.icon)
+				point.wm.icon:SetTexture(obj.icon)
 			else 
 				point.mm.icon:SetTexture("Interface\\minimap\\objecticons")
 				point.mm.icon:SetTexCoord(0.875, 1, 0, 0.125)
+				point.wm.icon:SetTexture("Interface\\minimap\\objecticons")
+				point.wm.icon:SetTexCoord(0.875, 1, 0, 0.125)
 			end
-			point.mm.icon:SetHeight(16)
-			point.mm.icon:SetWidth(16)
 			self:SetPin(point)
 		end
 	end
@@ -60,6 +76,7 @@ end
 function MapPins:SetPin(point)
 	if not type(point) == "table" then return end
 	hbdp:AddMinimapIconMap(self, point.mm, point.mapID, point.x, point.y, true, true)
+	hbdp:AddWorldMapIconMap(self, point.wm, point.mapID, point.x, point.y)
 end
 function MapPins:RemovePin(point)
 	hbdp:RemoveMinimapIcon(self, point.mm)
