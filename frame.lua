@@ -182,12 +182,12 @@ local function OpenCascadingWindow(anchorFrame, options)
 
 	-- If the frame the mouse goes to isn't the new cascade frame or any of its children, then we want to close it instead
 	anchorFrame:SetScript("OnLeave", function(s, motion)
-			local frameUnderMouse = GetMouseFocus()
-			if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent():GetParent() ~= cascadeFrame then
-				CloseCascadeFrame(cascadeFrame)
-				anchorFrame.cascadeWindow = nil
-				anchorFrame:SetScript("OnLeave", nil)
-			end
+		local frameUnderMouse = GetMouseFocus()
+		if frameUnderMouse ~= cascadeFrame and frameUnderMouse:GetParent():GetParent() ~= cascadeFrame then
+			CloseCascadeFrame(cascadeFrame)
+			anchorFrame.cascadeWindow = nil
+			anchorFrame:SetScript("OnLeave", nil)
+		end
 	end)
 	
 	for k,v in pairs(options or {}) do
@@ -198,7 +198,10 @@ local function OpenCascadingWindow(anchorFrame, options)
 			row:EnableMouse(true)
 		end
 		DrawRow(row, v, 0)
-		row:SetScript("OnClick", v.command)
+		row:SetScript("OnClick", function()
+			v.command()
+			CloseCascadeFrame(cascadeFrame)
+		end)
 	end
 	
 	-- need to set height after visible rows were evaluated
