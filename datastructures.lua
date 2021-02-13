@@ -160,11 +160,18 @@ MasterCollector.structs.quest = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
 			TrySetQuestName(self)
-			self.icon = "Interface\\gossipframe\\availablequesticon" -- TODO: temporary
 			self.loaded = true
 		end
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "icon" then
+			if self.repeatable then
+				self.icon = "Interface\\gossipframe\\dailyquesticon"
+			else
+				self.icon = "Interface\\gossipframe\\availablequesticon"
+			end
+		elseif key == "repeatable" then
+			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.yearly or self.flags.calling)
 		elseif key == "collected" then
 			if not rawget(self, key) then
 				self.collected = IsQuestComplete(self.id)
