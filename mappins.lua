@@ -79,5 +79,6 @@ function MapPins:SetPin(point)
 end
 function MapPins:RemovePin(point)
 	hbdp:RemoveMinimapIcon(self, point.mm)
+	hbdp:RemoveWorldMapIcon(self, point.wm)
 	table.insert(pinFramePool, point)
 end
