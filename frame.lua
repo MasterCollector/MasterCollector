@@ -463,7 +463,7 @@ function Window:Sort()
 		-- sort the current dataSet keys
 		local keys={}
 		for k in pairs(dataSet or {}) do keys[#keys+1]=k end
-		table.sort(keys, function(a,b) return dataSet[a].text < dataSet[b].text end)
+		table.sort(keys, function(a,b) return (dataSet[a].sortkey or dataSet[a].text) < (dataSet[b].sortkey or dataSet[b].text) end)
 		-- rebuild the data as a sorted set
 		for idx,key in pairs(keys) do
 			sortedSet[idx] = dataSet[key]
