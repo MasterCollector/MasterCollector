@@ -59,6 +59,30 @@ local function determineVisibility(tbl)
 	
 	return true
 end
+local colors = {
+	red = "|cFFFF0000",
+	green = "|cFF00FF00",
+	blue = "|cFF33DAFF",
+}
+local function GetQuestTextColor(obj)
+	if not obj then return end
+	-- Go through requirements first. If they aren't met, we want to render the text as red
+	if obj.minlevel and playerData.level < obj.minlevel then return colors.red end
+	if obj.requirements then
+		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end
+		if obj.requirements.quest then
+			if type(obj.requirements.quest) == "table" then
+				for i=1,#obj.requirements.quest do
+					if not IsQuestComplete(obj.requirements.quest[i]) then return colors.red end
+				end
+			else
+				if not IsQuestComplete(obj.requirements.quest) then return colors.red end
+			end
+		end
+	end
+	-- If requirements are met, now we can color based on other conditions
+	if obj.repeatable then return colors.blue end
+end
 
 -- set a background frame that listens to load requests for quest data
 local QuestNames = setmetatable({}, {
@@ -160,8 +184,15 @@ MasterCollector.structs.quest = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "sortkey" then
+			return QuestNames[self.id]
 		elseif key == "text" then
+			local color = GetQuestTextColor(self)
+			if color then
+				return string.format("%s%s|r", color, QuestNames[self.id])
+			else
 				return QuestNames[self.id]
+			end
 		elseif key == "icon" then
 			if self.repeatable then
 				self.icon = "Interface\\gossipframe\\dailyquesticon"
