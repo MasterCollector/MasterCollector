@@ -199,6 +199,7 @@ MasterCollector.structs.quest = {
 			else
 				self.icon = "Interface\\gossipframe\\availablequesticon"
 			end
+			return self.icon
 		elseif key == "repeatable" then
 			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.yearly or self.flags.calling)
 		elseif key == "collected" then
