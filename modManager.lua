@@ -19,13 +19,11 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 end)
 eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
-		MasterCollector.playerData = {
-			class = select(3, UnitClass("player")),
-			race = select(3, UnitRace("player")),
-			level = UnitLevel("player"),
-			covenant = C_Covenants.GetActiveCovenantID(),
-			renown = C_CovenantSanctumUI.GetRenownLevel(),
-		}
+		MasterCollector.playerData.class = select(3, UnitClass("player"))
+		MasterCollector.playerData.race = select(3, UnitRace("player"))
+		MasterCollector.playerData.level = UnitLevel("player")
+		MasterCollector.playerData.covenant = C_Covenants.GetActiveCovenantID()
+		MasterCollector.playerData.renown = C_CovenantSanctumUI.GetRenownLevel()
 		-- set a faction identifier. We translate blizzard's english code value to a number to compare against faction-level race restrictions
 		local factionCode = select(1, UnitFactionGroup("player"))
 		if factionCode == 'Horde' then

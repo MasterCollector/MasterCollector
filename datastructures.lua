@@ -6,6 +6,9 @@ local GetQuestTitle = C_QuestLog.GetTitleForQuestID
 local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 
+MasterCollector.playerData = {}
+local playerData = MasterCollector.playerData
+
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
 	if tbl.type == "panel" then
