@@ -61,15 +61,24 @@ local function determineVisibility(tbl)
 end
 
 -- set a background frame that listens to load requests for quest data
-local pendingQuestTitles = CreateFrame("FRAME", 'MasterCollectorQuestTitleQueueFrame', UIParent)
-pendingQuestTitles.data = {}
-pendingQuestTitles.AddPendingQuestTitle = function(questData)
-	if not pendingQuestTitles.data[questData.id] then
-		questData.text = SEARCH_LOADING_TEXT
-		RequestLoadQuestByID(questData.id)
-		pendingQuestTitles.data[questData.id] = questData
+local QuestNames = setmetatable({}, {
+	__index = function(self, key)
+		if not rawget(self, key) then
+			local name = GetQuestTitle(key)
+			if not name then
+				RequestLoadQuestByID(key)
+				rawset(self, key, SEARCH_LOADING_TEXT)
+				return SEARCH_LOADING_TEXT
+			else
+				rawset(self, key, name)
+				return name
+			end
+		else
+			return string.format(L.Text.QUEST_PENDING_NAME, key)
+		end
 	end
-end
+})
+local pendingQuestTitles = CreateFrame("FRAME", 'MasterCollectorQuestTitleQueueFrame', UIParent)
 pendingQuestTitles:RegisterEvent("QUEST_DATA_LOAD_RESULT")
 pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 	-- Once blizzard returns the quest data, we can inspect the result to see if it's a valid entry or not
@@ -77,26 +86,14 @@ pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 	--   the quest itself doesn't have a name (e.g. tracking quests). 
 	if event == "QUEST_DATA_LOAD_RESULT" then
 		local questID, success = ...
-		-- Only handle quest load results for the ones we're waiting on a response for
-		if pendingQuestTitles.data[questID] then
-			local quest = pendingQuestTitles.data[questID]
-			pendingQuestTitles.data[questID] = nil
-			if success then
-				rawset(quest, 'text', GetQuestTitle(questID))
-			else
-				rawset(quest, 'text', string.format(L.Text.QUEST_PENDING_NAME, questID))
-			end
-			MasterCollector:RefreshWindows(true)
+		if success then
+			rawset(QuestNames, questID, GetQuestTitle(questID))
+		else
+			rawset(QuestNames, questID, string.format(L.Text.QUEST_PENDING_NAME, questID))
 		end
+		MasterCollector:RefreshWindows(true)
 	end
 end)
--- If the client has already cached the quest name, GetQuestTitle returns immediately. If it doesn't set a name, add the quest to the queue so it can be loaded in the background
-local function TrySetQuestName(questData)
-	rawset(questData, 'text', GetQuestTitle(questData.id))
-	if not rawget(questData, 'text') then
-		pendingQuestTitles.AddPendingQuestTitle(questData)
-	end
-end
 
 
 -- All metatables describing data structures should be added below
@@ -161,12 +158,10 @@ MasterCollector.structs.pet = {
 }
 MasterCollector.structs.quest = {
 	__index = function(self, key)
-		if not rawget(self, "loaded") then
-			TrySetQuestName(self)
-			self.loaded = true
-		end
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "text" then
+				return QuestNames[self.id]
 		elseif key == "icon" then
 			if self.repeatable then
 				self.icon = "Interface\\gossipframe\\dailyquesticon"
