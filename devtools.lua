@@ -1,5 +1,7 @@
 local MasterCollector = MasterCollector
 local debugWindow = MasterCollector.Window:New("MasterCollectorHarvester", "debug", "Data Collector")
+local IsWorldQuest = C_QuestLog.IsWorldQuest
+local IsBonusQuest = C_QuestLog.IsQuestTask
 local function SaveDebugData()
 	MCGathererDataPC = debugWindow.data
 end
@@ -102,7 +104,66 @@ events.QUEST_DETAIL = function(questStartItemID)
 	end
 end
 -- quests that immediately show the completion window (e.g. companion/follower quests) skip QUEST_DETAIL and only fire QUEST_COMPLETE
-events.QUEST_COMPLETE = events.QUEST_DETAIL
+events.QUEST_COMPLETE = function()
+	local questID = GetQuestID()
+	if questID == 0 then return end
+	
+	local mapID = C_Map.GetBestMapForUnit("player")
+	if mapID then
+		local map = FindMapOrParent(mapID)
+		if map and not ObjectExistsInContainer(map, "quest", questID) then
+			local quest = {
+				id = questID,
+				visible = true,
+				type = "quest"
+			}
+			setmetatable(quest, MasterCollector.structs.quest)
+			local npc = "questnpc"
+			local guid = UnitGUID(npc)
+			if not guid then
+				npc = "npc"
+				guid = UnitGUID(npc)
+			end
+			local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid
+			if guid then type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid) end
+			print("QUEST_DETAIL: #" .. questID)
+			
+			-- this condition apparently never happens because questStartItemID is always 0. Not sure if this just a blizzard bug or the event isn't properly documented
+			if questStartItemID and questStartItemID > 0 then
+				print('Started by ItemID: ' .. questStartItemID)
+			end
+			
+			if type and npc_id then
+				quest.provider = UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')'
+				print('Granted by ' .. UnitName(npc) .. ' ('.. tonumber(npc_id) .. ')')
+			end
+			local mapPosition = C_Map.GetPlayerMapPosition(mapID, "player")
+			if mapPosition then
+				local posX, posY = mapPosition:GetXY()
+				if posX and posY then
+					quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')'
+					print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')')
+				end
+			end
+			table.insert(map.children, quest)
+			SaveDebugData()
+			debugWindow:Refresh()
+		end
+	end
+end
+events.QUEST_ACCEPTED = function(questID)
+	if not questID then return end
+	-- if it's a world quest, just print the ID and name so it's easier to tag
+	local mapID = C_Map.GetBestMapForUnit("player")
+	local name = C_TaskQuest.GetQuestInfoByQuestID(questID)
+	if IsWorldQuest(questID) then
+		print('MapID ' .. mapID .. ' World Quest #' .. questID .. ': ' .. name)
+	end
+	if IsBonusQuest(questID) then
+		print('MapID ' .. mapID .. ' Bonus/Task Quest #' .. questID .. ': ' .. name)
+	end
+	
+end
 events.VARIABLES_LOADED = function()
 	debugWindow.data = MCGathererDataPC or {}
 	local function initMetaTables(tbl)
