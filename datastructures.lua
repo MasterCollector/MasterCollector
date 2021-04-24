@@ -201,7 +201,7 @@ MasterCollector.structs.quest = {
 			end
 			return self.icon
 		elseif key == "repeatable" then
-			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.yearly or self.flags.calling)
+			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.yearly or self.flags.calling or self.flags.wq)
 		elseif key == "collected" then
 			if not rawget(self, key) then
 				self.collected = IsQuestComplete(self.id)
