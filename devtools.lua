@@ -44,9 +44,30 @@ local function ObjectExistsInContainer(container, type, key)
 	return false
 end
 
+
+MasterCollector.knownQuestIDs = {}
+local function CheckForNewlyTriggeredQuests()
+	local completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
+	for _,v in pairs(completedQuestIDs) do
+		if not MasterCollector.knownQuestIDs[v] then
+			print('Quest Completed: ' .. v)
+			MasterCollector.knownQuestIDs[v] = true
+		end
+	end
+end
+for _,v in pairs(C_QuestLog.GetAllCompletedQuestIDs()) do
+	MasterCollector.knownQuestIDs[v] = true
+end
+local function SetCheckQuestIDsTimer()
+	CheckForNewlyTriggeredQuests()
+	C_Timer.After(1, SetCheckQuestIDsTimer)
+end
+SetCheckQuestIDsTimer()
+
 local events = {}
 -- LOOT_OPENED works for treasures since they contain loot, but it doesn't work for non-loot treasures
 events.LOOT_OPENED = function()
+	CheckForNewlyTriggeredQuests()
 	local guid = GetLootSourceInfo(1)
 	if guid then
 		local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
@@ -57,6 +78,7 @@ events.LOOT_OPENED = function()
 	end
 end
 events.QUEST_DETAIL = function(questStartItemID)
+	CheckForNewlyTriggeredQuests()
 	local questID = GetQuestID()
 	if questID == 0 then return end
 	local quest = {
@@ -105,6 +127,7 @@ events.QUEST_DETAIL = function(questStartItemID)
 end
 -- quests that immediately show the completion window (e.g. companion/follower quests) skip QUEST_DETAIL and only fire QUEST_COMPLETE
 events.QUEST_COMPLETE = function()
+	CheckForNewlyTriggeredQuests()
 	local questID = GetQuestID()
 	if questID == 0 then return end
 	
@@ -152,6 +175,7 @@ events.QUEST_COMPLETE = function()
 	end
 end
 events.QUEST_ACCEPTED = function(questID)
+	CheckForNewlyTriggeredQuests()
 	if not questID then return end
 	-- if it's a world quest, just print the ID and name so it's easier to tag
 	local mapID = C_Map.GetBestMapForUnit("player")
@@ -165,6 +189,7 @@ events.QUEST_ACCEPTED = function(questID)
 	
 end
 events.VARIABLES_LOADED = function()
+	CheckForNewlyTriggeredQuests()
 	debugWindow.data = MCGathererDataPC or {}
 	local function initMetaTables(tbl)
 		for _,v in pairs(tbl) do
@@ -178,6 +203,7 @@ events.VARIABLES_LOADED = function()
 	debugWindow:Refresh()
 end
 events.ZONE_CHANGED_NEW_AREA = function()
+	CheckForNewlyTriggeredQuests()
 	local mapID = C_Map.GetBestMapForUnit("player")
 	if not mapID then return end
 	local mapInfo = C_Map.GetMapInfo(mapID)
@@ -193,3 +219,30 @@ end
 events.NEW_WMO_CHUNK = events.ZONE_CHANGED_NEW_AREA
 MasterCollector:RegisterModuleEvents(events)
 debugWindow:Show()
+
+--[[
+
+exile's reach:
+59933,59254 - not available for DKs and DHs?
+
+
+q(58882),	-- Triggered after looting white-quality chestpiece. loot controller so they don't drop twice
+q(58883),	-- Triggered after looting white-quality boots. loot controller so they don't drop twice
+q(54928),	-- Triggered after getting 3 holy power and striking Warlord Grimaxe with the first major combat ability. Didn't trigger at all on an alliance priest
+q(58336),	-- Triggered at the same time as 54928. Possibly dialog-related?
+q(55607),	-- Triggered while killing quilboars in Quilboar Briarpatch on an alliance priest. Did not see it trigger as horde
+q(55611),	-- triggered when completing "Message to Base" in Exile's Reach on alliance priest
+q(59610),	-- Triggered after killing Torgok. Loot controller for "Torgok's Reagent Pouch"
+q(59143),	-- Triggered after looting the Runetusk Necklace from ogres in Darkmaul Citadel
+q(59139),	-- Triggered after looting the Spider-Eye Ring from spiders in Hrun's Barrow
+q(60167),	-- Triggered right after Warlord Grimaxe tells Shuja to heal during the Tunk encounter
+q(62547),	-- Triggered after speaking to trainer for What's Your Specialty? quest [Horde]
+q(62548),	-- Triggered after speaking to trainer for What's Your Specialty? quest [Alliance]
+q(62550),	-- Triggered after choosing a specialization for What's Your Specialty? quest [Alliance]
+q(62551),	-- Triggered after choosing a specialization for What's Your Specialty? quest [Horde]
+q(62655),	-- Triggers after you activate your specialization (both NPE and non-NPE characters)
+q(62802),	-- Triggered after going to Stormwind for An End to Beginnings
+q(62803),	-- Triggered after going to Orgrimmar for An End to Beginnings
+q(63012),	-- Triggered after talking to Jaina at docks for The Nation of Kul Tiras
+q(62912),	-- Triggered when flying from Exile's Reach (as Alliance if it matters)
+]]--
