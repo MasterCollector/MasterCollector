@@ -23,13 +23,26 @@ local function determineVisibility(tbl)
 	else
 		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
 		if not optionIgnoreRaces and tbl.races then
+			local matched = false
 			if type(tbl.races) == 'table' then
-				local matched = false
 				for i=1,#tbl.races do
 					if tbl.races[i] == MasterCollector.playerData.race then matched = true break end
 				end
 			else
 				matched = (tbl.races == MasterCollector.playerData.faction or tbl.races == MasterCollector.playerData.race)
+			end
+			if not matched then return false end
+		end
+		
+		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
+		if not optionIgnoreClasses and tbl.classes then
+			local matched = false
+			if type(tbl.classes) == 'table' then
+				for i=1,#tbl.classes do
+					if tbl.classes[i] == MasterCollector.playerData.class then matched = true break end
+				end
+			else
+				matched = tbl.classes == MasterCollector.playerData.class
 			end
 			if not matched then return false end
 		end
