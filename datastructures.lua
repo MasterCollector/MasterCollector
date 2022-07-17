@@ -13,6 +13,7 @@ local function IsLevelRangeMet(obj)
 	return (not obj.minlevel or playerData.level >= obj.minlevel) and (not obj.maxlevel or playerData.level <= obj.maxlevel)
 end
 local function IsRaceOrFactionMet(obj)
+	if not obj.races then return true end
 	if type(obj.races) == 'table' then
 		for i=1,#obj.races do
 			if obj.races[i] == MasterCollector.playerData.race then return true end
