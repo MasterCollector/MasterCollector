@@ -46,12 +46,26 @@ end
 
 
 MasterCollector.knownQuestIDs = {}
+local function IsQuestIDKnown(questID)
+	if not questID then return false end
+	for k,v in pairs(MasterCollector.Modules) do
+		if v.DB.quest and v.DB.quest[questID] then
+			return true
+		end
+	end
+end
+local questFound = 'Quest Completed: %d'
+local questNotFound = 'Quest Completed: %d (Not found in DB)'
 local function CheckForNewlyTriggeredQuests()
 	local completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
 	for _,v in pairs(completedQuestIDs) do
 		if not MasterCollector.knownQuestIDs[v] then
-			print('Quest Completed: ' .. v)
 			MasterCollector.knownQuestIDs[v] = true
+			if IsQuestIDKnown(v) then
+				print(string.format(questFound, v))
+			else
+				print(string.format(questNotFound, v))
+			end
 		end
 	end
 end
@@ -79,7 +93,6 @@ events.LOOT_OPENED = function()
 			if mapPosition then
 				local posX, posY = mapPosition:GetXY()
 				if posX and posY then
-					quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')'
 					print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')')
 				end
 			end
@@ -136,9 +149,9 @@ events.QUEST_DETAIL = function(questStartItemID)
 end
 -- quests that immediately show the completion window (e.g. companion/follower quests) skip QUEST_DETAIL and only fire QUEST_COMPLETE
 events.QUEST_COMPLETE = function()
-	CheckForNewlyTriggeredQuests()
 	local questID = GetQuestID()
 	if questID == 0 then return end
+	MasterCollector.knownQuestIDs[questID] = true
 	
 	local mapID = C_Map.GetBestMapForUnit("player")
 	if mapID then
@@ -182,6 +195,7 @@ events.QUEST_COMPLETE = function()
 			debugWindow:Refresh()
 		end
 	end
+	CheckForNewlyTriggeredQuests()
 end
 events.QUEST_ACCEPTED = function(questID)
 	CheckForNewlyTriggeredQuests()
