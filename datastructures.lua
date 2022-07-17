@@ -35,7 +35,7 @@ local function IsClassMet(obj)
 	end
 end
 local function IsQuestComplete(questID)
-	return MasterCollector.knownQuestIDs[questID] or C_QuestLog_IsQuestComplete(questID)
+	return questID and (MasterCollector.knownQuestIDs[questID] or C_QuestLog_IsQuestComplete(questID))
 end
 local function IsPlayerEligibleForQuestID(questID)
 	local quest
