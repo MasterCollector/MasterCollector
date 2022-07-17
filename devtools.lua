@@ -72,8 +72,17 @@ events.LOOT_OPENED = function()
 	if guid then
 		local type, zero, server_id, instance_id, zone_uid, npc_id, spawn_uid = strsplit("-",guid);
 		if(type == "GameObject") then
-		  local text = GameTooltipTextLeft1:GetText()
-		  print('ObjectID: '..(npc_id or 'UNKNOWN').. ' || ' .. 'Name: ' .. (text or 'UNKNOWN'))
+			local text = GameTooltipTextLeft1:GetText()
+			print('ObjectID: '..(npc_id or 'UNKNOWN').. ' || ' .. 'Name: ' .. (text or 'UNKNOWN'))
+			local mapID = C_Map.GetBestMapForUnit("player")
+			local mapPosition = C_Map.GetPlayerMapPosition(mapID, "player")
+			if mapPosition then
+				local posX, posY = mapPosition:GetXY()
+				if posX and posY then
+					quest.coords = '(' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')'
+					print('Coordinates: (' .. string.format('%.2f', posX * 100) .. ', ' .. string.format('%.2f', posY * 100) .. ', ' .. tostring(mapID) .. ')')
+				end
+			end
 	   end
 	end
 end
