@@ -9,69 +9,8 @@ local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 MasterCollector.playerData = {}
 local playerData = MasterCollector.playerData
 
--- supporting functions for the data structure metatables
-local function determineVisibility(tbl)
-	if tbl.type == "panel" then
-		-- if the panel has no children (should never happen but this is a safety check), don't show it
-		if not tbl.children then return false end
-		-- check all children of the panel. If any of them are visible, then the panel itself must be visible
-		for _,v in pairs(tbl.children) do
-			if determineVisibility(v) then return true end
-		end
-		-- if no children are visible, then the panel doesn't need to be shown
-		return false
-	else
-		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
-		if not optionIgnoreRaces and tbl.races then
-			local matched = false
-			if type(tbl.races) == 'table' then
-				for i=1,#tbl.races do
-					if tbl.races[i] == MasterCollector.playerData.race then matched = true break end
-				end
-			else
-				matched = (tbl.races == MasterCollector.playerData.faction or tbl.races == MasterCollector.playerData.race)
-			end
-			if not matched then return false end
-		end
-		
-		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
-		if not optionIgnoreClasses and tbl.classes then
-			local matched = false
-			if type(tbl.classes) == 'table' then
-				for i=1,#tbl.classes do
-					if tbl.classes[i] == MasterCollector.playerData.class then matched = true break end
-				end
-			else
-				matched = tbl.classes == MasterCollector.playerData.class
-			end
-			if not matched then return false end
-		end
-		
-		local ignoreLevel = false
-		-- the player must be between the min and max level of the object. If either is not defined, compare against a default value
-		if not ignoreLevel and not (MasterCollector.playerData.level >= (tbl.minLevel or 1)) and (MasterCollector.playerData.level <= (tbl.maxLevel or MasterCollector.playerData.level)) then
-			return false
-		end
-		
-		-- special requirements inspection
-		if tbl.requirements then
-			local ignoreCovenant = false
-			if not ignoreCovenant and tbl.requirements.covenant and tbl.requirements.covenant ~= MasterCollector.playerData.covenant then
-				return false
-			end
-		end
-	
-		local optionShowCollected = false -- TODO: replace with addon setting when the settings panel is written
-		-- if the object has already been collected and the user has chosen not to show collected items, then don't show the object
-		if tbl.collected and not optionShowCollected then
-			return false
-		end
-	end
-	
-	return true
-end
-local function IsMinLevelMet(obj)
-	return not obj.minlevel or playerData.level >= obj.minlevel
+local function IsLevelRangeMet(obj)
+	return (not obj.minlevel or playerData.level >= obj.minlevel) and (not obj.maxlevel or playerData.level <= obj.maxlevel)
 end
 local function IsRaceOrFactionMet(obj)
 	if type(obj.races) == 'table' then
@@ -108,6 +47,44 @@ local function IsPlayerEligibleForQuestID(questID)
 	if quest then return IsRaceOrFactionMet(quest) and IsClassMet(quest) end
 	return false
 end
+-- supporting functions for the data structure metatables
+local function determineVisibility(tbl)
+	if tbl.type == "panel" then
+		-- if the panel has no children (should never happen but this is a safety check), don't show it
+		if not tbl.children then return false end
+		-- check all children of the panel. If any of them are visible, then the panel itself must be visible
+		for _,v in pairs(tbl.children) do
+			if determineVisibility(v) then return true end
+		end
+		-- if no children are visible, then the panel doesn't need to be shown
+		return false
+	else
+		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
+		if not optionIgnoreRaces and not IsRaceOrFactionMet(tbl) then return false end
+		
+		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
+		if not optionIgnoreClasses and not IsClassMet(tbl) then return false end
+		
+		local ignoreLevel = false -- TODO: replace with addon setting when the settings panel is written
+		if not ignoreLevel and not IsLevelRangeMet(tbl) then return false end
+		
+		-- special requirements inspection
+		if tbl.requirements then
+			local ignoreCovenant = false
+			if not ignoreCovenant and tbl.requirements.covenant and tbl.requirements.covenant ~= MasterCollector.playerData.covenant then
+				return false
+			end
+		end
+	
+		local optionShowCollected = true -- TODO: replace with addon setting when the settings panel is written
+		-- if the object has already been collected and the user has chosen not to show collected items, then don't show the object
+		if tbl.collected and not optionShowCollected then
+			return false
+		end
+	end
+	
+	return true
+end
 local colors = {
 	red = "|cFFFF0000",
 	green = "|cFF00FF00",
@@ -115,7 +92,7 @@ local colors = {
 }
 local function GetQuestTextColor(obj)
 	if not obj then return end
-	if not IsMinLevelMet(obj) then return colors.red end
+	if not IsLevelRangeMet(obj) then return colors.red end
 	if not IsRaceOrFactionMet(obj) then return colors.red end
 	if not IsClassMet(obj) then return colors.red end
 	-- Go through requirements first. If they aren't met, we want to render the text as red
