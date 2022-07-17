@@ -3,7 +3,7 @@ local L = MasterCollector.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
 local GetQuestTitle = C_QuestLog.GetTitleForQuestID
-local IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
+local C_QuestLog_IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 
 MasterCollector.playerData = {}
@@ -70,6 +70,44 @@ local function determineVisibility(tbl)
 	
 	return true
 end
+local function IsMinLevelMet(obj)
+	return not obj.minlevel or playerData.level >= obj.minlevel
+end
+local function IsRaceOrFactionMet(obj)
+	if type(obj.races) == 'table' then
+		for i=1,#obj.races do
+			if obj.races[i] == MasterCollector.playerData.race then return true end
+		end
+		return false
+	else
+		return obj.races == MasterCollector.playerData.faction or obj.races == MasterCollector.playerData.race
+	end
+end
+local function IsClassMet(obj)
+	if not obj.classes then return true end
+	if type(obj.classes) == 'table' then
+		for i=1,#obj.classes do
+			if obj.classes[i] == MasterCollector.playerData.class then return true end
+		end
+		return false
+	else
+		return obj.classes == MasterCollector.playerData.class or obj.classes == MasterCollector.playerData.class
+	end
+end
+local function IsQuestComplete(questID)
+	return MasterCollector.knownQuestIDs[questID] or C_QuestLog_IsQuestComplete(questID)
+end
+local function IsPlayerEligibleForQuestID(questID)
+	local quest
+	for k,v in pairs(MasterCollector.Modules) do
+		if v.DB and v.DB.quest and v.DB.quest[questID] then
+			quest = v.DB.quest[questID]
+			break
+		end
+	end
+	if quest then return IsRaceOrFactionMet(quest) and IsClassMet(quest) end
+	return false
+end
 local colors = {
 	red = "|cFFFF0000",
 	green = "|cFF00FF00",
@@ -77,17 +115,24 @@ local colors = {
 }
 local function GetQuestTextColor(obj)
 	if not obj then return end
+	if not IsMinLevelMet(obj) then return colors.red end
+	if not IsRaceOrFactionMet(obj) then return colors.red end
+	if not IsClassMet(obj) then return colors.red end
 	-- Go through requirements first. If they aren't met, we want to render the text as red
-	if obj.minlevel and playerData.level < obj.minlevel then return colors.red end
 	if obj.requirements then
 		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end
 		if obj.requirements.quest then
 			if type(obj.requirements.quest) == "table" then
+				local requirementsMet = true
 				for i=1,#obj.requirements.quest do
-					if not IsQuestComplete(obj.requirements.quest[i]) then return colors.red end
+					if not IsQuestComplete(obj.requirements.quest[i]) and IsPlayerEligibleForQuestID(obj.requirements.quest[i]) then
+						requirementsMet = false
+						break;
+					end
 				end
+				if not requirementsMet then return colors.red end
 			else
-				if not IsQuestComplete(obj.requirements.quest) then return colors.red end
+				if not IsQuestComplete(obj.requirements.quest) and IsPlayerEligibleForQuestID(obj.requirements.quest) then return colors.red end
 			end
 		end
 	end
