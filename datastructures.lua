@@ -10,6 +10,8 @@ MasterCollector.playerData = {}
 local playerData = MasterCollector.playerData
 
 local function IsLevelRangeMet(obj)
+	local ignoreLevel = false -- TODO: replace with addon setting when the settings panel is written
+	if ignoreLevel then return true end
 	return (not obj.minlevel or playerData.level >= obj.minlevel) and (not obj.maxlevel or playerData.level <= obj.maxlevel)
 end
 local function IsRaceOrFactionMet(obj)
@@ -65,10 +67,7 @@ local function determineVisibility(tbl)
 		
 		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
 		if not optionIgnoreClasses and not IsClassMet(tbl) then return false end
-		
-		local ignoreLevel = false -- TODO: replace with addon setting when the settings panel is written
-		if not ignoreLevel and not IsLevelRangeMet(tbl) then return false end
-		
+
 		-- special requirements inspection
 		if tbl.requirements then
 			local ignoreCovenant = false
