@@ -3,7 +3,6 @@ local mod = MasterCollector.Modules.Pets
 if mod then
 	local numPetsOwned
 	local GetNumPetsOwned = C_PetJournal.GetNumPets
-	MasterCollector:InitializeDatabases(mod)
 	
 	local function reloadCollectedStates()
 		for id in pairs(mod.DB.pet) do
