@@ -62,7 +62,7 @@ local function CheckForNewlyTriggeredQuests()
 		else
 			if not quest.collected then
 				print(string.format(questFound, v))
-				rawset(MasterCollector.DB.data.quest[v], collected, true)
+				rawset(MasterCollector.DB.data.quest[v], "collected", true)
 				refresh = true
 			end
 		end
