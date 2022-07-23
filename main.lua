@@ -78,25 +78,20 @@ local function GetCurrentZoneData(mapID)
 		mapID = GetClosestZoneMapFromMapID(C_Map.GetBestMapForUnit("player"))
 	end
 	local data, workingItem = {}
-	for mod,modTable in pairs(MasterCollector.Modules) do
-		if modTable.mapData and modTable.mapData[mapID] then
-			for _,entry in pairs(modTable.mapData[mapID]) do
-				local panelID = entry[1]
-				local items = entry[2]
-				for i=1,#items do
-					-- TODO: if the map data has something that isn't in the DB, how should we handle it? ignoring it for now, but this really shouldn't happen so an error message may be more appropriate
-					workingItem = modTable.DB[panelID][items[i]] or nil
-					if workingItem then
-						if not data[panelID] then
-							data[panelID] = setmetatable({id=panelID,children={},expanded=true},MasterCollector.structs.panel)
-						end
-						data[panelID].children[items[i]] = workingItem
-					end
-				end
-			end
+	local mapData = MasterCollector.DB:GetMapMetadata(mapID)
+	for panel, panelData in pairs(mapData) do
+		if not data[panel] then
+			data[panel] = setmetatable({id=panel,children={},expanded=true},MasterCollector.structs.panel)
+		end
+		for id,value in pairs(panelData) do
+			data[panel].children[id] = MasterCollector.DB:GetObjectData(panel, id)
 		end
 	end
+	
 	return mapID, data
+end
+function MasterCollector:MapData(mapID)
+	return GetCurrentZoneData(mapID)
 end
 
 function MasterCollector:Start()

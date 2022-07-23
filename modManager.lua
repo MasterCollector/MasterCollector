@@ -64,10 +64,6 @@ function MasterCollector:FlagModAsLoaded(modName)
 	if MasterCollector.Modules and MasterCollector.Modules[modName] then
 		MasterCollector.Modules[modName].loaded = true
 	end
-	-- do a quick scan of registered modules. If we detect a
-	for mod,modTable in pairs(MasterCollector.Modules) do
-		if not modTable.loaded then return end
-	end
 end
 
 local function LoadPanel(mod, tbl)

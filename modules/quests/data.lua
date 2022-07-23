@@ -2,8 +2,7 @@
 --if true then return end
 local MasterCollector = select(2,...)
 --@GENERATE_HERE@--
-MasterCollector.Modules.Quests={}
-MasterCollector.Modules.Quests.DB={
+local moduleDB={
 	["quest"]={
 		[2]={minlevel=7,races=-2},
 		[23]={coordinates={{40.4,66.4,63}},minlevel=7,races=-2},
@@ -3304,7 +3303,7 @@ MasterCollector.Modules.Quests.DB={
 		[64655]={description="Uncertain of what actually triggers this. Came across as completed on a completely brand new character on a new account",flags={hidden=true}},
 	},
 }
-MasterCollector.Modules.Quests.mapData={
+local mapData={
 	[1]={{"quest",{834,835,840,25165,25167,25168,25169,25170,25171,25173,25176,25177,25178,25179,25187,25188,25190,25192,25193,25194,25195,25196,25205,25206,25227,25232,25236,25256,25257,25258,25259,25260,25261,25262,25263,25267,25648,25924,26806,26807,29690,31012,31570,31571,31572,31830,39698,39801,40518,40522,40605,40607,40760,40982,40983,41002,42484,44281,47867,53777}}},
 	[7]={{"quest",{743,744,749,751,761,770,773,833,6361,6362,11129,14438,14491,20440,20441,24440,24441,24456,24457,24459,24523,24524,24550,26179,26180,26188}}},
 	[10]={{"quest",{844,845,848,850,851,852,855,858,863,865,866,867,869,870,871,872,875,876,877,880,881,887,891,895,899,903,905,4021,5041,6365,6384,9267,13612,13613,13615,13618,13620,13621,13628,13712,13878,13949,13961,13963,13968,13969,13970,13971,13973,13975,13988,13991,13992,13995,13998,13999,14003,14004,14006,14034,14038,14042,14045,14046,14049,14050,14052,14056,14057,14063,14066,14067,14068,14072,14073,26701,26702,26769,26878,29015,29021,29022,29023,29024,29026,29027,29086,29087,29088,29089,29090,29094,29095,29109,29110,29111,29112}}},
@@ -3380,3 +3379,15 @@ MasterCollector.Modules.Quests.mapData={
 	[1917]={{"quest",{59811}}},
 	[1961]={{"quest",{64089}}},
 }
+
+for k,v in pairs(moduleDB) do
+	for id, obj in pairs(v) do
+		MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+	end
+end
+table.wipe(moduleDB)
+
+for k,v in pairs(mapData) do
+	MasterCollector.DB:MergeMapData(k, v)
+end
+table.wipe(mapData)

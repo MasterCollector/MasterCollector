@@ -7,7 +7,7 @@ if mod then
 	-- Set up all the events that this module will use
 	local events = {}
 	events.QUEST_TURNED_IN = function(questID)
-		local quest = mod.DB.quest[questID]
+		local quest = MasterCollector.DB:GetObjectData("quest", questID)
 		if quest then
 			quest.collected = true
 			if quest.coordinates then

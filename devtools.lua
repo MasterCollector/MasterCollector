@@ -45,32 +45,34 @@ local function ObjectExistsInContainer(container, type, key)
 end
 
 
-MasterCollector.knownQuestIDs = {}
 local function IsQuestIDKnown(questID)
-	if not questID then return false end
-	for k,v in pairs(MasterCollector.Modules) do
-		if v.DB.quest and v.DB.quest[questID] then
-			return true
-		end
-	end
+	return questID and MasterCollector.DB:GetObjectData("quest", questID)
 end
+
 local questFound = 'Quest Completed: %d'
 local questNotFound = 'Quest Completed: %d (Not found in DB)'
+local completedQuestIDs = {}
 local function CheckForNewlyTriggeredQuests()
-	local completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
+	completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
+	local refresh, quest = false
 	for _,v in pairs(completedQuestIDs) do
-		if not MasterCollector.knownQuestIDs[v] then
-			MasterCollector.knownQuestIDs[v] = true
-			if IsQuestIDKnown(v) then
+		quest = MasterCollector.DB:GetObjectData("quest", v)
+		if not quest then
+			print(string.format(questNotFound, v))
+		else
+			if not quest.collected then
 				print(string.format(questFound, v))
-			else
-				print(string.format(questNotFound, v))
+				rawset(MasterCollector.DB.data.quest[v], collected, true)
+				refresh = true
 			end
 		end
 	end
+	if refresh then MasterCollector:RefreshWindows() end
+	table.wipe(completedQuestIDs)
 end
 for _,v in pairs(C_QuestLog.GetAllCompletedQuestIDs()) do
-	MasterCollector.knownQuestIDs[v] = true
+	local quest = MasterCollector.DB:GetObjectData("quest", v)
+	if quest then rawset(quest, "collected", true) end
 end
 local function SetCheckQuestIDsTimer()
 	CheckForNewlyTriggeredQuests()
@@ -151,7 +153,6 @@ end
 events.QUEST_COMPLETE = function()
 	local questID = GetQuestID()
 	if questID == 0 then return end
-	MasterCollector.knownQuestIDs[questID] = true
 	
 	local mapID = C_Map.GetBestMapForUnit("player")
 	if mapID then

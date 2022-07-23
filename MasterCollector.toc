@@ -15,6 +15,7 @@ libs\HereBeDragons\HereBeDragons-Pins-2.0.lua
 localizationBase.lua
 
 settings.lua
+database.lua
 datastructures.lua
 mappins.lua
 frame.lua

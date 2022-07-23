@@ -3,7 +3,6 @@ local L = MasterCollector.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
 local GetQuestTitle = C_QuestLog.GetTitleForQuestID
-local C_QuestLog_IsQuestComplete = C_QuestLog.IsQuestFlaggedCompleted
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 
 MasterCollector.playerData = {}
@@ -37,16 +36,11 @@ local function IsClassMet(obj)
 	end
 end
 local function IsQuestComplete(questID)
-	return questID and (MasterCollector.knownQuestIDs[questID] or C_QuestLog_IsQuestComplete(questID))
+	local quest = MasterCollector.DB:GetObjectData("quest", questID)
+	return quest and quest.collected
 end
 local function IsPlayerEligibleForQuestID(questID)
-	local quest
-	for k,v in pairs(MasterCollector.Modules) do
-		if v.DB and v.DB.quest and v.DB.quest[questID] then
-			quest = v.DB.quest[questID]
-			break
-		end
-	end
+	local quest = MasterCollector.DB:GetObjectData("quest", questID)
 	if quest then return IsRaceOrFactionMet(quest) and IsClassMet(quest) end
 	return false
 end
@@ -237,11 +231,6 @@ MasterCollector.structs.quest = {
 			return self.icon
 		elseif key == "repeatable" then
 			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.yearly or self.flags.calling or self.flags.wq)
-		elseif key == "collected" then
-			if not rawget(self, key) then
-				self.collected = IsQuestComplete(self.id)
-			end
-			return self.collected
 		else
 			return rawget(self, key)
 		end
@@ -251,14 +240,14 @@ MasterCollector.structs.treasure = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
 			self.text = "Treasure " .. self.id
-			--self.icon = "Interface\\minimap\\objecticons"
-			--self.txcoord = { left = 0.25, right = 0.25, top = 0.625, bottom = 0.75 }
+			self.icon = "Interface\\minimap\\objecticons"
+			self.txcoord = { left = 0.26953125, right = 0.35546875, top = 0.64453125, bottom = 0.734375 }
 			self.loaded = true
 		end
 		if key == "visible" then
 			return determineVisibility(self)
 		elseif key == "collected" then
-			return IsQuestComplete(self.questID)
+			return IsQuestComplete(self.id)
 		else
 			return rawget(self, key)
 		end
