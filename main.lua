@@ -79,7 +79,7 @@ local function GetCurrentZoneData(mapID)
 	end
 	local data, workingItem = {}
 	local mapData = MasterCollector.DB:GetMapMetadata(mapID)
-	for panel, panelData in pairs(mapData) do
+	for panel, panelData in pairs(mapData or {}) do
 		if not data[panel] then
 			data[panel] = setmetatable({id=panel,children={},expanded=true},MasterCollector.structs.panel)
 		end
