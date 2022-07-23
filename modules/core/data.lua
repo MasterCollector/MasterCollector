@@ -1,6 +1,21 @@
 local MasterCollector = select(2,...)
+local moduleDB, mapData = {}, {}
+local function Process()
+	for k,v in pairs(moduleDB) do
+		for id, obj in pairs(v) do
+			MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+		end
+	end
+	table.wipe(moduleDB)
+
+	for k,v in pairs(mapData) do
+		MasterCollector.DB:MergeMapData(k, v)
+	end
+	table.wipe(mapData)
+end
 --@GENERATE_HERE@--
-local moduleDB={
+MasterCollector.Modules.Core={}
+moduleDB={
 	["ach"]={
 		[33]={races=-1},
 		[34]={races=-1},
@@ -156,7 +171,7 @@ local moduleDB={
 		[14764]={requirements={covenant=4}},
 	},
 }
-local mapData={
+mapData={
 	[1]={{"ach",{728}}},
 	[10]={{"ach",{4933}}},
 	[14]={{"ach",{4896}}},
@@ -278,15 +293,4 @@ local mapData={
 	[1911]={{"ach",{14463,14468,14469,14470,14471,14472,14478,14483,14498,14500,14568,14569,14570,14773,14776,14778,14808,14809}}},
 	[1912]={{"ach",{14754,14755,14759,14760,14795}}},
 }
-
-for k,v in pairs(moduleDB) do
-	for id, obj in pairs(v) do
-		MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
-	end
-end
-table.wipe(moduleDB)
-
-for k,v in pairs(mapData) do
-	MasterCollector.DB:MergeMapData(k, v)
-end
-table.wipe(mapData)
+Process()

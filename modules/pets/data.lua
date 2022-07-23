@@ -1,8 +1,23 @@
 -- TODO: check if pets module is enabled. If not, return immediately
 --if true then return end
 local MasterCollector = select(2,...)
+local moduleDB, mapData = {}, {}
+local function Process()
+	for k,v in pairs(moduleDB) do
+		for id, obj in pairs(v) do
+			MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+		end
+	end
+	table.wipe(moduleDB)
+
+	for k,v in pairs(mapData) do
+		MasterCollector.DB:MergeMapData(k, v)
+	end
+	table.wipe(mapData)
+end
 --@GENERATE_HERE@--
-local moduleDB={
+MasterCollector.Modules.Pets={}
+moduleDB={
 	["pet"]={
 		[69]={description="Only available between 21.December and 20.March."},
 		[411]={description="Only available when it rains on Jaguero Isle."},
@@ -164,7 +179,7 @@ local moduleDB={
 		[56467]={races=-2},
 	},
 }
-local mapData={
+mapData={
 	[1]={{"pet",{418,420,448,466,467,468,635}},{"quest",{31570,31571,31572,31813,31818,31830}}},
 	[7]={{"pet",{378,385,386,477}},{"quest",{31573,31574,31575,31831}}},
 	[10]={{"pet",{386,419,474,631,635,1157}},{"quest",{31814,31819,45083}}},
@@ -297,15 +312,4 @@ local mapData={
 	[1543]={{"pet",{3120}}},
 	[1565]={{"pet",{2919,2924,3021,3080,3081,3082}}},
 }
-
-for k,v in pairs(moduleDB) do
-	for id, obj in pairs(v) do
-		MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
-	end
-end
-table.wipe(moduleDB)
-
-for k,v in pairs(mapData) do
-	MasterCollector.DB:MergeMapData(k, v)
-end
-table.wipe(mapData)
+Process()
