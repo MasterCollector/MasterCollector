@@ -8,13 +8,7 @@ if mod then
 		local quest = MasterCollector.DB:GetObjectData("quest", questID)
 		if quest then
 			quest.collected = true
-			if quest.coordinates then
-				for i=1,#quest.coordinates do
-					if quest.coordinates[i].wp then 
-						Mappins:RemovePin(quest.coordinates[i].wp)
-					end
-				end
-			end
+			Mappins:TryRemoveObjectPins(quest)
 			MasterCollector:RefreshWindows()
 		end
 	end
