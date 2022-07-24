@@ -15,12 +15,41 @@ do
 	worldMapOverlay:SetFrameLevel(100)
 	worldMapOverlay:SetAllPoints(true)
 end
-
+local function GetCoordsOnObject(obj)
+	if not obj then return end
+	if obj.coordinates then return obj.coordinates end
+	if obj.providers then
+		local coords = {}
+		for i=1, #obj.providers do
+			local providerType, id = unpack(obj.providers[i])
+			local provider
+			if providerType == "n" then
+				provider = MasterCollector.DB:GetObjectData("npc", id)
+			elseif providerType == "i" then
+				provider = MasterCollector.DB:GetObjectData("item", id)
+			elseif providerType == "o" then
+				provider = MasterCollector.DB:GetObjectData("object", id)
+			end
+		  
+			if provider then
+				if(type(provider.coordinates[1]) == 'table') then
+					for i=1, #provider.coordinates do
+						table.insert(coords, provider.coordinates[i])
+					end
+				else
+					table.insert(coords, provider.coordinates)
+				end
+			end
+			i = i+1
+		end
+		return coords
+	end
+end
 function MapPins:TryMapObject(obj)
-	if not obj or not obj.coordinates then return end
-	local coord
-	for i=1, #obj.coordinates do
-		coord = obj.coordinates[1]
+	local coords = GetCoordsOnObject(obj)
+	if not coords then return end
+	for i=1, #coords do
+		coord = coords[1]
 		if not coord.wp then
 		-- try to get a frame from the pool first before creating new ones
 			local point = table.remove(pinFramePool)
@@ -61,13 +90,12 @@ function MapPins:TryMapObject(obj)
 	end
 end
 function MapPins:TryRemoveObjectPins(obj)
-	if not obj or not obj.coordinates then return end
-	local coord
-	for i=1, #obj.coordinates do
-		coord = obj.coordinates[1]
-		if coord.wp then
-			MapPins:RemovePin(coord.wp)
-			coord.wp = nil
+	local coords = GetCoordsOnObject(obj)
+	if not coords then return end
+	for i=1, #coords do
+		if coords[i].wp then
+			MapPins:RemovePin(coords[i].wp)
+			coords[i].wp = nil
 		end
 	end
 end
