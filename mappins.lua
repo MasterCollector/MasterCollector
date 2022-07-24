@@ -20,8 +20,10 @@ local function GetCoordsOnObject(obj)
 	if obj.coordinates then return obj.coordinates end
 	if obj.providers then
 		local coords = {}
-		for i=1, #obj.providers do
-			local providerType, id = unpack(obj.providers[i])
+		local providers = obj.providers
+		if obj.providers[1] ~= "table" then providers = {providers} end
+		for i=1, #providers do
+			local providerType, id = unpack(providers[i])
 			local provider
 			if providerType == "n" then
 				provider = MasterCollector.DB:GetObjectData("npc", id)
