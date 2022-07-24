@@ -48,6 +48,9 @@ end
 function MapPins:TryMapObject(obj)
 	local coords = GetCoordsOnObject(obj)
 	if not coords then return end
+	if type(coords[1]) ~= 'table' then
+		coords = {coords}
+	end
 	for i=1, #coords do
 		coord = coords[1]
 		if not coord.wp then
@@ -92,6 +95,9 @@ end
 function MapPins:TryRemoveObjectPins(obj)
 	local coords = GetCoordsOnObject(obj)
 	if not coords then return end
+	if type(coords[1]) ~= 'table' then
+		coords = {coords}
+	end
 	for i=1, #coords do
 		if coords[i].wp then
 			MapPins:RemovePin(coords[i].wp)
