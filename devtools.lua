@@ -59,6 +59,7 @@ local function CheckForNewlyTriggeredQuests()
 		quest = MasterCollector.DB:GetObjectData("quest", v)
 		if not quest then
 			print(string.format(questNotFound, v))
+			MasterCollector.DB.data.quest[v] = {id=v,collected=true}
 		else
 			if not quest.collected then
 				print(string.format(questFound, v))

@@ -5,19 +5,13 @@ if mod then
 	local GetNumPetsOwned = C_PetJournal.GetNumPets
 	
 	local function reloadCollectedStates()
-		for id in pairs(mod.DB.pet) do
-			rawset(mod.DB.pet[id], 'collected', C_PetJournal.GetNumCollectedInfo(id) > 0)
+		for id in pairs(MasterCollector.DB.data.pet) do
+			rawset(MasterCollector.DB.data.pet[id], 'collected', C_PetJournal.GetNumCollectedInfo(id) > 0)
 		end
 	end
 
 	-- Set up all the events that this module will use
 	local events = {}
-	events.QUEST_TURNED_IN = function(questID)
-		if mod.DB.quest[questID] then
-			mod.DB.quest[questID].collected = true
-			MasterCollector:RefreshWindows()
-		end
-	end
 	-- During the login/reload process, pets appear to be available after the first SPELLS_CHANGED event fires. We don't need to listen to it after its first run
 	events.SPELLS_CHANGED = function()
 		MasterCollector:UnregisterEvent('SPELLS_CHANGED', events.SPELLS_CHANGED)
@@ -43,8 +37,8 @@ if mod then
 	end
 	events.NEW_PET_ADDED = function(petID) -- fires when capturing a wild pet, learning a pet from a cage, or learning from an item
 		local speciesID = C_PetJournal.GetPetInfoByPetID(petID);
-		if speciesID and mod.DB.pet[speciesID] then
-			mod.DB.pet[speciesID].collected = true
+		if speciesID and MasterCollector.DB.data.pet[speciesID] then
+			MasterCollector.DB.data.pet[speciesID].collected = true
 		end
 		MasterCollector:RefreshWindows()
 		-- This isn't ideal, but blizzard API doesn't return the correct number of pets owned until AFTER this event completes.
