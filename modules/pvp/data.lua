@@ -19,8 +19,11 @@ end
 MasterCollector.Modules.Pvp={}
 moduleDB={
 	["quest"]={
-		[62285]={coordinates={{34.24,55.91,1670}},minlevel=60,providers={{"n",174922}}},
-		[62288]={coordinates={{34.24,55.91,1670}},minlevel=60,providers={{"n",174922}}},
+		[62285]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
+		[62288]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
+	},
+	["npc"]={
+		[174922]={coordinates={34.24,55.89,1670}},
 	},
 }
 mapData={
