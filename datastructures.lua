@@ -39,11 +39,6 @@ local function IsQuestComplete(questID)
 	local quest = MasterCollector.DB:GetObjectData("quest", questID)
 	return quest and quest.collected
 end
-local function IsPlayerEligibleForQuestID(questID)
-	local quest = MasterCollector.DB:GetObjectData("quest", questID)
-	if quest then return IsRaceOrFactionMet(quest) and IsClassMet(quest) end
-	return false
-end
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
 	if tbl.type == "panel" then
@@ -86,6 +81,12 @@ local colors = {
 	green = "|cFF00FF00",
 	blue = "|cFF33DAFF",
 }
+local function IsPlayerEligibleForQuest(quest)
+	return quest and IsRaceOrFactionMet(quest) and IsClassMet(quest)
+end
+local function IsQuestOptional(quest)
+	return quest and quest.flags and quest.flags.breadcrumb
+end
 local function GetQuestTextColor(obj)
 	if not obj then return end
 	if not IsLevelRangeMet(obj) then return colors.red end
@@ -95,18 +96,17 @@ local function GetQuestTextColor(obj)
 	if obj.requirements then
 		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end
 		if obj.requirements.quest then
-			if type(obj.requirements.quest) == "table" then
-				local requirementsMet = true
-				for i=1,#obj.requirements.quest do
-					if not IsQuestComplete(obj.requirements.quest[i]) and IsPlayerEligibleForQuestID(obj.requirements.quest[i]) then
-						requirementsMet = false
-						break;
-					end
+			local quests = obj.requirements.quest
+			if type(quests) ~= "table" then quests = {quests} end
+			local requirementsMet, quest = true
+			for i=1,#quests do
+				quest = MasterCollector.DB:GetObjectData("quest", quests[i])
+				if quest and not quest.collected and IsPlayerEligibleForQuest(quest) and not IsQuestOptional(quest) then
+					requirementsMet = false
+					break
 				end
-				if not requirementsMet then return colors.red end
-			else
-				if not IsQuestComplete(obj.requirements.quest) and IsPlayerEligibleForQuestID(obj.requirements.quest) then return colors.red end
 			end
+			if not requirementsMet then return colors.red end
 		end
 	end
 	-- If requirements are met, now we can color based on other conditions
