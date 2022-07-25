@@ -223,7 +223,9 @@ MasterCollector.structs.quest = {
 				return QuestNames[self.id]
 			end
 		elseif key == "icon" then
-			if self.repeatable then
+			if self.flags and self.flags.breadcrumb then
+				self.icon = "Interface\\icons\\inv_misc_food_12"
+			elseif self.repeatable then
 				self.icon = "Interface\\gossipframe\\dailyquesticon"
 			else
 				self.icon = "Interface\\gossipframe\\availablequesticon"
