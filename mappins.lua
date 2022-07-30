@@ -21,7 +21,7 @@ local function GetCoordsOnObject(obj)
 	if obj.providers then
 		local coords = {}
 		local providers = obj.providers
-		if obj.providers[1] ~= "table" then providers = {providers} end
+		if type(obj.providers[1]) ~= "table" then providers = {providers} end
 		for i=1, #providers do
 			local providerType, id = unpack(providers[i])
 			local provider
