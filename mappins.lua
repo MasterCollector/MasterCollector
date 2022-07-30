@@ -50,7 +50,7 @@ end
 function MapPins:TryMapObject(obj)
 	local coords = GetCoordsOnObject(obj)
 	if not coords then return end
-	if type(coords[1]) ~= 'table' then
+	if coords[1] and type(coords[1]) ~= 'table' then
 		coords = {coords}
 	end
 	for i=1, #coords do
