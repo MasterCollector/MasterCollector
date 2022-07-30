@@ -51,7 +51,7 @@ local function determineVisibility(tbl)
 		-- if no children are visible, then the panel doesn't need to be shown
 		return false
 	else
-		if tbl.flags and tbl.flags.hidden then return false end
+		if tbl.flags and (tbl.flags.hidden or tbl.flags.removed) then return false end
 	
 		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
 		if not optionIgnoreRaces and not IsRaceOrFactionMet(tbl) then return false end
