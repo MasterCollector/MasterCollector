@@ -19,13 +19,18 @@ end
 MasterCollector.Modules.Treasures={}
 moduleDB={
 	["quest"]={
+		[54131]={providers={"o",310709}},
 		[56088]={coordinates={41.84,42.84,1409},providers={"o",327407},requirements={quest={55981,59978}}},
 		[56579]={coordinates={58.47,59.33,1409},providers={"o",329918}},
 		[56581]={coordinates={59.36,37.69,1409},providers={"o",329919}},
 		[58380]={coordinates={57.08,68.43,1409},providers={"o",339770}},
 	},
+	["object"]={
+		[310709]={coordinates={32.21,63.43,37}},
+	},
 }
 mapData={
+	[37]={{"quest",{54131}}},
 	[1409]={{"quest",{56088,56579,56581,58380}}},
 }
 Process()
