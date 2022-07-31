@@ -49,8 +49,8 @@ local function IsQuestIDKnown(questID)
 	return questID and MasterCollector.DB:GetObjectData("quest", questID)
 end
 
-local questFound = 'Quest Completed: %d'
-local questNotFound = 'Quest Completed: %d (Not found in DB)'
+local questFound = 'Quest Completed: %d (%s)'
+local questNotFound = 'Quest Completed: %d (%s) (Not found in DB)'
 local completedQuestIDs = {}
 local function CheckForNewlyTriggeredQuests()
 	completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
@@ -58,11 +58,11 @@ local function CheckForNewlyTriggeredQuests()
 	for _,v in pairs(completedQuestIDs) do
 		quest = MasterCollector.DB:GetObjectData("quest", v)
 		if not quest then
-			print(string.format(questNotFound, v))
-			MasterCollector.DB.data.quest[v] = {id=v,collected=true}
+			MasterCollector.DB.data.quest[v] = setmetatable({id=v,collected=true}, MasterCollector.structs.quest)
+			print(string.format(questNotFound, v, quest.text))
 		else
 			if not quest.collected then
-				print(string.format(questFound, v))
+				print(string.format(questFound, v, quest.text))
 				rawset(MasterCollector.DB.data.quest[v], "collected", true)
 				refresh = true
 			end
@@ -244,30 +244,3 @@ end
 events.NEW_WMO_CHUNK = events.ZONE_CHANGED_NEW_AREA
 MasterCollector:RegisterModuleEvents(events)
 debugWindow:Show()
-
---[[
-
-exile's reach:
-59933,59254 - not available for DKs and DHs?
-
-
-q(58882),	-- Triggered after looting white-quality chestpiece. loot controller so they don't drop twice
-q(58883),	-- Triggered after looting white-quality boots. loot controller so they don't drop twice
-q(54928),	-- Triggered after getting 3 holy power and striking Warlord Grimaxe with the first major combat ability. Didn't trigger at all on an alliance priest
-q(58336),	-- Triggered at the same time as 54928. Possibly dialog-related?
-q(55607),	-- Triggered while killing quilboars in Quilboar Briarpatch on an alliance priest. Did not see it trigger as horde
-q(55611),	-- triggered when completing "Message to Base" in Exile's Reach on alliance priest
-q(59610),	-- Triggered after killing Torgok. Loot controller for "Torgok's Reagent Pouch"
-q(59143),	-- Triggered after looting the Runetusk Necklace from ogres in Darkmaul Citadel
-q(59139),	-- Triggered after looting the Spider-Eye Ring from spiders in Hrun's Barrow
-q(60167),	-- Triggered right after Warlord Grimaxe tells Shuja to heal during the Tunk encounter
-q(62547),	-- Triggered after speaking to trainer for What's Your Specialty? quest [Horde]
-q(62548),	-- Triggered after speaking to trainer for What's Your Specialty? quest [Alliance]
-q(62550),	-- Triggered after choosing a specialization for What's Your Specialty? quest [Alliance]
-q(62551),	-- Triggered after choosing a specialization for What's Your Specialty? quest [Horde]
-q(62655),	-- Triggers after you activate your specialization (both NPE and non-NPE characters)
-q(62802),	-- Triggered after going to Stormwind for An End to Beginnings
-q(62803),	-- Triggered after going to Orgrimmar for An End to Beginnings
-q(63012),	-- Triggered after talking to Jaina at docks for The Nation of Kul Tiras
-q(62912),	-- Triggered when flying from Exile's Reach (as Alliance if it matters)
-]]--
