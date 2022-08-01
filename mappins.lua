@@ -66,6 +66,7 @@ function MapPins:TryMapObject(obj)
 				mm.icon = mm:CreateTexture(nil, "OVERLAY")
 				mm.icon:SetPoint("CENTER", 0, 0)
 				mm.icon:SetBlendMode("BLEND")
+				mm.icon:SetSize(16, 16)
 				point.mm = mm
 				
 				local wm = CreateFrame("BUTTON", nil, worldMapOverlay)
@@ -73,6 +74,7 @@ function MapPins:TryMapObject(obj)
 				wm.icon = wm:CreateTexture(nil, "OVERLAY")
 				wm.icon:SetAllPoints()
 				wm.icon:SetBlendMode("BLEND")
+				wm.icon:SetSize(16, 16)
 				point.wm = wm
 			end
 			
