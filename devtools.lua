@@ -59,7 +59,7 @@ local function CheckForNewlyTriggeredQuests()
 		quest = MasterCollector.DB:GetObjectData("quest", v)
 		if not quest then
 			MasterCollector.DB.data.quest[v] = setmetatable({id=v,collected=true}, MasterCollector.structs.quest)
-			print(string.format(questNotFound, v, quest.text))
+			print(string.format(questNotFound, v, MasterCollector.DB.data.quest[v].text))
 		else
 			if not quest.collected then
 				print(string.format(questFound, v, quest.text))
