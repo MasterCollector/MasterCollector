@@ -108,7 +108,8 @@ function MasterCollector:Start()
 		-- the current zone list should perform the same initial load as it does with zone map changes
 		if event == "PLAYER_ENTERING_WORLD" or "ZONE_CHANGED" or "ZONE_CHANGED_NEW_AREA" or "ZONE_CHANGED_INDOORS" or "NEW_WMO_CHUNK" then
 			local mapID, data = GetCurrentZoneData()
-			if mapID then
+			if mapID and mapID ~= currentZoneWindow.mapID then
+				currentZoneWindow.mapID = mapID
 				currentZoneWindow:SetTitle(((mapID and C_Map.GetMapInfo(mapID).name) or "UNKNOWN MAP" ) .. ' ('..mapID..')')
 				currentZoneWindow:SetData(data, true)
 			end
