@@ -65,6 +65,7 @@ local function SetExpandedTexture(row, data)
 end
 local function DrawRow(row, data, indentSize)
 	row.label:SetText(data.text)
+	row.objectIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize or 0)*INDENT_LEVEL_SPACING), 0)
 	if data.icon then
 		row.objectIcon:SetTexture(data.icon)
 		-- if the object icon is using a single file with multiple icons, then we can define a relative position in the image to display
@@ -79,7 +80,6 @@ local function DrawRow(row, data, indentSize)
 	if data.type == "panel" or data.type == "map" then
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()
-		row.objectIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize or 0)*INDENT_LEVEL_SPACING), 0)
 		row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
 		
 		SetExpandedTexture(row, data)
@@ -104,13 +104,14 @@ local function DrawRow(row, data, indentSize)
 		row.label:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN, 0)
 	else
 		row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
+		row.collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize-1 or 0)*INDENT_LEVEL_SPACING), 0)
+		row.objectIcon:SetPoint("LEFT", row.collectedIcon, "RIGHT")
 		if data.collected then
 			row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
 		else
 			row.collectedIcon:SetTexture(nil)
 		end
 		row.collectedIcon:Show()
-		row.objectIcon:SetPoint("LEFT", row.collectedIcon, "RIGHT")
 	end
 	row:Enable()
 end
