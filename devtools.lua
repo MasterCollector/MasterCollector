@@ -6,34 +6,35 @@ local function SaveDebugData()
 	MCGathererDataPC = debugWindow.data
 end
 local function CreateMap(id, name)
-	local mapPanel = {
-		id = id,
-		text = (name or "Unknown Map") .. " (" .. id .. ")",
-		type = "map",
-		children = {},
-		expanded = true
-	}
-	setmetatable(mapPanel, MasterCollector.structs.map)
-	return mapPanel
+   local mapPanel = {
+      id = id,
+      text = (name or "Unknown Map") .. " (" .. id .. ")",
+      type = "map",
+      children = {},
+      expanded = true
+   }
+   setmetatable(mapPanel, MasterCollector.structs.map)
+   return mapPanel
 end
 local function FindMapOrParent(mapID)
-	if debugWindow.data[mapID] then
-		return debugWindow.data[mapID]
-	end
-	local parent
-	local mapInfo = C_Map.GetMapInfo(mapID)
-	if (mapInfo.mapType == 3 or mapInfo.mapType == 5) and mapInfo.parentMapID then
-		parent = FindMapOrParent(mapInfo.parentMapID)
-	end
-	if parent then
-		if parent.children[mapID] then
-			return parent.children[mapID]
-		end
-		parent.children[mapID] = CreateMap(mapID, mapInfo.name)
-		return parent.children[mapID]
-	end
-	debugWindow.data[mapID] = CreateMap(mapID, mapInfo.name)
-	return debugWindow.data[mapID]
+   local mapKey = 'map_'..mapID
+   if debugWindow.data[mapKey] and debugWindow.data[mapKey].type == 'map' then
+      return debugWindow.data[mapKey]
+   end
+   local parent
+   local mapInfo = C_Map.GetMapInfo(mapID)
+   if (mapInfo.mapType == 3 or mapInfo.mapType == 5) and mapInfo.parentMapID then
+      parent = FindMapOrParent(mapInfo.parentMapID)
+   end
+   if parent then
+      if parent.children[mapKey] and parent.children[mapKey].type == 'map' then
+         return parent.children[mapKey]
+      end
+      parent.children[mapKey] = CreateMap(mapID, mapInfo.name)
+      return parent.children[mapKey]
+   end
+   debugWindow.data[mapKey] = CreateMap(mapID, mapInfo.name)
+   return debugWindow.data[mapKey]
 end
 local function ObjectExistsInContainer(container, type, key)
 	for _,v in pairs(container.children or {}) do
@@ -43,7 +44,6 @@ local function ObjectExistsInContainer(container, type, key)
 	end
 	return false
 end
-
 
 local function IsQuestIDKnown(questID)
 	return questID and MasterCollector.DB:GetObjectData("quest", questID)
@@ -231,13 +231,7 @@ events.ZONE_CHANGED_NEW_AREA = function()
 	CheckForNewlyTriggeredQuests()
 	local mapID = C_Map.GetBestMapForUnit("player")
 	if not mapID then return end
-	local mapInfo = C_Map.GetMapInfo(mapID)
-	local parent = FindMapOrParent(mapID)
-	if not parent then
-		debugWindow.data[mapID] = CreateMap(mapID, mapInfo.name)
-	elseif parent.id ~= mapID then
-		parent.children[mapID] = CreateMap(mapID, mapInfo.name)
-	end
+	_ = FindMapOrParent(mapID)
 	SaveDebugData()
 	debugWindow:Refresh()
 end
