@@ -4,6 +4,7 @@ local L = MasterCollector.L
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
 local GetQuestTitle = C_QuestLog.GetTitleForQuestID
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
+local IsOnQuest = C_QuestLog.IsOnQuest
 
 MasterCollector.playerData = {}
 local playerData = MasterCollector.playerData
@@ -87,6 +88,14 @@ end
 local function IsQuestOptional(quest)
 	return quest and quest.flags and quest.flags.breadcrumb
 end
+
+local dataFunctions = {
+   IsOnQuestOrComplete = function(questID)
+      if not questID then return end
+      return IsOnQuest(questID) or IsQuestComplete(questID)
+   end
+}
+
 local function GetQuestTextColor(obj)
 	if not obj then return end
 	if not IsLevelRangeMet(obj) then return colors.red end
@@ -98,15 +107,22 @@ local function GetQuestTextColor(obj)
 		if obj.requirements.quest then
 			local quests = obj.requirements.quest
 			if type(quests) ~= "table" then quests = {quests} end
-			local requirementsMet, quest = true
+			local quest
 			for i=1,#quests do
 				quest = MasterCollector.DB:GetObjectData("quest", quests[i])
 				if quest and not quest.collected and IsPlayerEligibleForQuest(quest) and not IsQuestOptional(quest) then
-					requirementsMet = false
-					break
+					return colors.red
 				end
 			end
-			if not requirementsMet then return colors.red end
+		end
+		if obj.requirements.script then
+			local scripts = obj.requirements.script
+			if type(scripts[1]) ~= "table" then scripts = {scripts} end
+			for i=1,#scripts do
+				if not dataFunctions[scripts[i][1]](strsplit(',',scripts[i][2])) then
+					return colors.red
+				end
+			end
 		end
 	end
 	-- If requirements are met, now we can color based on other conditions
