@@ -67,7 +67,7 @@ end
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
 	local mapInfo = C_Map.GetMapInfo(mapID)
-	if mapInfo and mapInfo.mapType == 5 and mapInfo.parentMapID then
+	if mapInfo and (mapInfo.mapType == 5 or mapInfo.mapType == 6) and mapInfo.parentMapID then
 		return GetClosestZoneMapFromMapID(mapInfo.parentMapID)
 	end
 	return mapInfo.mapID

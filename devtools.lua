@@ -23,7 +23,7 @@ local function FindMapOrParent(mapID)
    end
    local parent
    local mapInfo = C_Map.GetMapInfo(mapID)
-   if (mapInfo.mapType == 3 or mapInfo.mapType == 5) and mapInfo.parentMapID then
+   if (mapInfo.mapType == 3 or mapInfo.mapType == 5 or mapInfo.mapType == 6) and mapInfo.parentMapID then
       parent = FindMapOrParent(mapInfo.parentMapID)
    end
    if parent then
