@@ -512,7 +512,7 @@ moduleDB={
 		[31814]={coordinates={58.6,53,10},providers={"n",66135},races=-2,requirements={quest=31813}},
 		[31815]={coordinates={20.2,29.5,63},providers={"n",66136},races=-2,requirements={quest=31814}},
 		[31817]={coordinates={59.6,71.6,65},flags={daily=true},providers={"n",66317},races=-2},
-		[31818]={coordinates={43.9,28.9,1},flags={daily=true},providers={"n",66126},races=-2},
+		[31818]={flags={daily=true},providers={"n",66126},races=-2},
 		[31819]={coordinates={58.6,53,10},flags={daily=true},providers={"n",66135},races=-2},
 		[31821]={races=-1},
 		[31822]={races=-1},
@@ -651,6 +651,9 @@ moduleDB={
 		[56465]={races=-2},
 		[56466]={races=-2},
 		[56467]={races=-2},
+	},
+	["npc"]={
+		[66126]={coordinates={43.85,28.87,1}},
 	},
 }
 mapData={
