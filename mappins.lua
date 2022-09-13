@@ -54,7 +54,7 @@ function MapPins:TryMapObject(obj)
 		coords = {coords}
 	end
 	for i=1, #coords do
-		coord = coords[1]
+		coord = coords[i]
 		if not coord.wp then
 		-- try to get a frame from the pool first before creating new ones
 			local point = table.remove(pinFramePool)
