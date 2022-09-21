@@ -25,6 +25,14 @@ local function IsRaceOrFactionMet(obj)
 		return obj.races == MasterCollector.playerData.faction or obj.races == MasterCollector.playerData.race
 	end
 end
+local function IsProfessionMet(obj)
+	if obj.requirements then
+		if not obj.requirements.prof then return true end
+		local professionData = MasterCollector.playerData.professions
+		return professionData and professionData[obj.requirements.prof]
+	end
+	return true
+end
 local function IsClassMet(obj)
 	if not obj.classes then return true end
 	if type(obj.classes) == 'table' then
@@ -60,6 +68,9 @@ local function determineVisibility(tbl)
 		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
 		if not optionIgnoreClasses and not IsClassMet(tbl) then return false end
 
+		local optionIgnoreProfessions = false
+		if not optionIgnoreProfessions and not IsProfessionMet(tbl) then return false end
+		
 		-- special requirements inspection
 		if tbl.requirements then
 			local ignoreCovenant = false
