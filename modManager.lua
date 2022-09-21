@@ -31,6 +31,13 @@ eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 		elseif factionCode == 'Alliance' then
 			MasterCollector.playerData.faction = -1
 		end
+		
+		MasterCollector.playerData.professions = {}
+		for _,v in pairs({GetProfessions()}) do
+		   local _,_,level,_,_,_,skill = GetProfessionInfo(v)
+		   MasterCollector.playerData.professions[skill]=level
+		end
+		
 		MasterCollector:Start()
 		-- we don't need to listen to this event anymore. Free up the memory of this function and unregister it from the frame listener
 		eventFrame.events.ADDON_LOADED = nil
