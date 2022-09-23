@@ -25,6 +25,12 @@ local function IsRaceOrFactionMet(obj)
 		return obj.races == MasterCollector.playerData.faction or obj.races == MasterCollector.playerData.race
 	end
 end
+local function IsPlayerSexMet(obj)
+	if obj.requirements and obj.requirements.sex then
+		return obj.requirements.sex == MasterCollector.playerData.sex
+	end
+	return true
+end
 local function IsProfessionMet(obj)
 	if obj.requirements then
 		if not obj.requirements.prof then return true end
@@ -77,6 +83,11 @@ local function determineVisibility(tbl)
 			if not ignoreCovenant and tbl.requirements.covenant and tbl.requirements.covenant ~= MasterCollector.playerData.covenant then
 				return false
 			end
+			
+			local ignoreSex = false
+			if not ignoreSex and not IsPlayerSexMet(tbl) then
+				return false
+			end
 		end
 	
 		local optionShowCollected = true -- TODO: replace with addon setting when the settings panel is written
@@ -94,7 +105,7 @@ local colors = {
 	blue = "|cFF33DAFF",
 }
 local function IsPlayerEligibleForQuest(quest)
-	return quest and IsRaceOrFactionMet(quest) and IsClassMet(quest)
+	return quest and IsRaceOrFactionMet(quest) and IsClassMet(quest) and IsPlayerSexMet(quest)
 end
 local function IsQuestOptional(quest)
 	return quest and quest.flags and quest.flags.breadcrumb
@@ -112,6 +123,7 @@ local function GetQuestTextColor(obj)
 	if not IsLevelRangeMet(obj) then return colors.red end
 	if not IsRaceOrFactionMet(obj) then return colors.red end
 	if not IsClassMet(obj) then return colors.red end
+	if not IsPlayerSexMet(obj) then return colors.red end
 	-- Go through requirements first. If they aren't met, we want to render the text as red
 	if obj.requirements then
 		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end

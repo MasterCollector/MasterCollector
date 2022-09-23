@@ -21,6 +21,7 @@ eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
 		MasterCollector.playerData.class = select(3, UnitClass("player"))
 		MasterCollector.playerData.race = select(3, UnitRace("player"))
+		MasterCollector.playerData.sex = UnitSex("player")
 		MasterCollector.playerData.level = UnitLevel("player")
 		MasterCollector.playerData.covenant = C_Covenants.GetActiveCovenantID()
 		MasterCollector.playerData.renown = C_CovenantSanctumUI.GetRenownLevel()
