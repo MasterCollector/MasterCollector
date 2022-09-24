@@ -277,6 +277,24 @@ MasterCollector.structs.quest = {
 		end
 	end
 }
+MasterCollector.structs.toy = {
+	__index = function(self, key)
+		if key == "visible" then
+			return determineVisibility(self)
+		elseif key == "collected" then
+			return PlayerHasToy(self.id)
+		elseif key == "text" then
+			local item = Item:CreateFromItemID(self.id)
+			item:ContinueOnItemLoad(function()
+				rawset(self, 'icon', item:GetItemIcon())
+				rawset(self, 'text', item:GetItemName())
+			end)
+			return 'Item #' .. self.id
+		else
+			return rawget(self, key)
+		end
+	end
+}
 MasterCollector.structs.treasure = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
