@@ -513,7 +513,7 @@ moduleDB={
 		[31815]={coordinates={20.2,29.5,63},providers={"n",66136},races=-2,requirements={quest=31814}},
 		[31817]={coordinates={59.6,71.6,65},flags={daily=true},providers={"n",66317},races=-2},
 		[31818]={flags={daily=true},providers={"n",66126},races=-2},
-		[31819]={coordinates={58.6,53,10},flags={daily=true},providers={"n",66135},races=-2},
+		[31819]={flags={daily=true},providers={"n",66135},races=-2},
 		[31821]={races=-1},
 		[31822]={races=-1},
 		[31823]={races=-2},
@@ -624,7 +624,7 @@ moduleDB={
 		[38299]={races=-1},
 		[38300]={races=-2},
 		[40329]={},
-		[45083]={coordinates={63.6,35.8,10},flags={daily=true},providers={"n",115286}},
+		[45083]={flags={daily=true},providers={"n",115286}},
 		[47895]={},
 		[52061]={description="Kill Idej the Wise to spawn Taptaf."},
 		[56444]={races=-1},
@@ -654,6 +654,8 @@ moduleDB={
 	},
 	["npc"]={
 		[66126]={coordinates={43.85,28.87,1}},
+		[66135]={coordinates={58.61,53.05,10}},
+		[115286]={coordinates={63.58,35.81,10}},
 	},
 }
 mapData={
