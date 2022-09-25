@@ -10,7 +10,7 @@ local WINDOW_LEFT_MARGIN = 8
 local WINDOW_RIGHT_MARGIN = -8
 local ROW_HEIGHT = 16
 local ICON_WIDTH = 16
-local INDENT_LEVEL_SPACING = 10
+local INDENT_LEVEL_SPACING = 16
 local SCROLLBAR_WIDTH = 20
 local cascadeFrame
 local MapPins = MasterCollector.MapPins
@@ -77,7 +77,7 @@ local function DrawRow(row, data, indentSize)
 		end
 		row.objectIcon:Show()
 	end
-	if data.type == "panel" or data.type == "map" then
+	if data.type == "panel" or data.type == "map" or (data.children and #data.children > 0) then
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()
 		row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
@@ -425,9 +425,7 @@ function Window:Refresh()
 						DrawRow(self.displayFrame.dataArea.rows[targetRowCounter], v, (indentLevel or 0))
 						targetRowCounter = targetRowCounter + 1
 					end
-					
-					-- if the skipped section was an expanded panel, we need to still inspect the children to render their data
-					if v.expanded and v.children then
+					if v.children and v.expanded then
 						renderRowData(v.children, (indentLevel or 0) + 1)
 					end
 				end
