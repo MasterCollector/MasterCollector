@@ -222,6 +222,33 @@ MasterCollector.structs.ach = {
 		end
 	end
 }
+MasterCollector.structs.item = {
+	__index = function(self, key)
+		if key == "visible" then
+			return determineVisibility(self)
+		elseif key == "collected" then
+			if self.type == 'equipment' then
+				return C_TransmogCollection.PlayerHasTransmog(self.id)
+			elseif self.type == 'toy' then
+				return PlayerHasToy(self.id)
+			end
+			return false
+		elseif key == "text" then
+			local item = Item:CreateFromItemID(self.id)
+			item:ContinueOnItemLoad(function()
+				local _,_,_,_,icon, classID = GetItemInfoInstant(self.id)
+				rawset(self, 'text', item:GetItemName())
+				rawset(self, 'icon', icon)
+				if classID == 2 or classID == 4 then
+					rawset(self, 'type', 'equipment')
+				end
+			end)
+			return 'Item #' .. self.id
+		else
+			return rawget(self, key)
+		end
+	end
+}
 MasterCollector.structs.map = {
 	__index = function(self, key)
 		if key == "visible" then
