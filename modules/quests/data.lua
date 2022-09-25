@@ -6,6 +6,16 @@ local function Process()
 	for k,v in pairs(moduleDB) do
 		for id, obj in pairs(v) do
 			MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+			if obj.grants then
+				if not obj.children then obj.children = {} end
+				for group=1,#obj.grants do
+					for _,id in pairs(obj.grants[group][2] or {}) do
+						local item = MasterCollector.DB:GetObjectData(obj.grants[group][1], id)
+						table.insert(obj.children, item)
+					end
+				end
+			end
+			obj.grants = nil
 		end
 	end
 	table.wipe(moduleDB)
