@@ -2,7 +2,7 @@ local MasterCollector = select(2, ...)
 local L = MasterCollector.L
 -- set local functions for blizz API calls for slightly faster processing
 local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
-local GetQuestTitle = C_QuestLog.GetTitleForQuestID
+local GetQuestTitle = QuestUtils_GetQuestName
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local IsOnQuest = C_QuestLog.IsOnQuest
 
@@ -157,7 +157,7 @@ local QuestNames = setmetatable({}, {
 	__index = function(self, key)
 		if not rawget(self, key) then
 			local name = GetQuestTitle(key)
-			if not name then
+			if not name or name=='' then
 				RequestLoadQuestByID(key)
 				rawset(self, key, SEARCH_LOADING_TEXT)
 				return SEARCH_LOADING_TEXT
