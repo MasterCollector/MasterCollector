@@ -10,6 +10,7 @@ function DB:MergeObject(type, id, object, struct)
 		object.id = id -- TODO: I don't like this. Why should an object be self-aware of its id when the DB key is that id?
 		self.data[type][id] = setmetatable(object, struct)
 	end
+	return self.data[type][id]
 end
 function DB:MergeMapData(mapID, mapData)
 	if not self.mapData[mapID] then self.mapData[mapID] = {} end
@@ -29,7 +30,8 @@ function DB:MergeMapData(mapID, mapData)
 	end
 end
 function DB:GetObjectData(type, id)
-	return self.data[type][id]
+	if not self.data[type] then self.data[type] = {} end
+	return self.data[type][id] or DB:MergeObject(type, id, {}, MasterCollector.structs[type])
 end
 function DB:GetMapMetadata(mapID)
 	return self.mapData[mapID]
