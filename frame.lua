@@ -81,7 +81,6 @@ local function DrawRow(row, data, indentSize)
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()
 		row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
-		
 		SetExpandedTexture(row, data)
 		row.expandableIcon:Show()
 		
@@ -106,13 +105,13 @@ local function DrawRow(row, data, indentSize)
 		row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
 		row.collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize-1 or 0)*INDENT_LEVEL_SPACING), 0)
 		row.objectIcon:SetPoint("LEFT", row.collectedIcon, "RIGHT")
-		if data.collected then
-			row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
-		else
-			row.collectedIcon:SetTexture(nil)
-		end
-		row.collectedIcon:Show()
 	end
+	if data.collected then
+		row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
+	else
+		row.collectedIcon:SetTexture(nil)
+	end
+	row.collectedIcon:Show()
 	row:Enable()
 end
 local function CountVisibleDataEntries(tbl)
