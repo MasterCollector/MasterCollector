@@ -123,7 +123,35 @@ local function CountVisibleDataEntries(tbl)
 	end
 	return visibleEntries
 end
-
+local function ExpandCollapseData(wnd)
+	local expanded = false -- could be a user setting to control the default operation
+	local function checkObject(obj)
+		if expanded or obj.expanded then
+			expanded = true
+			return
+		end
+		if obj.children then 
+			for _,v in pairs(obj.children) do
+				checkObject(v)
+				if expanded then return end
+			end
+		end
+	end
+	for _,v in pairs(wnd.data) do checkObject(v) end
+	
+	local function toggleState(obj)
+		if obj.expanded ~= nil then
+			obj.expanded = not expanded
+			if obj.children then 
+				for _,v in pairs(obj.children) do
+					toggleState(v)
+				end
+			end
+		end
+	end
+	for _,v in pairs(wnd.data) do toggleState(v) end
+	wnd:Refresh()
+end
 local function ProcessWaypointsForData(data, remove)
 	if not data then return end
 	for _,v in pairs(data) do
@@ -360,6 +388,13 @@ function Window:New(name, type, title)
 			type = "command",
 			command = function()
 				ProcessWaypointsForData(wnd.data, true)
+			end,
+		},
+		{
+			text = "Expand/Collapse all",
+			type = "command",
+			command = function()
+				ExpandCollapseData(wnd)
 			end,
 		},
 	}
