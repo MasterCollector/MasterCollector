@@ -33,7 +33,7 @@ local function GetCoordsOnObject(obj)
 				provider = MasterCollector.DB:GetObjectData("object", id)
 			end
 		  
-			if provider then
+			if provider and provider.coordinates then
 				if(type(provider.coordinates[1]) == 'table') then
 					for i=1, #provider.coordinates do
 						table.insert(coords, provider.coordinates[i])
