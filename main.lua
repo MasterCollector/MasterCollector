@@ -85,7 +85,9 @@ local function GetCurrentZoneData(mapID)
 		end
 		for id,value in pairs(panelData) do
 			data[panel].children[id] = MasterCollector.DB:GetObjectData(panel, id)
-			data[panel].children[id].expanded = data[panel].children[id].children
+			if data[panel].children[id].expanded == nil and data[panel].children[id].children then
+				data[panel].children[id].expanded = true
+			end
 		end
 	end
 	
