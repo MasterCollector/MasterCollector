@@ -7,7 +7,7 @@ if mod then
 	events.QUEST_TURNED_IN = function(questID)
 		local quest = MasterCollector.DB:GetObjectData("quest", questID)
 		if quest then
-			quest.collected = true
+			rawset(quest, 'collected', true)
 			Mappins:TryRemoveObjectPins(quest)
 			MasterCollector:RefreshWindows()
 		end
