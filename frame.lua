@@ -105,7 +105,9 @@ local function DrawRow(row, data, indentSize)
 		end
 	end
 	
-	if data.collected then
+	if data.collected == -1 then -- missed
+		row.collectedIcon:SetTexture("Interface\\BUTTONS\\UI-GroupLoot-Pass-Up")
+	elseif data.collected then
 		row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
 	else
 		row.collectedIcon:SetTexture(nil)
