@@ -17,6 +17,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
+
 eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
 		MasterCollector.playerData.class = select(3, UnitClass("player"))
@@ -37,6 +38,12 @@ eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 		for _,v in pairs({GetProfessions()}) do
 		   local _,_,level,_,_,_,skill = GetProfessionInfo(v)
 		   MasterCollector.playerData.professions[skill]=level
+		end
+		
+		local  completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
+		for _,v in pairs(completedQuestIDs) do
+			quest = MasterCollector.DB:GetObjectData("quest", v)
+			MasterCollector.DB:SetCollectedState(quest, true)
 		end
 		
 		MasterCollector:Start()
