@@ -50,10 +50,6 @@ local function IsClassMet(obj)
 		return obj.classes == MasterCollector.playerData.class or obj.classes == MasterCollector.playerData.class
 	end
 end
-local function IsQuestComplete(questID)
-	local quest = MasterCollector.DB:GetObjectData("quest", questID)
-	return quest and quest.collected
-end
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
 	if tbl.type == "panel" then
@@ -114,7 +110,7 @@ end
 local dataFunctions = {
    IsOnQuestOrComplete = function(questID)
       if not questID then return end
-      return IsOnQuest(questID) or IsQuestComplete(questID)
+      return IsOnQuest(questID) or MasterCollector.DB:GetObjectData("quest", questID).collected
    end
 }
 
@@ -333,7 +329,8 @@ MasterCollector.structs.treasure = {
 		if key == "visible" then
 			return determineVisibility(self)
 		elseif key == "collected" then
-			return IsQuestComplete(self.id)
+			local quest = MasterCollector.DB:GetObjectData("quest", self.id)
+			return rawget(quest, 'collected')
 		else
 			return rawget(self, key)
 		end
