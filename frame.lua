@@ -77,20 +77,12 @@ local function DrawRow(row, data, indentSize)
 		end
 		row.objectIcon:Show()
 	end
-	if data.type == "panel" or data.type == "map" or (data.children and #data.children > 0) then
+	if data.type == "panel" or data.type == "map" then
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()
 		row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
 		SetExpandedTexture(row, data)
 		row.expandableIcon:Show()
-		
-		row:RegisterForClicks("LeftButtonUp")
-		row:SetScript("OnClick", function(self, button)
-				data.expanded = not data.expanded
-				SetExpandedTexture(row, data)
-				-- TODO: this abomination needs to addressed. If window frame layers change AT ALL, this will break
-				Windows[row:GetParent():GetParent():GetParent():GetName()]:Refresh()
-		end)
 	elseif data.type == "command" then
 		row.collectedIcon:Hide()
 		row.objectIcon:Hide()
@@ -105,12 +97,30 @@ local function DrawRow(row, data, indentSize)
 		row.collectedIcon:SetSize(ICON_WIDTH, ICON_WIDTH)
 		row.collectedIcon:SetPoint("LEFT", row, "LEFT", WINDOW_LEFT_MARGIN+((indentSize-1 or 0)*INDENT_LEVEL_SPACING), 0)
 		row.objectIcon:SetPoint("LEFT", row.collectedIcon, "RIGHT")
+		if data.children and #data.children > 0 then
+			row.expanded = data.expanded
+			row.label:SetPoint("LEFT", row.objectIcon, "RIGHT", 4, 0)
+			SetExpandedTexture(row, data)
+			row.expandableIcon:Show()
+		end
 	end
+	
 	if data.collected then
 		row.collectedIcon:SetTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected")
 	else
 		row.collectedIcon:SetTexture(nil)
 	end
+	
+	if data.children and #data.children > 0 then
+		row:RegisterForClicks("LeftButtonUp")
+		row:SetScript("OnClick", function(self, button)
+				data.expanded = not data.expanded
+				SetExpandedTexture(row, data)
+				-- TODO: this abomination needs to addressed. If window frame layers change AT ALL, this will break
+				Windows[row:GetParent():GetParent():GetParent():GetName()]:Refresh()
+		end)
+	end
+	
 	row.collectedIcon:Show()
 	row:Enable()
 end
