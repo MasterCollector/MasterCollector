@@ -4,6 +4,13 @@ local DB = {
 	data = {},
 	mapData = {}
 }
+local QuestInvalidationRules = {
+	-- format= [completed QuestID] = integer or table of integers of missed/invalidated questIDs
+	[25617] = 25624, -- Hyjal, Into the Maw! (Lo'Gosh)
+	[25618] = 25623, -- Hyjal, Into the Maw! (Goldrinn)
+	[25623] = 25618, -- Hyjal, Into the Maw! (Ian)
+	[25624] = 25617 -- Hyjal, Into the Maw! (Takrik)
+}
 function DB:MergeObject(type, id, object, struct)
 	if not self.data[type] then self.data[type] = {} end
 	if not self.data[type][id] then
@@ -35,5 +42,20 @@ function DB:GetObjectData(type, id)
 end
 function DB:GetMapMetadata(mapID)
 	return self.mapData[mapID]
+end
+function DB:SetCollectedState(obj, state)
+	if getmetatable(obj) == MasterCollector.structs.quest then
+		rawset(obj, 'collected', true)
+		local invalidates = QuestInvalidationRules[obj.id]
+		if invalidates then
+			if type(invalidates) == 'table' then
+				for _,v in pairs(invalidates) do
+					rawset(MasterCollector.DB:GetObjectData("quest", v), "collected", -1)
+				end
+			else
+				rawset(MasterCollector.DB:GetObjectData("quest", invalidates), "collected", -1)
+			end
+		end
+	end
 end
 MasterCollector.DB = DB
