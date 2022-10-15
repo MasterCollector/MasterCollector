@@ -91,6 +91,11 @@ local function determineVisibility(tbl)
 		if tbl.collected and not optionShowCollected then
 			return false
 		end
+		
+		local optionShowMissed = true
+		if tbl.collected == -1 and not optionShowMissed then
+			return false
+		end
 	end
 	
 	return true
