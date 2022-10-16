@@ -67,7 +67,8 @@ end
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
 	local mapInfo = C_Map.GetMapInfo(mapID)
-	if mapInfo and (mapInfo.mapType == 5 or mapInfo.mapType == 6) and mapInfo.parentMapID then
+	-- molten front is maptype 6, while most other maps with type 6 are junk. May want to replace this hard-coded value with a map index override
+	if mapInfo and (mapInfo.mapType == 5 or (mapInfo.mapType == 6 and mapID ~= 338)) and mapInfo.parentMapID then
 		return GetClosestZoneMapFromMapID(mapInfo.parentMapID)
 	end
 	return mapInfo.mapID
