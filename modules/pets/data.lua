@@ -541,7 +541,7 @@ moduleDB={
 		[31904]={coordinates={39.5,79.1,199},flags={daily=true},providers={"n",66422},races=-2},
 		[31905]={coordinates={53.8,74.8,70},flags={breadcrumb=true},providers={"n",66436},races=-2},
 		[31906]={coordinates={31.8,32.8,64},flags={daily=true},providers={"n",66452},races=-2},
-		[31907]={coordinates={40,56.6,77},flags={daily=true},providers={"n",66442},races=-2},
+		[31907]={flags={daily=true},providers={"n",66442},races=-2},
 		[31908]={races=-2},
 		[31909]={coordinates={65.6,64.5,83},flags={daily=true},providers={"n",66466}},
 		[31910]={},
@@ -581,7 +581,7 @@ moduleDB={
 		[31967]={races=-2},
 		[31970]={coordinates={56.6,41.8,249},providers={"n",66824}},
 		[31971]={coordinates={56.6,41.8,249},flags={daily=true},providers={"n",66824}},
-		[31972]={},
+		[31972]={flags={daily=true},providers={"n",66819}},
 		[31973]={},
 		[31974]={},
 		[31975]={coordinates={65.6,64.4,83},flags={breadcrumb=true},providers={"n",66466},races=-1},
@@ -655,6 +655,8 @@ moduleDB={
 	["npc"]={
 		[66126]={coordinates={43.85,28.87,1}},
 		[66135]={coordinates={58.61,53.05,10}},
+		[66442]={coordinates={39.95,56.57,77}},
+		[66819]={coordinates={61.37,32.71,198}},
 		[115286]={coordinates={63.58,35.81,10}},
 	},
 }
