@@ -238,7 +238,7 @@ MasterCollector.structs.item = {
 			local item = Item:CreateFromItemID(self.id)
 			item:ContinueOnItemLoad(function()
 				local _,_,_,_,icon, classID = GetItemInfoInstant(self.id)
-				rawset(self, 'text', item:GetItemName())
+				rawset(self, 'text', item:GetItemName() or 'Item #' .. self.id)
 				rawset(self, 'icon', icon)
 				if classID == 2 or classID == 4 then
 					rawset(self, 'type', 'equipment')
