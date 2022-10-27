@@ -64,8 +64,14 @@ for k,v in pairs(MasterCollector.L.Panels) do
 	panelCache[k] = setmetatable({id=k},MasterCollector.structs.panel)
 end
 
+local mapDisplayOverrides = {
+	[338] = 338, -- molten front
+	[1648] = 1648, -- the maw (intro to shadowlands version)
+	[577] = 577, -- draenor (intro - dark portal scenario)
+}
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
+	if mapDisplayOverrides[mapID] then return mapDisplayOverrides[mapID] end
 	local mapInfo = C_Map.GetMapInfo(mapID)
 	-- molten front is maptype 6, while most other maps with type 6 are junk. May want to replace this hard-coded value with a map index override
 	if mapInfo and (mapInfo.mapType == 5 or (mapInfo.mapType == 6 and mapID ~= 338)) and mapInfo.parentMapID then
