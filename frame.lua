@@ -273,7 +273,7 @@ function Window:New(name, type, title)
 	window:SetWidth(WINDOW_WIDTH)
 	window:SetHeight(WINDOW_HEIGHT)
 	window:SetResizable(true)
-	window:SetMinResize(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT)
+	window:SetResizeBounds(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT)
 	window:SetClampedToScreen(true) -- prevents window from being dragged off-screen
 	window:SetUserPlaced(true) -- this will allow window placement to be stored in cache, but is that reliable enough? Should we set up a window placement along with the saved sessions?
 	
