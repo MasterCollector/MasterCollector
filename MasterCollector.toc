@@ -20,6 +20,7 @@ datastructures.lua
 mappins.lua
 frame.lua
 main.lua
+tooltips.lua
 
 modManager.lua
 modules/core/data.lua
