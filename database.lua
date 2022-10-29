@@ -16,6 +16,17 @@ function DB:MergeObject(type, id, object, struct)
 	if not self.data[type][id] then
 		object.id = id -- TODO: I don't like this. Why should an object be self-aware of its id when the DB key is that id?
 		self.data[type][id] = setmetatable(object, struct)
+		if type == 'item' then
+			local item = Item:CreateFromItemID(id)
+			item:ContinueOnItemLoad(function()
+				local _,_,_,_,icon, classID = GetItemInfoInstant(id)
+				rawset(self.data[type][id], 'text', item:GetItemName() or 'Item #' .. id)
+				rawset(self.data[type][id], 'icon', icon)
+				if classID == 2 or classID == 4 then
+					rawset(self.data[type][id], 'type', 'equipment')
+				end
+			end)
+		end
 	end
 	return self.data[type][id]
 end
