@@ -11,6 +11,19 @@ local QuestInvalidationRules = {
 	[25623] = 25618, -- Hyjal, Into the Maw! (Ian)
 	[25624] = 25617 -- Hyjal, Into the Maw! (Takrik)
 }
+
+local function MergeProperties(fromTable, toTable)
+	for k,v in pairs(fromTable) do
+		if not rawget(toTable, k) then
+			rawset(toTable, k, v)
+		else
+			if type(v) == 'table' then
+				MergeProperties(v, toTable[k])
+			end
+		end
+	end
+	return toTable
+end
 function DB:MergeObject(type, id, object, struct)
 	if not self.data[type] then self.data[type] = {} end
 	if not self.data[type][id] then
@@ -27,8 +40,9 @@ function DB:MergeObject(type, id, object, struct)
 				end
 			end)
 		end
+		return self.data[type][id]
 	end
-	return self.data[type][id]
+	return MergeProperties(object, self.data[type][id])
 end
 function DB:MergeMapData(mapID, mapData)
 	if not self.mapData[mapID] then self.mapData[mapID] = {} end
