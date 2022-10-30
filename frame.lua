@@ -76,7 +76,11 @@ local function DrawRow(row, data, indentSize)
 			row.objectIcon:SetTexCoord(0,1,0,1)
 		end
 		row.objectIcon:Show()
+	elseif data.displayID then
+		SetPortraitTextureFromCreatureDisplayID(row.objectIcon, data.displayID)
+		row.objectIcon:Show()
 	end
+	
 	if data.type == "panel" or data.type == "map" then
 		row.expanded = data.expanded
 		row.collectedIcon:Hide()

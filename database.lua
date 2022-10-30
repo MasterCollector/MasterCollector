@@ -25,7 +25,19 @@ local function LoadCreatureNameFromID(id)
 	end
 	return 'Retrieving data...'
 end
-
+local ModelViewer = CreateFrame("DressUpModel", nil, UIParent);
+local function LoadCreatureDisplayDataFromID(id)
+	if id > 0 then
+		ModelViewer:SetDisplayInfo(0);
+		ModelViewer:SetUnit("none");
+		ModelViewer:SetCreature(id);
+		local displayID = ModelViewer:GetDisplayInfo();
+		if displayID and displayID ~= 0 then
+			rawset(DB:GetObjectData('npc', id), 'displayID', displayID)
+		end
+	end
+end
+MasterCollector.test = LoadCreatureDisplayDataFromID
 local function MergeProperties(fromTable, toTable)
 	for k,v in pairs(fromTable) do
 		if not rawget(toTable, k) then
@@ -57,6 +69,7 @@ function DB:MergeObject(type, id, object, struct)
 			end)
 		elseif type == 'npc' then
 			LoadCreatureNameFromID(tonumber(id))
+			LoadCreatureDisplayDataFromID(tonumber(id))
 		end
 		return self.data[type][id]
 	end
