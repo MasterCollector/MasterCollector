@@ -250,6 +250,15 @@ MasterCollector.structs.map = {
 		end
 	end
 }
+MasterCollector.structs.npc = {
+	__index = function(self, key)
+		if key == "visible" then
+			return determineVisibility(self)
+		else
+			return rawget(self, key)
+		end
+	end
+}
 MasterCollector.structs.pet = {
 	__index = function(self, key)
 		if not rawget(self, "loaded") then
