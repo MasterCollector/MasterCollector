@@ -11,6 +11,9 @@ MasterCollector.L.Panels = {
 		icon = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-TinyShield",
 		txcoord = { left = 0, right = 0.6, top = 0, bottom = 0.6 },
 	},
+	["npc"] = {
+		text = "NPCs"
+	},
 	["pet"] = {
 		text = AUCTION_CATEGORY_BATTLE_PETS,
 		icon = "Interface\\Icons\\Tracking_WildPet",
