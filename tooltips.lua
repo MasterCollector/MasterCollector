@@ -18,6 +18,7 @@ local function OnTooltipSetUnit(tooltip)
 					for _,v in pairs(obj.children or {}) do
 						if v.visible then
 							tooltip:AddLine(v.text)
+							if v.icon then tooltip:AddTexture(v.icon) end
 						end
 					end
 				end
