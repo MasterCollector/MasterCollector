@@ -12,6 +12,20 @@ local QuestInvalidationRules = {
 	[25624] = 25617 -- Hyjal, Into the Maw! (Takrik)
 }
 
+local HarvesterTooltip = CreateFrame("GameTooltip", "MCHarvesterTooltip", UIParent, "GameTooltipTemplate")
+local function LoadCreatureNameFromID(id)
+	if not HarvesterTooltip:GetOwner() then 
+		HarvesterTooltip:SetOwner(UIParent,"ANCHOR_NONE")
+	end
+	HarvesterTooltip:SetHyperlink(format("unit:Creature-0-0-0-0-%d-0000000000",id))
+	local text = MCHarvesterTooltipTextLeft1:GetText()
+	if text then
+		rawset(DB:GetObjectData('npc', id), 'text', text)
+		return text
+	end
+	return 'Retrieving data...'
+end
+
 local function MergeProperties(fromTable, toTable)
 	for k,v in pairs(fromTable) do
 		if not rawget(toTable, k) then
@@ -39,6 +53,8 @@ function DB:MergeObject(type, id, object, struct)
 					rawset(self.data[type][id], 'type', 'equipment')
 				end
 			end)
+		elseif type == 'npc' then
+			LoadCreatureNameFromID(tonumber(id))
 		end
 		return self.data[type][id]
 	end
