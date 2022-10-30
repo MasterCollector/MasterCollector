@@ -47,11 +47,13 @@ function DB:MergeObject(type, id, object, struct)
 			local item = Item:CreateFromItemID(id)
 			item:ContinueOnItemLoad(function()
 				local _,_,_,_,icon, classID = GetItemInfoInstant(id)
-				rawset(self.data[type][id], 'text', item:GetItemName() or 'Item #' .. id)
 				rawset(self.data[type][id], 'icon', icon)
 				if classID == 2 or classID == 4 then
 					rawset(self.data[type][id], 'type', 'equipment')
 				end
+				
+				rawset(self.data[type][id], 'quality', item:GetItemQuality())
+				rawset(self.data[type][id], 'text', format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(item:GetItemQuality())), id, item:GetItemName()))
 			end)
 		elseif type == 'npc' then
 			LoadCreatureNameFromID(tonumber(id))
