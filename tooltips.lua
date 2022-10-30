@@ -9,9 +9,17 @@ local function OnTooltipSetUnit(tooltip)
 		if unitType == 'Creature' then
 			local obj = MasterCollector.DB:GetObjectData('npc', tonumber(id))
 			if obj.children then
-				tooltip:AddLine('Grants:')
-				for k,v in pairs(obj.children or {}) do
-					tooltip:AddLine(v.text)
+				local visible = false
+				for _,v in pairs(obj.children) do
+					if v.visible then visible = true break end
+				end
+				if visible then
+					tooltip:AddLine('Grants:')
+					for _,v in pairs(obj.children or {}) do
+						if v.visible then
+							tooltip:AddLine(v.text)
+						end
+					end
 				end
 			end
 		end
