@@ -230,6 +230,8 @@ MasterCollector.structs.item = {
 		elseif key == "collected" then
 			if self.type == 'equipment' then
 				return C_TransmogCollection.PlayerHasTransmog(self.id)
+			elseif self.type == 'pet' then
+				return C_PetJournal.GetNumCollectedInfo(self.speciesID) > 0
 			elseif self.type == 'toy' then
 				return PlayerHasToy(self.id)
 			end
