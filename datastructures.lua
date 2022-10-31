@@ -211,7 +211,12 @@ MasterCollector.structs.panel = {
 MasterCollector.structs.ach = {
 	__index = function(self, key)
 		if key == "text" then
-			return select(2, GetAchievementInfo(self.id)) or 'Achievement #' .. self.id
+			local name = select(2, GetAchievementInfo(self.id))
+			if name then
+				rawset(self, 'name', format('|cffffff00%s|r', name))
+				return self.name
+			end
+			return format('|cffffff00%s|r', 'Achievement #' .. self.id)
 		elseif key == "visible" then
 			return determineVisibility(self)
 		elseif key == "collected" then
