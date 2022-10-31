@@ -48,4 +48,5 @@ if mod then
 
 	-- Last step is to register the mod-specific events to the core engine
 	MasterCollector:RegisterModuleEvents(events)
+	MasterCollector:FlagModAsLoaded("Pets")
 end
