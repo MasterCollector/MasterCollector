@@ -98,6 +98,15 @@ local function determineVisibility(tbl)
 		end
 	end
 	
+	if tbl.children then
+		local hasVisibleChildren = false
+		-- check all children of the panel. If any of them are visible, then the panel itself must be visible
+		for _,v in pairs(tbl.children) do
+			if determineVisibility(v) then return true end
+		end
+		if not hasVisibleChildren then return false end
+	end
+	
 	return true
 end
 local colors = {
