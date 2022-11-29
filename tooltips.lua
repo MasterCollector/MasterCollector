@@ -28,6 +28,7 @@ local function OnTooltipSetUnit(tooltip)
 end
 
 local function OnTooltipSetItem(tooltip)
+	if not tooltip.GetItem then return end
 	local link = select(2, tooltip:GetItem())
 	if link then
 		local itemID = tonumber(link:match("item:(%d+)"))
