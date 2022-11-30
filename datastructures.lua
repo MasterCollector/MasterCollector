@@ -124,6 +124,7 @@ end
 local dataFunctions = {
    IsOnQuestOrComplete = function(questID)
       if not questID then return end
+	  questID = tonumber(questID)
       return IsOnQuest(questID) or MasterCollector.DB:GetObjectData("quest", questID).collected
    end
 }
