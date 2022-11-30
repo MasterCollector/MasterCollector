@@ -3,7 +3,6 @@ local moduleDB, mapData = {}, {}
 local function Process()
 	for k,v in pairs(moduleDB) do
 		for id, obj in pairs(v) do
-			MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
 			if obj.grants then
 				if not obj.children then obj.children = {} end
 				for group=1,#obj.grants do
@@ -14,6 +13,7 @@ local function Process()
 				end
 			end
 			obj.grants = nil
+			MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
 		end
 	end
 	table.wipe(moduleDB)
