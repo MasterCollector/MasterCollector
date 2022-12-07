@@ -21,12 +21,15 @@ moduleDB={
 	["quest"]={
 		[62285]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
 		[62288]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
+		[72166]={minlevel=70,providers={"n",196191}},
 	},
 	["npc"]={
 		[174922]={coordinates={34.24,55.89,1670}},
+		[196191]={coordinates={43.35,42.52,2112}},
 	},
 }
 mapData={
 	[1670]={{"quest",{62285,62288}}},
+	[2112]={{"quest",{72166}}},
 }
 Process()
