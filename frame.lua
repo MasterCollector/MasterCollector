@@ -53,6 +53,10 @@ local function CreateRow(container)
 	label:SetPoint("RIGHT", expandableIcon, "LEFT")
 	label:SetJustifyH("LEFT")
 	row.label = label
+	
+	row:SetScript("OnEnter", function() MasterCollector.Tooltip:WindowFrameEnter(row) end)
+	row:SetScript("OnLeave", function() MasterCollector.Tooltip:WindowFrameLeave(row) end)
+	
 	return row
 end
 local function SetExpandedTexture(row, data)
@@ -126,7 +130,7 @@ local function DrawRow(row, data, indentSize)
 				Windows[row:GetParent():GetParent():GetParent():GetName()]:Refresh()
 		end)
 	end
-	
+	row.data = data
 	row.collectedIcon:Show()
 	row:Enable()
 end

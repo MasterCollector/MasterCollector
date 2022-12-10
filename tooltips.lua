@@ -1,6 +1,25 @@
 local MasterCollector = select(2,...)
-MasterCollector.Tooltip = {}
+local tt = {}
+MasterCollector.Tooltip = tt
 
+local tooltip = CreateFrame("GameTooltip", "MasterCollectorWindowTooltip", UIParent, "GameTooltipTemplate")
+function tt:WindowFrameEnter(frame)
+	if frame.data then
+		tooltip:SetOwner(frame)
+		if frame.data.type == 'achievement' then
+			tooltip:SetAchievementByID(frame.data.id)
+		elseif frame.data.type == 'item' then
+			tooltip:SetItemByID(frame.data.id)
+		end
+		tooltip:Show()
+	end
+end
+function tt:WindowFrameLeave(frame)
+	tooltip:ClearLines()
+	tooltip:Hide()
+end
+
+-- game tooltip extensions
 local function OnTooltipSetUnit(tooltip)
 	local unitGuid = UnitGUID("mouseover")
 	if unitGuid then
@@ -51,10 +70,3 @@ local function OnTooltipSetItem(tooltip)
 end
 TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
---GameTooltip:SetScript("OnTooltipSetUnit", OnTooltipSetUnit)
---GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
-
-
---local function TooltipCleared(tooltip)
---end
---GameTooltip:HookScript("OnTooltipCleared", TooltipCleared)

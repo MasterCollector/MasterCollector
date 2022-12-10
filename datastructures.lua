@@ -227,6 +227,8 @@ MasterCollector.structs.ach = {
 				return self.name
 			end
 			return format('|cffffff00%s|r', 'Achievement #' .. self.id)
+		elseif key == "type" then
+			return "achievement"
 		elseif key == "visible" then
 			return determineVisibility(self)
 		elseif key == "collected" then
@@ -242,6 +244,8 @@ MasterCollector.structs.item = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "type" then
+			return "item"
 		elseif key == "collected" then
 			if self.type == 'equipment' then
 				return C_TransmogCollection.PlayerHasTransmog(self.id)

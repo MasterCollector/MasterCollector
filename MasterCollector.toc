@@ -18,9 +18,9 @@ settings.lua
 database.lua
 datastructures.lua
 mappins.lua
+tooltips.lua
 frame.lua
 main.lua
-tooltips.lua
 
 modManager.lua
 modules/core/data.lua
