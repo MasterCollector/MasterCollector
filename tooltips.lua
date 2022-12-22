@@ -48,12 +48,8 @@ end
 
 local function OnTooltipSetItem(tooltip)
 	if not tooltip.GetItem then return end
-	local link = select(2, tooltip:GetItem())
-	if link then
-		local itemID = tonumber(link:match("item:(%d+)"))
-		if not itemID then
-			return
-		end
+	local _, link, itemID = tooltip:GetItem()
+	if itemID then
 		tooltip:AddDoubleLine("Item ID:", tostring(itemID))
 		local _,_,_,equipLocation,_,classID,subclassID = GetItemInfoInstant(itemID)
 		local appearanceID, sourceID = C_TransmogCollection.GetItemInfo(link)
