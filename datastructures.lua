@@ -275,6 +275,8 @@ MasterCollector.structs.npc = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "text" then
+			return 'NPC #' .. self.id
 		else
 			return rawget(self, key)
 		end
