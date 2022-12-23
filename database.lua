@@ -57,20 +57,24 @@ function DB:MergeObject(type, id, object, struct)
 		self.data[type][id] = setmetatable(object, struct)
 		if type == 'item' then
 			local item = Item:CreateFromItemID(id)
-			item:ContinueOnItemLoad(function()
-				local _,_,_,_,icon, classID, subclassID = GetItemInfoInstant(id)
-				rawset(self.data[type][id], 'icon', icon)
-				if classID == 2 or classID == 4 then
-					rawset(self.data[type][id], 'type', 'equipment')
-				end
-				rawset(self.data[type][id], 'quality', item:GetItemQuality())
-				rawset(self.data[type][id], 'text', format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(item:GetItemQuality())), id, item:GetItemName()))
-				
-				if (classID == 15 and subclassID ==2) or classID == 17 then
-					rawset(self.data[type][id], 'type', 'pet')
-					rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
-				end
-			end)
+			if not item:IsItemEmpty() then
+				item:ContinueOnItemLoad(function()
+					local _,_,_,_,icon, classID, subclassID = GetItemInfoInstant(id)
+					rawset(self.data[type][id], 'icon', icon)
+					if classID == 2 or classID == 4 then
+						rawset(self.data[type][id], 'type', 'equipment')
+					end
+					rawset(self.data[type][id], 'quality', item:GetItemQuality())
+					rawset(self.data[type][id], 'text', format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(item:GetItemQuality())), id, item:GetItemName()))
+					
+					if (classID == 15 and subclassID ==2) or classID == 17 then
+						rawset(self.data[type][id], 'type', 'pet')
+						rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
+					end
+				end)
+			else
+				rawset(self.data[type][id], 'text', format('Item #%d', id))
+			end
 		elseif type == 'npc' then
 			LoadCreatureNameFromID(tonumber(id))
 			LoadCreatureDisplayDataFromID(tonumber(id))
