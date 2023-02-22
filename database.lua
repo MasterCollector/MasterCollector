@@ -71,6 +71,9 @@ function DB:MergeObject(type, id, object, struct)
 						if (classID == 15 and subclassID ==2) or classID == 17 then
 							rawset(self.data[type][id], 'type', 'pet')
 							rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
+						elseif C_MountJournal.GetMountFromItem(id) then
+							rawset(self.data[type][id], 'type', 'mount')
+							rawset(self.data[type][id], 'mountID', C_MountJournal.GetMountFromItem(id))
 						elseif C_ToyBox.GetToyInfo(id) then
 							rawset(self.data[type][id], 'type', 'toy')
 						end
