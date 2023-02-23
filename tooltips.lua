@@ -2,7 +2,7 @@ local MasterCollector = select(2,...)
 local tt = {}
 MasterCollector.Tooltip = tt
 
-local tooltip = CreateFrame("GameTooltip", "MasterCollectorWindowTooltip", UIParent, "GameTooltipTemplate")
+local tooltip = GameTooltip
 function tt:WindowFrameEnter(frame)
 	if frame.data then
 		tooltip:SetOwner(frame)
