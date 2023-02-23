@@ -8,7 +8,7 @@ function tt:WindowFrameEnter(frame)
 		tooltip:SetOwner(frame)
 		if frame.data.type == 'achievement' then
 			tooltip:SetAchievementByID(frame.data.id)
-		elseif frame.data.type == 'item' then
+		elseif frame.data.baseType == 'item' then
 			tooltip:SetItemByID(frame.data.id)
 		end
 		tooltip:Show()
