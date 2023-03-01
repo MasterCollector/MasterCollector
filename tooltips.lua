@@ -10,6 +10,8 @@ local function OnTooltipSetUnit(tooltip)
 	local unitGuid = UnitGUID("mouseover")
 	if unitGuid then
 		local unitType,_,_,_,_,id = strsplit('-',unitGuid)
+		if unitType == 'Player' then return end
+		
 		tooltip:AddDoubleLine(unitType .. ' ID:', id)
 		if unitType == 'Creature' then
 			local obj = MasterCollector.DB:GetObjectData('npc', tonumber(id))
