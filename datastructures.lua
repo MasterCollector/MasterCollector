@@ -305,6 +305,7 @@ MasterCollector.structs.quest = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "type" then return "quest"
 		elseif key == "sortkey" then
 			return QuestNames[self.id]
 		elseif key == "text" then

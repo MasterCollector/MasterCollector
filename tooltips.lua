@@ -1,23 +1,9 @@
 local MasterCollector = select(2,...)
 local tt = {}
+local L = MasterCollector.L
 MasterCollector.Tooltip = tt
 
 local tooltip = GameTooltip
-function tt:WindowFrameEnter(frame)
-	if frame.data then
-		tooltip:SetOwner(frame)
-		if frame.data.type == 'achievement' then
-			tooltip:SetAchievementByID(frame.data.id)
-		elseif frame.data.baseType == 'item' then
-			tooltip:SetItemByID(frame.data.id)
-		end
-		tooltip:Show()
-	end
-end
-function tt:WindowFrameLeave(frame)
-	tooltip:ClearLines()
-	tooltip:Hide()
-end
 
 -- game tooltip extensions
 local function OnTooltipSetUnit(tooltip)
@@ -64,5 +50,61 @@ local function OnTooltipSetItem(tooltip)
 		end
 	end
 end
+
+local function OnTooltipSetQuest(tooltip, rowFrame)
+	if rowFrame and rowFrame.data then
+		local data = rowFrame.data
+		tooltip:SetOwner(rowFrame)
+		tooltip:AddLine(string.format('%s %s', data.text, '('..tostring(data.id or "Unknown")..')'))
+		
+		if data.requirements or data.races then
+			tooltip:AddLine("Requirements:")
+			
+			if data.races then
+				local races = data.races
+				if races ~= 'table' then races = {races} end
+				for _,v in pairs(races) do
+					tooltip:AddDoubleLine("Race(s):", L.Races[v])
+				end
+			end
+			
+			if data.requirements then
+				for k,v in pairs(data.requirements) do
+					if k == "quest" then
+						if type(v) ~= "table" then v = {v} end
+						for row,questID in pairs(v) do
+							local quest = MasterCollector.DB:GetObjectData("quest", questID)
+							if row == 1 then
+								tooltip:AddDoubleLine("Quests: ", quest.text)
+							else
+								tooltip:AddDoubleLine(" ", quest.text)
+							end
+							if quest.icon then tooltip:AddTexture(quest.icon, {region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
 TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
+
+function tt:WindowFrameEnter(frame)
+	if frame.data then
+		tooltip:SetOwner(frame)
+		if frame.data.type == 'achievement' then
+			tooltip:SetAchievementByID(frame.data.id)
+		elseif frame.data.baseType == 'item' then
+			tooltip:SetItemByID(frame.data.id)
+		elseif frame.data.type == 'quest' then
+			OnTooltipSetQuest(tooltip, frame)
+		end
+		tooltip:Show()
+	end
+end
+function tt:WindowFrameLeave(frame)
+	tooltip:ClearLines()
+	tooltip:Hide()
+end
