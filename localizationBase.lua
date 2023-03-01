@@ -1,11 +1,11 @@
 local MasterCollector = select(2,...)
-MasterCollector.L = {}
+local L = {}
+MasterCollector.L = L
 
--- panel info
-MasterCollector.L.Text = {
+L.Text = {
 	QUEST_PENDING_NAME = LOOT_JOURNAL_LEGENDARIES_SOURCE_QUEST .. ' #%d' -- Using a known global constant here will auto-translate. Not the best key but it works
 }
-MasterCollector.L.Panels = {
+L.Panels = {
 	["ach"] = {
 		text = ACHIEVEMENTS,
 		icon = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-TinyShield",
@@ -28,3 +28,19 @@ MasterCollector.L.Panels = {
 		txcoord = { left = 0.26953125, right = 0.35546875, top = 0.64453125, bottom = 0.734375 }
 	}
 }
+
+L.Races = {
+   [-2] = FACTION_HORDE,
+   [-1] = FACTION_ALLIANCE,
+   [0] = FACTION_NEUTRAL
+}
+setmetatable(L.Races, {
+      __index = function(self, key)
+         local raceID, ci = tonumber(key)
+         if raceID then
+            ci = C_CreatureInfo.GetRaceInfo(raceID)
+         end
+         rawset(self, key, (ci and ci.raceName) or "Unknown")
+         return self[key]
+      end
+})
