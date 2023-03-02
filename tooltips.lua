@@ -87,7 +87,9 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 							else
 								tooltip:AddDoubleLine(" ", quest.text)
 							end
-							if quest.icon then tooltip:AddTexture(quest.icon, {region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+							
+							if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+							if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 						end
 					end
 				end
