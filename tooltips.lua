@@ -59,6 +59,12 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 		tooltip:SetOwner(rowFrame)
 		tooltip:AddLine(string.format('%s %s', data.text, '('..tostring(data.id or "Unknown")..')'))
 		
+		if data.description then
+			tooltip:AddLine(" ")
+			tooltip:AddLine(data.description, nil, nil, nil, true)
+			tooltip:AddLine(" ")
+		end
+		
 		if data.requirements or data.races then
 			tooltip:AddLine("Requirements:")
 			
