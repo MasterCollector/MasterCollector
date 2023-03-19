@@ -1,5 +1,5 @@
 ## Author: Pr3vention
-## Interface: 100002
+## Interface: 100007
 ## Title: Master Collector
 ## Notes: Tracks collection completion
 ## Version: 0.0.1
