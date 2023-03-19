@@ -171,15 +171,15 @@ local function ExpandCollapseData(wnd)
 	for _,v in pairs(wnd.data) do toggleState(v) end
 	wnd:Refresh()
 end
-local function ProcessWaypointsForData(data, remove)
+local function ProcessWaypointsForData(data, remove, omitComplete)
 	if not data then return end
 	for _,v in pairs(data) do
 		if v.visible then
-			if v.children then ProcessWaypointsForData(v.children, remove) end
+			if v.children then ProcessWaypointsForData(v.children, remove, omitComplete) end
 			if remove then
 				MapPins:TryRemoveObjectPins(v)
 			else
-				MapPins:TryMapObject(v)
+				MapPins:TryMapObject(v, omitComplete)
 			end
 		end
 	end
@@ -400,6 +400,13 @@ function Window:New(name, type, title)
 			type = "command",
 			command = function()
 				ProcessWaypointsForData(wnd.data)
+			end,
+		},
+		{
+			text = "Show Uncollected Waypoints",
+			type = "command",
+			command = function()
+				ProcessWaypointsForData(wnd.data, false, true)
 			end,
 		},
 		{
