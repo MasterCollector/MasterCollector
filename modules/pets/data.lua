@@ -709,6 +709,10 @@ moduleDB={
 		[71180]={flags={wq=true}},
 		[71206]={flags={wq=true},minlevel=60},
 		[72721]={flags={weekly=true},minlevel=70,providers={"n",199526}},
+		[73146]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202413}}}},
+		[73147]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202411}}}},
+		[73148]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202412}}}},
+		[73149]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202407}}}},
 	},
 }
 mapData={
@@ -802,7 +806,7 @@ mapData={
 	[427]={{"pet",{378,440,441}}},
 	[433]={{"pet",{706,708,709}}},
 	[460]={{"pet",{447,507}}},
-	[461]={{"pet",{448,467,468,635}}},
+	[461]={{"pet",{448,466,467,468,635}}},
 	[462]={{"pet",{378,385,386}}},
 	[463]={{"pet",{466,467}}},
 	[465]={{"pet",{417,458}}},
@@ -850,5 +854,6 @@ mapData={
 	[2024]={{"pet",{388,487,550,635,641,3272,3276,3281,3282,3288,3296,3300,3322,3328,3351,3353,3354,3357}},{"quest",{71145}}},
 	[2025]={{"pet",{406,3272,3282,3295,3296,3301,3322,3336,3366,3403,3404}},{"quest",{71180}}},
 	[2112]={{"pet",{3301}},{"quest",{72721}}},
+	[2151]={{"quest",{73146,73147,73148,73149}}},
 }
 Process()
