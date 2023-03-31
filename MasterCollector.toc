@@ -31,6 +31,3 @@ modules/quests/data.lua
 modules/quests/module.lua
 modules/treasures/data.lua
 modules/treasures/module.lua
-
-# OMIT_BELOW
-devtools.lua
