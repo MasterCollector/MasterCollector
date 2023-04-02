@@ -192,7 +192,7 @@ pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 		if success then
 			rawset(QuestNames, questID, GetQuestTitle(questID))
 		else
-			rawset(QuestNames, questID, string.format(L.Text.QUEST_PENDING_NAME, questID))
+			rawset(QuestNames, questID, MasterCollector.L.Quests[questID] or string.format(L.Text.QUEST_PENDING_NAME, questID))
 		end
 		MasterCollector:RefreshWindows(true)
 	end
@@ -310,10 +310,11 @@ MasterCollector.structs.quest = {
 			return QuestNames[self.id]
 		elseif key == "text" then
 			local color = GetQuestTextColor(self)
+			local name = QuestNames[self.id]
 			if color then
-				return string.format("%s%s|r", color, QuestNames[self.id])
+				return string.format("%s%s|r", color, name)
 			else
-				return QuestNames[self.id]
+				return name
 			end
 		elseif key == "icon" then
 			if self.flags and self.flags.breadcrumb then

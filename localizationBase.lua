@@ -44,3 +44,9 @@ setmetatable(L.Races, {
          return self[key]
       end
 })
+
+-- not sure if this is a good idea or not [Pr3vention]
+-- Explicit titles should only be provided for quests that otherwise don't have names (e.g. account triggers)
+L.Quests = {
+	[75658] = "Zaralek Cavern world quests unlocked on one character",
+}
