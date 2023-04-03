@@ -55,6 +55,9 @@ function MasterCollector:MapData(mapID)
 end
 
 function MasterCollector:Start()
+	-- initialize the database(s)
+	MasterCollector.DB:Process()
+
 	local currentZoneWindow = MasterCollector.Window:Get("MasterCollectorCurrentZone")
 	if not currentZoneWindow then
 		currentZoneWindow = MasterCollector.Window:New("MasterCollectorCurrentZone", "currentZone")

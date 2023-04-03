@@ -130,4 +130,27 @@ function DB:SetCollectedState(obj, state)
 		end
 	end
 end
+function DB:Process()
+	for k,v in pairs(MasterCollector.Modules) do
+		for k,v in pairs(v.moduleDB) do
+			for id, obj in pairs(v) do
+				if obj.grants then
+					if not obj.children then obj.children = {} end
+					for group=1,#obj.grants do
+						for _,id in pairs(obj.grants[group][2] or {}) do
+							local item = MasterCollector.DB:GetObjectData(obj.grants[group][1], id)
+							table.insert(obj.children, item)
+						end
+					end
+				end
+				obj.grants = nil
+				MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+			end
+		end
+		for k,v in pairs(v.mapData) do
+			MasterCollector.DB:MergeMapData(k, v)
+		end
+	end
+	MasterCollector.Modules = nil
+end
 MasterCollector.DB = DB
