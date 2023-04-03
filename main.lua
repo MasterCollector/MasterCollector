@@ -10,6 +10,14 @@ local mapDisplayOverrides = {
 	[338] = 338, -- molten front
 	[1648] = 1648, -- the maw (intro to shadowlands version)
 	[577] = 577, -- draenor (intro - dark portal scenario)
+	[578] = 578,
+	[2085] = 2025, -- primalist's future -> thaldraszus
+	[2088] = 2025, -- pandaren revolution -> thaldraszus
+	[2089] = 2025, -- the black empire -> thaldraszus
+	[2090] = 2025, -- the gnoll war -> thaldraszus
+	[2091] = 2025, -- war of the shifting sands -> thaldraszus
+	[2092] = 2025, -- azmerloth (scenario map) -> thaldraszus
+	[464] = 463, -- spitescale cavern -> echo isles
 }
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
