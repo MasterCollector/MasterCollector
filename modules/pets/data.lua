@@ -698,6 +698,7 @@ MasterCollector.Modules.Pets={
 			[73147]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202411}}}},
 			[73148]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202412}}}},
 			[73149]={description="Lower the objective to an epic quality before defeating it to obtain the pet",flags={wq=true},grants={{"item",{202407}}}},
+			[75750]={flags={wq=true},requirements={quest=75658}},
 		},
 	},
 	mapData={
@@ -839,7 +840,7 @@ MasterCollector.Modules.Pets={
 		[2024]={{"pet",{388,487,550,635,641,3272,3276,3281,3282,3288,3296,3300,3322,3328,3351,3353,3354,3357}},{"quest",{71145}}},
 		[2025]={{"pet",{406,3272,3282,3295,3296,3301,3322,3336,3366,3403,3404}},{"quest",{71180}}},
 		[2112]={{"pet",{3301}},{"quest",{72721}}},
-		[2133]={{"pet",{3477,3478,3479,3480,3481,3482,3483,3484,3485}}},
+		[2133]={{"pet",{3477,3478,3479,3480,3481,3482,3483,3484,3485}},{"quest",{75750}}},
 		[2151]={{"quest",{73146,73147,73148,73149}}},
 	}
 }
