@@ -189,6 +189,10 @@ pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 	--   the quest itself doesn't have a name (e.g. tracking quests). 
 	if event == "QUEST_DATA_LOAD_RESULT" then
 		local questID, success = ...
+		-- For some reason, Blizzard sends QUEST_DATA_LOAD_RESULT for every step completion in a world quest for all world/bonus quests on the map.
+		-- If the quest already has a name that isn't the loading text, we can skip this event
+		if QuestNames[questID] and QuestNames[questID] ~= SEARCH_LOADING_TEXT then return end
+		
 		if success then
 			rawset(QuestNames, questID, GetQuestTitle(questID))
 		else
