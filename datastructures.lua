@@ -187,11 +187,11 @@ pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
 	-- Once blizzard returns the quest data, we can inspect the result to see if it's a valid entry or not
 	-- Quests that have a nil or false "success" return tell us that either blizzard has removed the quest completely OR
 	--   the quest itself doesn't have a name (e.g. tracking quests). 
-	if event == "QUEST_DATA_LOAD_RESULT" then
+	if event == "QUEST_DATA_LOAD_RESULT" and rawget(QuestNames, ...) then -- only bother with results from quest load requests made by this addon
 		local questID, success = ...
 		-- For some reason, Blizzard sends QUEST_DATA_LOAD_RESULT for every step completion in a world quest for all world/bonus quests on the map.
 		-- If the quest already has a name that isn't the loading text, we can skip this event
-		if QuestNames[questID] and QuestNames[questID] ~= SEARCH_LOADING_TEXT then return end
+		if QuestNames[questID] ~= SEARCH_LOADING_TEXT then return end
 		
 		if success then
 			rawset(QuestNames, questID, GetQuestTitle(questID))
