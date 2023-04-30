@@ -50,3 +50,7 @@ setmetatable(L.Races, {
 L.Quests = {
 	[75658] = "Zaralek Cavern world quests unlocked on one character",
 }
+
+L.Scripts = {
+	["IsOnQuestOrComplete"] = "Must be on or have completed quest ",
+}

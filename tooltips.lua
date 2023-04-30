@@ -91,6 +91,13 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 							if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 							if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 						end
+					elseif k == "script" then
+						if type(v) ~= "table" then v = {v} end
+						local scriptName, params = v[1], v[2]
+						if scriptName == "IsOnQuestOrComplete" then
+							local quest = MasterCollector.DB:GetObjectData("quest", tonumber(params))
+							tooltip:AddDoubleLine(MasterCollector.L.Scripts[scriptName], quest.text)
+						end
 					end
 				end
 			end
