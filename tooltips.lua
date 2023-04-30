@@ -98,6 +98,11 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 							local quest = MasterCollector.DB:GetObjectData("quest", tonumber(params))
 							tooltip:AddDoubleLine(MasterCollector.L.Scripts[scriptName], quest.text)
 						end
+					elseif k == "rep" then
+						local name = GetFactionInfoByID(v)
+						tooltip:AddDoubleLine(REPUTATION, name or string.format("Unknown (%s)",v))
+					elseif k == "renown" then
+						tooltip:AddDoubleLine(RENOWN_LEVEL_LABEL, v)
 					end
 				end
 			end
