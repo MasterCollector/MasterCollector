@@ -16,6 +16,7 @@ MasterCollector.Modules.Pvp={
 			[62285]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
 			[62288]={coordinates={34.24,55.91,1670},minlevel=60,providers={"n",174922}},
 			[72166]={minlevel=70,providers={"n",196191}},
+			[72171]={minlevel=70,providers={"n",196191}},
 			[72648]={flags={weekly=true},minlevel=60,providers={"n",199393}},
 			[72720]={flags={weekly=true},minlevel=70,providers={"n",199526}},
 		},
@@ -23,6 +24,6 @@ MasterCollector.Modules.Pvp={
 	mapData={
 		[85]={{"npc",{12796,73151}}},
 		[1670]={{"quest",{62285,62288}}},
-		[2112]={{"quest",{72166,72648,72720}}},
+		[2112]={{"quest",{72166,72171,72648,72720}}},
 	}
 }
