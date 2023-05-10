@@ -4,9 +4,6 @@
 ## Notes: Tracks collection completion
 ## Version: 0.0.1
 ## IconTexture: Interface/Addons/MasterCollector/assets/logo_32x32
-## SavedVariables: MCItemHarvestData
-## SavedVariablesPerCharacter: MCGathererDataPC
-
 
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
