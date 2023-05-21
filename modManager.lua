@@ -33,6 +33,45 @@ events.PET_JOURNAL_LIST_UPDATE = function ()
 	MasterCollector:RefreshWindows()
 end
 
+
+events.ACHIEVEMENT_EARNED = function(achievementID, alreadyEarned)
+	-- TODO: where does 'alreadyEarned' come into play? Is it for achievements unlocked
+	--		 on your account but not on the character?
+	local ach = MasterCollector.DB:GetObjectData("ach", achievementID)
+	if ach then
+		rawset(ach, 'collected', true)
+		MasterCollector:RefreshWindows()
+	end
+end
+events.TRANSMOG_COLLECTION_SOURCE_ADDED = function(itemModifiedAppearanceID)
+	if not itemModifiedAppearanceID then return end
+	print('TRANSMOG_COLLECTION_SOURCE_ADDED:', itemModifiedAppearanceID)
+	MasterCollector:RefreshWindows()
+end
+events.TRANSMOG_COLLECTION_SOURCE_REMOVED = function(itemModifiedAppearanceID)
+	print('TRANSMOG_COLLECTION_SOURCE_REMOVED:', itemModifiedAppearanceID)
+	MasterCollector:RefreshWindows()
+end
+events.TRANSMOG_COLLECTION_UPDATED = function(collectionIndex, modID, itemAppearanceID, reason)
+	-- probably fires when a transmog set has an item added to its collection (e.g. raid tier, world quest items, etc)
+	print("TRANSMOG_COLLECTION_UPDATED", collectionIndex, modID, itemAppearanceID, reason)
+end
+events.QUEST_TURNED_IN = function(questID)
+	local quest = MasterCollector.DB:GetObjectData("quest", questID)
+	if quest then
+		rawset(quest, 'collected', true)
+		print('quest completed: ' .. questID .. ' (' .. quest.text .. ')')
+		Mappins:TryRemoveObjectPins(quest)
+		MasterCollector:RefreshWindows()
+	end
+end
+events.QUEST_ACCEPTED = function()
+	-- There is a delay between the event and the API responding with the right values.
+	-- this solution sucks. I hate it, but it works for the time being
+	C_Timer.After(0.1, function() MasterCollector:RefreshWindows() end)
+end
+events.QUEST_REMOVED = events.QUEST_ACCEPTED
+
 eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
 		MasterCollector.playerData.class = select(3, UnitClass("player"))
