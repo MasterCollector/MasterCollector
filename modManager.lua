@@ -1,5 +1,7 @@
 local addonName = select(1, ...)
 MasterCollector = select(2, ...)	-- Intentionally made non-local
+-- local references for performance
+local C_PetJournal = C_PetJournal
 
 --------------------
 -- Event Handling --
@@ -17,6 +19,19 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
+
+local events = {}
+local numPets
+events.PET_JOURNAL_LIST_UPDATE = function ()
+	local newPetCount = select(2, C_PetJournal.GetNumPets())
+	if numPets == newPetCount then return end
+	
+	numPets = newPetCount
+	for speciesID in pairs(MasterCollector.DB.data.pet) do
+		rawset(MasterCollector.DB.data.pet[speciesID], 'collected', C_PetJournal.GetNumCollectedInfo(speciesID) > 0)
+	end
+	MasterCollector:RefreshWindows()
+end
 
 eventFrame.events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
@@ -80,3 +95,6 @@ function MasterCollector:FlagModAsLoaded(modName)
 		MasterCollector.Modules[modName].loaded = true
 	end
 end
+
+-- work in progress. Registing events at the addon-level doesn't make sense but there are too many dependencies right now to eliminate it
+MasterCollector:RegisterModuleEvents(events)
