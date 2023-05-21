@@ -21,7 +21,8 @@ frame.lua
 main.lua
 
 modManager.lua
-modules/core/data.lua
-modules/pets/data.lua
-modules/quests/data.lua
-modules/treasures/data.lua
+modules/core.lua
+modules/pets.lua
+modules/pvp.lua
+modules/quests.lua
+modules/treasures.lua
