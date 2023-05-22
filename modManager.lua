@@ -1,6 +1,8 @@
 local addonName = select(1, ...)
 MasterCollector = select(2, ...)	-- Intentionally made non-local
+
 -- local references for performance
+local MapPins = MasterCollector.MapPins
 local C_PetJournal = C_PetJournal
 
 --------------------
@@ -57,7 +59,7 @@ events.QUEST_TURNED_IN = function(questID)
 	if quest then
 		rawset(quest, 'collected', true)
 		print('quest completed: ' .. questID .. ' (' .. quest.text .. ')')
-		Mappins:TryRemoveObjectPins(quest)
+		MapPins:TryRemoveObjectPins(quest)
 		MasterCollector:RefreshWindows()
 	end
 end
