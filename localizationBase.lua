@@ -1,4 +1,4 @@
-local MasterCollector = select(2,...)
+MasterCollector = select(2, ...)	-- Intentionally made non-local
 local L = {}
 MasterCollector.L = L
 

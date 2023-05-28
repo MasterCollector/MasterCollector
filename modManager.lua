@@ -1,5 +1,5 @@
 local addonName = select(1, ...)
-MasterCollector = select(2, ...)	-- Intentionally made non-local
+local MasterCollector = select(2, ...)	-- Intentionally made non-local
 
 -- local references for performance
 local MapPins = MasterCollector.MapPins
