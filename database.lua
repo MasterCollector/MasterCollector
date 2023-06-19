@@ -11,7 +11,6 @@ local QuestInvalidationRules = {
 	[25623] = 25618, -- Hyjal, Into the Maw! (Ian)
 	[25624] = 25617 -- Hyjal, Into the Maw! (Takrik)
 }
-
 local HarvesterTooltip = CreateFrame("GameTooltip", "MCHarvesterTooltip", UIParent, "GameTooltipTemplate")
 local function LoadCreatureNameFromID(id)
 	if not HarvesterTooltip:GetOwner() then 
@@ -109,8 +108,7 @@ function DB:MergeMapData(mapID, mapData)
 	end
 end
 function DB:GetObjectData(type, id)
-	if not self.data[type] then self.data[type] = {} end
-	return self.data[type][id] or DB:MergeObject(type, id, {}, MasterCollector.structs[type])
+	if self.data[type] then return self.data[type][id] end
 end
 function DB:GetMapMetadata(mapID)
 	return self.mapData[mapID]
@@ -131,24 +129,25 @@ function DB:SetCollectedState(obj, state)
 	end
 end
 function DB:Process()
-	for k,v in pairs(MasterCollector.Modules) do
-		for k,v in pairs(v.moduleDB) do
-			for id, obj in pairs(v) do
+	for modName,mod in pairs(MasterCollector.Modules or {}) do
+		for objType,objTable in pairs(mod.moduleDB) do
+			for id, obj in pairs(objTable) do
 				if obj.grants then
 					if not obj.children then obj.children = {} end
 					for group=1,#obj.grants do
 						for _,id in pairs(obj.grants[group][2] or {}) do
-							local item = MasterCollector.DB:GetObjectData(obj.grants[group][1], id)
+							local item = DB:GetObjectData(obj.grants[group][1], id) or DB:MergeObject(obj.grants[group][1], id, {}, MasterCollector.structs[obj.grants[group][1]])
+							if not item then print('item is null') end
 							table.insert(obj.children, item)
 						end
 					end
+					obj.grants = nil
 				end
-				obj.grants = nil
-				MasterCollector.DB:MergeObject(k, id, obj, MasterCollector.structs[obj.type or k])
+				self:MergeObject(objType, id, obj, MasterCollector.structs[obj.type or objType])
 			end
 		end
-		for k,v in pairs(v.mapData) do
-			MasterCollector.DB:MergeMapData(k, v)
+		for mapID,tbl in pairs(mod.mapData or {}) do
+			MasterCollector.DB:MergeMapData(mapID, tbl)
 		end
 	end
 	MasterCollector.Modules = nil
