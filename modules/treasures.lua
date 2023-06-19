@@ -1,5 +1,5 @@
 -- TODO: check if treasures module is enabled. If not, return immediately
-if true then return end
+--if true then return end
 local MasterCollector = select(2,...)
 --@GENERATE_HERE@--
 MasterCollector.Modules.Treasures={
