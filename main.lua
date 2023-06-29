@@ -10,6 +10,8 @@ local mapDisplayOverrides = {
 	[338] = 338, -- molten front
 	[1648] = 1648, -- the maw (intro to shadowlands version)
 	[577] = 577, -- draenor (intro - dark portal scenario)
+	[427] = 427, -- Coldridge Valley
+	[428] = 427, -- Frostmane Hovel -> Coldridge Valley
 	[578] = 578,
 	[2085] = 2025, -- primalist's future -> thaldraszus
 	[2088] = 2025, -- pandaren revolution -> thaldraszus
@@ -18,6 +20,10 @@ local mapDisplayOverrides = {
 	[2091] = 2025, -- war of the shifting sands -> thaldraszus
 	[2092] = 2025, -- azmerloth (scenario map) -> thaldraszus
 	[464] = 463, -- spitescale cavern -> echo isles
+	[2171] = 2171, -- abberus quest area 1
+	[2172] = 2171, -- abberus quest area 2
+	[2173] = 2171, -- aberrus quest area 3
+	[2174] = 2171 -- aberrus quest area 4
 }
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
