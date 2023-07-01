@@ -151,5 +151,6 @@ function DB:Process()
 		end
 	end
 	MasterCollector.Modules = nil
+	MasterCollector:PostProcess()
 end
 MasterCollector.DB = DB

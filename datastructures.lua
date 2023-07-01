@@ -320,6 +320,12 @@ MasterCollector.structs.quest = {
 			else
 				return name
 			end
+		elseif key == "collected" then
+			if self.IsMissed and self.IsMissed() then
+				rawset(self, key, -1)
+				return -1
+			end
+			return false
 		elseif key == "icon" then
 			if self.flags and self.flags.breadcrumb then
 				self.icon = "Interface\\icons\\inv_misc_food_12"

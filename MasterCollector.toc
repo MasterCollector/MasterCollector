@@ -26,3 +26,4 @@ modules/pets.lua
 modules/pvp.lua
 modules/quests.lua
 modules/treasures.lua
+modules/postprocessing.lua
