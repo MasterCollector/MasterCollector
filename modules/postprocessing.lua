@@ -3,6 +3,8 @@ local MasterCollector = select(2,...)
 local missable = {
 	["quest"] = {
 		[24493] = [[return C_QuestLog.IsQuestFlaggedCompleted(24492)]],
+		-- breadcrumbs below. These should be easy to automate since they lead to another quest, but having them here works for now
+		[26373] = [[return C_QuestLog.IsQuestFlaggedCompleted(25724)]],
 	}
 }
 

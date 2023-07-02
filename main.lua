@@ -23,7 +23,10 @@ local mapDisplayOverrides = {
 	[2171] = 2171, -- abberus quest area 1
 	[2172] = 2171, -- abberus quest area 2
 	[2173] = 2171, -- aberrus quest area 3
-	[2174] = 2171 -- aberrus quest area 4
+	[2174] = 2171, -- aberrus quest area 4
+	[30] = 469, -- new tinkertown (lower)
+	[469] = 469, -- new tinkertown
+	[470] = 469, -- frostmane hold
 }
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
