@@ -137,8 +137,10 @@ end
 local function CountVisibleDataEntries(tbl)
 	local visibleEntries = 0
 	for _,v in pairs(tbl or {}) do
-		if v.visible then visibleEntries = visibleEntries + 1 end
-		if v.children and v.expanded then visibleEntries = visibleEntries + CountVisibleDataEntries(v.children) end
+		if v.visible then
+			visibleEntries = visibleEntries + 1
+			if v.children and v.expanded then visibleEntries = visibleEntries + CountVisibleDataEntries(v.children) end
+		end
 	end
 	return visibleEntries
 end
