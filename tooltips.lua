@@ -81,7 +81,7 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 					if k == "quest" then
 						if type(v) ~= "table" then v = {v} end
 						for row,questID in pairs(v) do
-							local quest = MasterCollector.DB:GetObjectData("quest", questID)
+							local quest = MasterCollector.DB:GetObjectData("quest", questID) or {text=string.format(L.Text.QUEST_PENDING_NAME, questID)}
 							if row == 1 then
 								tooltip:AddDoubleLine("Quests: ", quest.text)
 							else
@@ -95,7 +95,7 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 						if type(v) ~= "table" then v = {v} end
 						local scriptName, params = v[1], v[2]
 						if scriptName == "IsOnQuestOrComplete" then
-							local quest = MasterCollector.DB:GetObjectData("quest", tonumber(params))
+							local quest = MasterCollector.DB:GetObjectData("quest", tonumber(params)) or {text=string.format(L.Text.QUEST_PENDING_NAME, params)}
 							tooltip:AddDoubleLine(MasterCollector.L.Scripts[scriptName], quest.text)
 						end
 					elseif k == "rep" then
