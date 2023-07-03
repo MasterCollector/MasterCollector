@@ -70,9 +70,13 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 			
 			if data.races then
 				local races = data.races
-				if races ~= 'table' then races = {races} end
-				for _,v in pairs(races) do
-					tooltip:AddDoubleLine("Race(s):", L.Races[v])
+				if type(races) ~= 'table' then races = {races} end
+				for row,raceID in pairs(races) do
+					if row == 1 then
+						tooltip:AddDoubleLine("Race(s):", L.Races[raceID])
+					else
+						tooltip:AddDoubleLine(" ", L.Races[raceID])
+					end
 				end
 			end
 			
