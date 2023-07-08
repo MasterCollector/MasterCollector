@@ -181,7 +181,9 @@ local function ProcessWaypointsForData(data, remove, omitComplete)
 			if remove then
 				MapPins:TryRemoveObjectPins(v)
 			else
-				MapPins:TryMapObject(v, omitComplete)
+				if not v.collected or (v.collected and not omitComplete) then
+					MapPins:TryMapObject(v)
+				end
 			end
 		end
 	end

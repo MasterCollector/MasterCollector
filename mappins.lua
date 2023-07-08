@@ -47,8 +47,7 @@ local function GetCoordsOnObject(obj)
 		return coords
 	end
 end
-function MapPins:TryMapObject(obj, omitCollected)
-	if obj.collected then return end
+function MapPins:TryMapObject(obj)
 	local coords = GetCoordsOnObject(obj)
 	if not coords then return end
 	if coords[1] and type(coords[1]) ~= 'table' then
