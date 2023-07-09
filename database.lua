@@ -61,14 +61,14 @@ function DB:MergeObject(type, id, object, struct)
 					rawset(self.data[type][id], 'text', format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(item:GetItemQuality())), id, item:GetItemName()))
 					
 					if not rawget(self.data[type][id], 'type') then
-						if (classID == 15 and subclassID ==2) or classID == 17 then
-							rawset(self.data[type][id], 'type', 'pet')
-							rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
+						if C_ToyBox.GetToyInfo(id) then
+							rawset(self.data[type][id], 'type', 'toy')
 						elseif C_MountJournal.GetMountFromItem(id) then
 							rawset(self.data[type][id], 'type', 'mount')
 							rawset(self.data[type][id], 'mountID', C_MountJournal.GetMountFromItem(id))
-						elseif C_ToyBox.GetToyInfo(id) then
-							rawset(self.data[type][id], 'type', 'toy')
+						elseif (classID == 15 and subclassID ==2) or classID == 17 then
+							rawset(self.data[type][id], 'type', 'pet')
+							rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
 						end
 					end
 				end)
