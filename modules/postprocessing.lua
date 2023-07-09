@@ -4,6 +4,10 @@ local missable = {
 	["quest"] = {
 		[24493] = [[return C_QuestLog.IsQuestFlaggedCompleted(24492)]],
 		-- riding quests. While collectible if you hit level 10, they're not possible to get if you abandon them, use a boost, or learn a riding skill without the quest
+		[25617] = [[return C_QuestLog.IsQuestFlaggedCompleted(25624)]],
+		[25624] = [[return C_QuestLog.IsQuestFlaggedCompleted(25617)]],
+		[25618] = [[return C_QuestLog.IsQuestFlaggedCompleted(25623)]],
+		[25623] = [[return C_QuestLog.IsQuestFlaggedCompleted(25618)]],
 		[14083] = [[for _,spellID in pairs({33388,33391,34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		[14084] = [[for _,spellID in pairs({33388,33391,34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		[32618] = [[for _,spellID in pairs({33388,33391,34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
