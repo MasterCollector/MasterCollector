@@ -27,13 +27,19 @@ local missable = {
 		[32674] = [[for _,spellID in pairs({34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		[32675] = [[for _,spellID in pairs({34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		-- breadcrumbs below. These should be easy to automate since they lead to another quest, but having them here works for now
+		[239] = [[return C_QuestLog.IsQuestFlaggedCompleted(11)]],
+		[1097] = [[return C_QuestLog.IsQuestFlaggedCompleted(353)]],
 		[13635] = [[return C_QuestLog.IsQuestFlaggedCompleted(26145)]],
 		[13636] = [[return C_QuestLog.IsQuestFlaggedCompleted(26843)]],
 		[25882] = [[return C_QuestLog.IsQuestFlaggedCompleted(25932)]],
 		[25986] = [[return C_QuestLog.IsQuestFlaggedCompleted(25978)]],
 		[26137] = [[return C_QuestLog.IsQuestFlaggedCompleted(25395)]],
+		[26150] = [[return C_QuestLog.IsQuestFlaggedCompleted(106)]],
 		[26176] = [[return C_QuestLog.IsQuestFlaggedCompleted(26842)]],
+		[26371] = [[return C_QuestLog.IsQuestFlaggedCompleted(26348)]],
 		[26373] = [[return C_QuestLog.IsQuestFlaggedCompleted(25724)]],
+		[26378] = [[return C_QuestLog.IsQuestFlaggedCompleted(26209)]],
+		[28562] = [[return C_QuestLog.IsQuestFlaggedCompleted(26209)]],
 	}
 }
 
