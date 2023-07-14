@@ -27,6 +27,7 @@ local mapDisplayOverrides = {
 	[30] = 469, -- new tinkertown (lower)
 	[469] = 469, -- new tinkertown
 	[470] = 469, -- frostmane hold
+	[425] = 425, -- northshire
 }
 local function GetClosestZoneMapFromMapID(mapID)
 	if not mapID then return end
