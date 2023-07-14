@@ -323,6 +323,7 @@ MasterCollector.structs.quest = {
 		elseif key == "collected" then
 			if self.IsMissed and self.IsMissed() then
 				rawset(self, key, -1)
+				MasterCollector.MapPins:TryRemoveObjectPins(self)
 				return -1
 			end
 			return false
