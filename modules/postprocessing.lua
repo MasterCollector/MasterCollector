@@ -7,6 +7,7 @@ local missable = {
 		[25624] = [[return C_QuestLog.IsQuestFlaggedCompleted(25617)]],
 		[25618] = [[return C_QuestLog.IsQuestFlaggedCompleted(25623)]],
 		[25623] = [[return C_QuestLog.IsQuestFlaggedCompleted(25618)]],
+		[26692] = [[return C_QuestLog.IsQuestFlaggedCompleted(26714)]],
 		-- lvl 20 riding quests. While collectible if you hit level 10, they're not possible to get if you abandon them, use a boost, or learn a riding skill without the quest
 		[14083] = [[for _,spellID in pairs({33388,33391,34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		[14084] = [[for _,spellID in pairs({33388,33391,34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
@@ -36,12 +37,14 @@ local missable = {
 		[26137] = [[return C_QuestLog.IsQuestFlaggedCompleted(25395)]],
 		[26150] = [[return C_QuestLog.IsQuestFlaggedCompleted(106)]],
 		[26176] = [[return C_QuestLog.IsQuestFlaggedCompleted(26842)]],
+		[26365] = [[return C_QuestLog.IsQuestFlaggedCompleted(26503)]],
 		[26371] = [[return C_QuestLog.IsQuestFlaggedCompleted(26348)]],
 		[26373] = [[return C_QuestLog.IsQuestFlaggedCompleted(25724)]],
 		[26378] = [[return C_QuestLog.IsQuestFlaggedCompleted(26209)]],
 		[26627] = [[return C_QuestLog.IsQuestFlaggedCompleted(26653)]],
 		[26785] = [[return C_QuestLog.IsQuestFlaggedCompleted(26717)]],
 		[28562] = [[return C_QuestLog.IsQuestFlaggedCompleted(26209)]],
+		[28563] = [[return C_QuestLog.IsQuestFlaggedCompleted(26503)]],
 	}
 }
 
