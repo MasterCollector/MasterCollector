@@ -107,6 +107,8 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 						tooltip:AddDoubleLine(REPUTATION, name or string.format("Unknown (%s)",v))
 					elseif k == "renown" then
 						tooltip:AddDoubleLine(RENOWN_LEVEL_LABEL, v)
+					elseif k == "spell" then
+						tooltip:AddDoubleLine('Spell:', select(1,GetSpellInfo(v)))
 					end
 				end
 			end

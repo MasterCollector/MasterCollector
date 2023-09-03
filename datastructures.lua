@@ -149,6 +149,20 @@ local function GetQuestTextColor(obj)
 				end
 			end
 		end
+		if obj.requirements.spell then
+			local spells = obj.requirements.spell
+			if type(spells) ~= "table" then spells = {spells} end
+			for i=1,#spells do
+				local found = false
+				AuraUtil.ForEachAura("player", AuraUtil.AuraFilters.Helpful, 1, function(...)
+					if(MasterCollector.L.constants.SpellIDsForRefresh[select(10, ...)]) then
+						found = true
+						return
+					end
+				end)
+				if not found then return colors.red end
+			end
+		end
 		if obj.requirements.script then
 			local scripts = obj.requirements.script
 			if type(scripts[1]) ~= "table" then scripts = {scripts} end

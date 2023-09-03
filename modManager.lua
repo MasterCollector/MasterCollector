@@ -69,6 +69,30 @@ events.QUEST_ACCEPTED = function()
 	C_Timer.After(0.1, function() MasterCollector:RefreshWindows() end)
 end
 events.QUEST_REMOVED = events.QUEST_ACCEPTED
+events.UNIT_AURA = function(unit, auraUpdates)
+	local refreshNeeded = false
+	if auraUpdates.addedAuras then
+	   for _,v in pairs(auraUpdates.addedAuras) do
+		  if MasterCollector.L.constants.SpellIDsForRefresh[v.spellId] then
+			 MasterCollector.playerData.auraInstances[v.auraInstanceID] = true
+			 refreshNeeded = true
+			 break
+		  end
+	   end
+	end
+	if not refreshNeeded and auraUpdates.removedAuraInstanceIDs then
+	   for _,instanceID in pairs(auraUpdates.removedAuraInstanceIDs) do
+		  if MasterCollector.playerData.auraInstances[instanceID] then
+			 MasterCollector.playerData.auraInstances[instanceID] = nil
+			 refreshNeeded = true
+			 break
+		  end
+	   end
+	end
+	if refreshNeeded then
+		MasterCollector:RefreshWindows()
+	end
+end
 events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
 		MasterCollector.playerData.class = select(3, UnitClass("player"))
@@ -77,6 +101,17 @@ events.ADDON_LOADED = function(loadedAddonName)
 		MasterCollector.playerData.level = UnitLevel("player")
 		MasterCollector.playerData.covenant = C_Covenants.GetActiveCovenantID()
 		MasterCollector.playerData.renown = C_CovenantSanctumUI.GetRenownLevel()
+		MasterCollector.playerData.auraInstances = {}
+		
+		AuraUtil.ForEachAura("player", AuraUtil.AuraFilters.Helpful, nil, function(...)
+			local spellID = select(10,...)
+			if(MasterCollector.L.constants.SpellIDsForRefresh[spellID]) then
+				local auraInfo = C_UnitAuras.GetPlayerAuraBySpellID(spellID)
+				if auraInfo and auraInfo.auraInstanceID then
+					MasterCollector.playerData.auraInstances[auraInfo.auraInstanceID] = true
+				end
+			end
+		end)
 		-- set a faction identifier. We translate blizzard's english code value to a number to compare against faction-level race restrictions
 		local factionCode = select(1, UnitFactionGroup("player"))
 		if factionCode == 'Horde' then
