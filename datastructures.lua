@@ -295,6 +295,16 @@ MasterCollector.structs.npc = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "collected" then
+			if self.children and #self.children > 0 then
+				local collected = true
+				for i=1,#self.children do
+					collected = self.children[i].collected
+					if not collected then break end
+				end
+				return collected
+			end
+			return false
 		elseif key == "text" then
 			return 'NPC #' .. self.id
 		else
