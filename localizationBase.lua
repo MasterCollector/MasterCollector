@@ -48,6 +48,7 @@ setmetatable(L.Races, {
 -- not sure if this is a good idea or not [Pr3vention]
 -- Explicit titles should only be provided for quests that otherwise don't have names (e.g. account triggers)
 L.Quests = {
+	[27563] = "Recruit Beezil Linkspanner",
 	[75658] = "Zaralek Cavern world quests unlocked on one character",
 }
 
