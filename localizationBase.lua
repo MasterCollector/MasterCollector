@@ -5,6 +5,15 @@ MasterCollector.L = L
 L.Text = {
 	QUEST_PENDING_NAME = LOOT_JOURNAL_LEGENDARIES_SOURCE_QUEST .. ' #%d' -- Using a known global constant here will auto-translate. Not the best key but it works
 }
+L.Settings = {
+	Filters = {
+		IGNORE_RACE = " Ignore race/faction requirements",
+		IGNORE_GENDER = " Ignore gender requirements",
+		IGNORE_CLASS = " Ignore class requirements",
+		IGNORE_LEVEL = " Ignore level requirements",
+		SHOW_COLLECTED = " Show collected",
+	},
+}
 L.Panels = {
 	["ach"] = {
 		text = ACHIEVEMENTS,

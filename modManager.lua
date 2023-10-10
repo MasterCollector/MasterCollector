@@ -132,6 +132,7 @@ events.ADDON_LOADED = function(loadedAddonName)
 			MasterCollector.DB:SetCollectedState(quest, true)
 		end
 		
+		MasterCollector:InitializeSettings()
 		MasterCollector:Start()
 	end
 end

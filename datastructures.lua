@@ -64,11 +64,9 @@ local function determineVisibility(tbl)
 	else
 		if tbl.flags and (tbl.flags.hidden or tbl.flags.removed or tbl.flags.nyi) then return false end
 	
-		local optionIgnoreRaces = false -- TODO: replace with addon setting when the settings panel is written
-		if not optionIgnoreRaces and not IsRaceOrFactionMet(tbl) then return false end
+		if not MCSettings.ActiveSettings.Filters.IgnoreRace and not IsRaceOrFactionMet(tbl) then return false end
 		
-		local optionIgnoreClasses = false -- TODO: replace with addon setting when the settings panel is written
-		if not optionIgnoreClasses and not IsClassMet(tbl) then return false end
+		if not MCSettings.ActiveSettings.Filters.IgnoreClass and not IsClassMet(tbl) then return false end
 
 		local optionIgnoreProfessions = false
 		if not optionIgnoreProfessions and not IsProfessionMet(tbl) then return false end
@@ -80,15 +78,13 @@ local function determineVisibility(tbl)
 				return false
 			end
 			
-			local ignoreSex = false
-			if not ignoreSex and not IsPlayerSexMet(tbl) then
+			if not MCSettings.ActiveSettings.Filters.IgnoreGender and not IsPlayerSexMet(tbl) then
 				return false
 			end
 		end
 	
-		local optionShowCollected = true -- TODO: replace with addon setting when the settings panel is written
 		-- if the object has already been collected and the user has chosen not to show collected items, then don't show the object
-		if tbl.collected and not optionShowCollected then
+		if tbl.collected and not MCSettings.ActiveSettings.Filters.ShowCollected then
 			return false
 		end
 		
