@@ -63,6 +63,23 @@ local moduleFrame = CreateFrame("Frame", "MCSettingsModules", nil)
 Settings.RegisterCanvasLayoutSubcategory(category, moduleFrame, "Modules");
 ]]--
 
+local MCSettingsCategoryID
+function MasterCollector_OnAddonCompartmentClick(addonName, buttonName, menuButtonFrame)
+	if not MCSettingsCategoryID then
+		for _,v in pairs(SettingsPanel:GetAllCategories()) do
+		   if v:GetName() == addonName then
+			  MCSettingsCategoryID = v:GetID()
+			  break
+		   end
+		end
+	end
+	if MCSettingsCategoryID then
+	   SettingsPanel:OpenToCategory(MCSettingsCategoryID)
+	else
+		error("Unable to locate settings panel ID for " .. addonName)
+	end
+end
+
 function addonTable:InitializeSettings()
 	if not MCSettings.ActiveSettings then MCSettings.ActiveSettings = clone(defaultSettings) end
 	setmetatable(MCSettings.ActiveSettings, {__index = defaultSettings})
