@@ -9,11 +9,6 @@ local IsOnQuest = C_QuestLog.IsOnQuest
 MasterCollector.playerData = {}
 local playerData = MasterCollector.playerData
 
-local function IsLevelRangeMet(obj)
-	local ignoreLevel = false -- TODO: replace with addon setting when the settings panel is written
-	if ignoreLevel then return true end
-	return (not obj.minlevel or playerData.level >= obj.minlevel) and (not obj.maxlevel or playerData.level <= obj.maxlevel)
-end
 local function IsRaceOrFactionMet(obj)
 	if not obj.races then return true end
 	if type(obj.races) == 'table' then
@@ -31,14 +26,6 @@ local function IsPlayerSexMet(obj)
 	end
 	return true
 end
-local function IsProfessionMet(obj)
-	if obj.requirements then
-		if not obj.requirements.prof then return true end
-		local professionData = MasterCollector.playerData.professions
-		return professionData and professionData[obj.requirements.prof]
-	end
-	return true
-end
 local function IsClassMet(obj)
 	if not obj.classes then return true end
 	if type(obj.classes) == 'table' then
@@ -50,8 +37,25 @@ local function IsClassMet(obj)
 		return obj.classes == MasterCollector.playerData.class or obj.classes == MasterCollector.playerData.class
 	end
 end
+local function IsProfessionMet(obj)
+	if obj.requirements then
+		if not obj.requirements.prof then return true end
+		local professionData = MasterCollector.playerData.professions
+		return professionData and professionData[obj.requirements.prof]
+	end
+	return true
+end
+-- Eligibility is defined by inflexible properties of a character (race, gender, class, etc) and the items they can learn
+local function IsEligible(obj)
+	assert(obj, 'IsEligible must receive a non-nil object')
+	if not IsRaceOrFactionMet(obj) or not IsPlayerSexMet(obj) or not IsClassMet(obj) then
+		return false
+	end
+	return true
+end
 -- supporting functions for the data structure metatables
 local function determineVisibility(tbl)
+	if not tbl.eligible then return false end
 	if tbl.type == "panel" then
 		-- if the panel has no children (should never happen but this is a safety check), don't show it
 		if not tbl.children then return false end
@@ -110,8 +114,10 @@ local colors = {
 	green = "|cFF00FF00",
 	blue = "|cFF33DAFF",
 }
-local function IsPlayerEligibleForQuest(quest)
-	return quest and IsRaceOrFactionMet(quest) and IsClassMet(quest) and IsPlayerSexMet(quest)
+local function IsLevelRangeMet(obj)
+	local ignoreLevel = false -- TODO: replace with addon setting when the settings panel is written
+	if ignoreLevel then return true end
+	return (not obj.minlevel or playerData.level >= obj.minlevel) and (not obj.maxlevel or playerData.level <= obj.maxlevel)
 end
 local function IsQuestOptional(quest)
 	return quest and quest.flags and quest.flags.breadcrumb
@@ -140,7 +146,7 @@ local function GetQuestTextColor(obj)
 			local quest
 			for i=1,#quests do
 				quest = MasterCollector.DB:GetObjectData("quest", quests[i])
-				if quest and not quest.collected and IsPlayerEligibleForQuest(quest) and not IsQuestOptional(quest) then
+				if quest and not quest.collected and quest.eligible and not IsQuestOptional(quest) then
 					return colors.red
 				end
 			end
@@ -219,6 +225,8 @@ MasterCollector.structs.panel = {
 	__index = function(self, key)
 		if key == "text" then
 			return L.Panels[self.id].text
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "icon" then
 			return (L.Panels[self.id] and L.Panels[self.id].icon) or nil
 		elseif key == "txcoord" then
@@ -241,6 +249,8 @@ MasterCollector.structs.ach = {
 				return self.name
 			end
 			return format('|cffffff00%s|r', 'Achievement #' .. self.id)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "type" then
 			return "achievement"
 		elseif key == "visible" then
@@ -258,6 +268,8 @@ MasterCollector.structs.item = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "type" then
 			return "item"
 		elseif key == "collected" then
@@ -301,6 +313,8 @@ MasterCollector.structs.npc = {
 				return collected
 			end
 			return false
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "text" then
 			return 'NPC #' .. self.id
 		else
@@ -320,6 +334,8 @@ MasterCollector.structs.pet = {
 		end
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		else
 			return rawget(self, key)
 		end
@@ -329,6 +345,8 @@ MasterCollector.structs.quest = {
 	__index = function(self, key)
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "type" then return "quest"
 		elseif key == "sortkey" then
 			return QuestNames[self.id]
@@ -369,6 +387,8 @@ MasterCollector.structs.toy = {
 			return determineVisibility(self)
 		elseif key == "collected" then
 			return PlayerHasToy(self.id)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "text" then
 			local item = Item:CreateFromItemID(self.id)
 			item:ContinueOnItemLoad(function()
@@ -391,6 +411,8 @@ MasterCollector.structs.treasure = {
 		end
 		if key == "visible" then
 			return determineVisibility(self)
+		elseif key == "eligible" then
+			self.eligible = IsEligible(self)
 		elseif key == "collected" then
 			local quest = MasterCollector.DB:GetObjectData("quest", self.id)
 			return rawget(quest, 'collected')
