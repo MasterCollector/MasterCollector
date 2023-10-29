@@ -4,6 +4,9 @@ local MasterCollector = select(2,...)
 --@GENERATE_HERE@--
 MasterCollector.Modules.Pvp={
 	moduleDB={
+		["ach"]={
+			[19294]={},
+		},
 		["npc"]={
 			[12793]={coordinates={37.87,72.09,85},grants={{"item",{15197,15199}}},races=-2},
 			[12794]={coordinates={38.48,73.04,85},grants={{"item",{18877,18831,18868,23465,18871,18828,16345,23467,18866,23464,18844,18848,18840,18826,18835,18837,18860,18874,23466,23468,23469}}},races=-2},
@@ -33,6 +36,7 @@ MasterCollector.Modules.Pvp={
 			[72171]={minlevel=70,providers={"n",196191}},
 			[72648]={flags={weekly=true},minlevel=60,providers={"n",199393}},
 			[72720]={flags={weekly=true},minlevel=70,providers={"n",199526}},
+			[78215]={flags={wq=true},requirements={quest=77887}},
 		},
 	},
 	mapData={
@@ -41,5 +45,6 @@ MasterCollector.Modules.Pvp={
 		[85]={{"npc",{12793,12794,12795,12796,52033,52036,54657,69977,69978,73151,146626,175050}}},
 		[1670]={{"quest",{62285,62288}}},
 		[2112]={{"quest",{72166,72171,72648,72720}}},
+		[2200]={{"ach",{19294}},{"quest",{78215}}},
 	}
 }
