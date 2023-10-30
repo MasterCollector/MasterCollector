@@ -60,6 +60,7 @@ L.Quests = {
 	[27563] = "Recruit Beezil Linkspanner",
 	[75658] = "Zaralek Cavern world quests unlocked",
 	[77887] = "Emerald Dream world quests unlocked",
+	[78904] = "Emerald Dream Chapter 3 completed on account",
 }
 
 L.Scripts = {
