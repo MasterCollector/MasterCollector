@@ -28,7 +28,7 @@ events.PET_JOURNAL_LIST_UPDATE = function ()
 	
 	numPets = newPetCount
 	for speciesID in pairs(MasterCollector.DB.data.pet) do
-		rawset(MasterCollector.DB.data.pet[speciesID], 'collected', C_PetJournal.GetNumCollectedInfo(speciesID) > 0)
+		rawset(MasterCollector.DB.data.pet[speciesID], 'collected', (C_PetJournal.GetNumCollectedInfo(speciesID) or 0) > 0)
 	end
 	MasterCollector:RefreshWindows()
 end
