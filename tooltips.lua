@@ -15,7 +15,7 @@ local function OnTooltipSetUnit(tooltip)
 		tooltip:AddDoubleLine(unitType .. ' ID:', id)
 		if unitType == 'Creature' then
 			local obj = MasterCollector.DB:GetObjectData('npc', tonumber(id))
-			if obj.children then
+			if obj and obj.children then
 				local visible = false
 				for _,v in pairs(obj.children) do
 					if v.visible then visible = true break end
