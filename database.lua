@@ -111,7 +111,7 @@ function DB:SetCollectedState(obj, state)
 		rawset(obj, 'collected', true)
 	end
 end
-function DB:Process()
+function DB:Initialize()
 	for modName,mod in pairs(MasterCollector.Modules or {}) do
 		for objType,objTable in pairs(mod.moduleDB) do
 			for id, obj in pairs(objTable) do
