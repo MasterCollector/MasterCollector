@@ -74,6 +74,7 @@ function MasterCollector:Start()
 				currentZoneWindow.mapID = mapID
 				currentZoneWindow:SetTitle(((mapID and C_Map.GetMapInfo(mapID).name) or "UNKNOWN MAP" ) .. ' ('..mapID..')')
 				currentZoneWindow:SetData(data, true)
+				currentZoneWindow:Refresh()
 			end
 		end
 	end
