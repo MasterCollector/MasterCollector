@@ -128,11 +128,12 @@ events.ADDON_LOADED = function(loadedAddonName)
 		
 		local  completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
 		for _,v in pairs(completedQuestIDs) do
-			quest = MasterCollector.DB:GetObjectData("quest", v)
-			MasterCollector.DB:SetCollectedState(quest, true)
+			local quest = MasterCollector.DB:GetObjectData("quest", v)
+			if quest then quest.collected = true end
 		end
 		
 		MasterCollector:InitializeSettings()
+		MasterCollector.DB:Initialize()
 		MasterCollector:Start()
 	end
 end

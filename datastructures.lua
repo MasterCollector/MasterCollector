@@ -242,14 +242,7 @@ MasterCollector.structs.panel = {
 }
 MasterCollector.structs.ach = {
 	__index = function(self, key)
-		if key == "text" then
-			local name = select(2, GetAchievementInfo(self.id))
-			if name then
-				rawset(self, 'name', format('|cffffff00%s|r', name))
-				return self.name
-			end
-			return format('|cffffff00%s|r', 'Achievement #' .. self.id)
-		elseif key == "eligible" then
+		if key == "eligible" then
 			self.eligible = IsEligible(self)
 		elseif key == "type" then
 			return "achievement"
@@ -257,8 +250,6 @@ MasterCollector.structs.ach = {
 			return determineVisibility(self)
 		elseif key == "collected" then
 			return select(4, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
-		elseif key == "icon" then
-			return select(10, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
 		else
 			return rawget(self, key)
 		end
@@ -324,18 +315,12 @@ MasterCollector.structs.npc = {
 }
 MasterCollector.structs.pet = {
 	__index = function(self, key)
-		if not rawget(self, "loaded") then
-			local name, icon, _, npcID = GetPetInfoBySpeciesID(self.id)
-			self.text = name
-			self.npcID = npcID
-			self.icon = icon
-			self.loaded = true
-			self.collected = C_PetJournal.GetNumCollectedInfo(self.id) > 0
-		end
 		if key == "visible" then
 			return determineVisibility(self)
 		elseif key == "eligible" then
 			self.eligible = IsEligible(self)
+		elseif key == 'text' then
+			return 'Pet Species #'..self.id
 		else
 			return rawget(self, key)
 		end
@@ -376,26 +361,6 @@ MasterCollector.structs.quest = {
 			return self.icon
 		elseif key == "repeatable" then
 			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.always or self.flags.annual or self.flags.calling or self.flags.wq)
-		else
-			return rawget(self, key)
-		end
-	end
-}
-MasterCollector.structs.toy = {
-	__index = function(self, key)
-		if key == "visible" then
-			return determineVisibility(self)
-		elseif key == "collected" then
-			return PlayerHasToy(self.id)
-		elseif key == "eligible" then
-			self.eligible = IsEligible(self)
-		elseif key == "text" then
-			local item = Item:CreateFromItemID(self.id)
-			item:ContinueOnItemLoad(function()
-				rawset(self, 'icon', item:GetItemIcon())
-				rawset(self, 'text', item:GetItemName())
-			end)
-			return 'Item #' .. self.id
 		else
 			return rawget(self, key)
 		end

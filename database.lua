@@ -1,35 +1,111 @@
 local MasterCollector = select(2,...)
+local C_PetJournal = C_PetJournal
 
 local DB = {
 	data = {},
 	mapData = {}
 }
-local HarvesterTooltip = CreateFrame("GameTooltip", "MCHarvesterTooltip", UIParent, "GameTooltipTemplate")
-local function LoadCreatureNameFromID(id)
-	if not HarvesterTooltip:GetOwner() then 
-		HarvesterTooltip:SetOwner(UIParent,"ANCHOR_NONE")
-	end
-	HarvesterTooltip:SetHyperlink(format("unit:Creature-0-0-0-0-%d-0000000000",id))
-	local text = MCHarvesterTooltipTextLeft1:GetText()
-	if text then
-		rawset(DB:GetObjectData('npc', id), 'text', text)
-		return text
-	end
-	return 'Retrieving data...'
-end
+
 local ModelViewer = CreateFrame("DressUpModel", nil, UIParent);
-local function LoadCreatureDisplayDataFromID(id)
+local function GetCreatureDisplayID(id)
 	if id > 0 then
 		ModelViewer:SetDisplayInfo(0);
 		ModelViewer:SetUnit("none");
 		ModelViewer:SetCreature(id);
-		local displayID = ModelViewer:GetDisplayInfo();
-		if displayID and displayID ~= 0 then
-			rawset(DB:GetObjectData('npc', id), 'displayID', displayID)
-		end
+		return ModelViewer:GetDisplayInfo();
 	end
 end
-MasterCollector.test = LoadCreatureDisplayDataFromID
+local HarvesterTooltip = CreateFrame("GameTooltip", "MCHarvesterTooltip", UIParent, "GameTooltipTemplate")
+local function GetCreatureNameFromID(id)
+	if not HarvesterTooltip:GetOwner() then 
+		HarvesterTooltip:SetOwner(UIParent,"ANCHOR_NONE")
+	end
+	HarvesterTooltip:SetHyperlink(format("unit:Creature-0-0-0-0-%d-0000000000",id))
+	return HarvesterTooltip.TextLeft1:GetText() or "NPC #"..id
+end
+
+local function EnrichAchievement(achievement)
+	local _,name,_,_,_,_,_,_,_,icon = GetAchievementInfo(achievement.id)
+	achievement.text = format('|cffffff00%s|r', (name or 'Achievement #'..achievement.id))
+	achievement.icon = icon
+end
+local function EnrichItem(item)
+	item.baseType = 'item'
+	local loadedItem = Item:CreateFromItemID(item.id)
+	if not loadedItem:IsItemEmpty() then
+		loadedItem:ContinueOnItemLoad(function()
+			local _,_,_,_,icon, classID, subclassID = GetItemInfoInstant(item.id)
+			item.icon = icon
+			if classID == 2 or classID == 4 then
+				item.type = "equipment"
+			end
+			item.quality = loadedItem:GetItemQuality()
+			item.text = format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(loadedItem:GetItemQuality())), item.id, loadedItem:GetItemName())
+			
+			if item.type then
+				if C_ToyBox.GetToyInfo(item.id) then
+					item.type = "toy"
+				elseif C_MountJournal.GetMountFromItem(item.id) then
+					item.type = "mount"
+					item.mountID = C_MountJournal.GetMountFromItem(item.id)
+				elseif (classID == 15 and subclassID ==2) or classID == 17 then
+					item.type = "pet"
+					item.speciesID = select(13, C_PetJournal.GetPetInfoByItemID(item.id))
+				end
+			end
+		end)
+	else
+		item.text = format('Item #%d', item.id)
+	end
+end
+local function EnrichNPC(npc)
+	npc.text = GetCreatureNameFromID(npc.id)
+	npc.displayID = GetCreatureDisplayID(npc.id)
+end
+local function EnrichPet(pet)
+	local name, icon, _, npcID = C_PetJournal.GetPetInfoBySpeciesID(pet.id)
+	pet.text = (name or 'Pet Species #'.. pet.id)
+	pet.npcID = npcID
+	pet.icon = icon
+	pet.collected = (C_PetJournal.GetNumCollectedInfo(pet.id) or 0) > 0
+end
+function DB:EnrichData()
+	local map = {
+		ach = EnrichAchievement,
+		pet = EnrichPet,
+		item = EnrichItem,
+		npc = EnrichNPC
+	}
+	local counter, maxLoadToYield = 0, 150
+	local co = coroutine.create(function()
+		for dataType,tbl in pairs(DB.data or {}) do
+			if map[dataType] then
+				for id,obj in pairs(tbl) do
+					map[dataType](obj)
+					counter = counter + 1
+					if counter >= maxLoadToYield then
+						coroutine.yield()
+						counter = 0
+					end
+				end
+			end
+		end
+	end)
+	local ticker
+	ticker = C_Timer.NewTicker(0, function()
+		if coroutine.status(co) == "dead" then
+			ticker:Cancel()
+			ticker = nil
+			collectgarbage()
+			MasterCollector.Ready = true
+			MasterCollector.Window:Get("MasterCollectorCurrentZone"):Reload()
+		else
+			coroutine.resume(co)
+		end
+	end)
+	DB.EnrichData = nil
+end
+
 local function MergeProperties(fromTable, toTable)
 	for k,v in pairs(fromTable) do
 		if not rawget(toTable, k) then
@@ -47,38 +123,6 @@ function DB:MergeObject(type, id, object, struct)
 	if not self.data[type][id] then
 		object.id = id -- TODO: I don't like this. Why should an object be self-aware of its id when the DB key is that id?
 		self.data[type][id] = setmetatable(object, struct)
-		if type == 'item' then
-			object.baseType = 'item'
-			local item = Item:CreateFromItemID(id)
-			if not item:IsItemEmpty() then
-				item:ContinueOnItemLoad(function()
-					local _,_,_,_,icon, classID, subclassID = GetItemInfoInstant(id)
-					rawset(self.data[type][id], 'icon', icon)
-					if classID == 2 or classID == 4 then
-						rawset(self.data[type][id], 'type', 'equipment')
-					end
-					rawset(self.data[type][id], 'quality', item:GetItemQuality())
-					rawset(self.data[type][id], 'text', format('|c%s|Hitem:%d|h%s|h|r', select(4,GetItemQualityColor(item:GetItemQuality())), id, item:GetItemName()))
-					
-					if not rawget(self.data[type][id], 'type') then
-						if C_ToyBox.GetToyInfo(id) then
-							rawset(self.data[type][id], 'type', 'toy')
-						elseif C_MountJournal.GetMountFromItem(id) then
-							rawset(self.data[type][id], 'type', 'mount')
-							rawset(self.data[type][id], 'mountID', C_MountJournal.GetMountFromItem(id))
-						elseif (classID == 15 and subclassID ==2) or classID == 17 then
-							rawset(self.data[type][id], 'type', 'pet')
-							rawset(self.data[type][id], 'speciesID', select(13, C_PetJournal.GetPetInfoByItemID(id)))
-						end
-					end
-				end)
-			else
-				rawset(self.data[type][id], 'text', format('Item #%d', id))
-			end
-		elseif type == 'npc' then
-			LoadCreatureNameFromID(tonumber(id))
-			LoadCreatureDisplayDataFromID(tonumber(id))
-		end
 		return self.data[type][id]
 	end
 	return MergeProperties(object, self.data[type][id])
@@ -135,5 +179,6 @@ function DB:Initialize()
 	end
 	MasterCollector.Modules = nil
 	MasterCollector:PostProcess()
+	DB.Initialize=nil
 end
 MasterCollector.DB = DB
