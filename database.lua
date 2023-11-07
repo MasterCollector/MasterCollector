@@ -1,5 +1,9 @@
 local MasterCollector = select(2,...)
+
+local C_Timer = C_Timer
 local C_PetJournal = C_PetJournal
+local GetQuestTitle = QuestUtils_GetQuestName
+local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 
 local DB = {
 	data = {},
@@ -22,6 +26,50 @@ local function GetCreatureNameFromID(id)
 	end
 	HarvesterTooltip:SetHyperlink(format("unit:Creature-0-0-0-0-%d-0000000000",id))
 	return HarvesterTooltip.TextLeft1:GetText() or "NPC #"..id
+end
+
+local PendingQuestNames = {}
+HarvesterTooltip:RegisterEvent("QUEST_DATA_LOAD_RESULT")
+HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
+	-- Once blizzard returns the quest data, we can inspect the result to see if it's a valid entry or not
+	-- Quests that have a nil or false "success" return tell us that either blizzard has removed the quest completely OR
+	--   the quest itself doesn't have a name (e.g. tracking quests). 
+	if event == "QUEST_DATA_LOAD_RESULT" and rawget(PendingQuestNames, ...) then -- only bother with results from quest load requests made by this addon
+		local questID, success = ...
+		if success then
+			PendingQuestNames[questID].callback(GetQuestTitle(questID))
+			PendingQuestNames[questID] = nil
+		else
+			if PendingQuestNames[questID].attempts >= 2 then
+				PendingQuestNames[questID].callback("Quest #"..questID)
+				PendingQuestNames[questID] = nil
+				return
+			end
+			PendingQuestNames[questID].attempts = PendingQuestNames[questID].attempts + 1
+			C_Timer.After(3, function() RequestLoadQuestByID(questID) end)
+		end
+	end
+end)
+local function GetQuestName(quest)
+	if MasterCollector.L.Quests[quest.id] then
+		return quest.name
+	elseif quest.flags and quest.flags.hidden then
+		return 'Tracking Quest# ' .. quest.id
+	else
+		local name = GetQuestTitle(quest.id)
+		if not name or name=='' then
+			RequestLoadQuestByID(quest.id)
+			PendingQuestNames[quest.id] = {
+				attempts = 0,
+				callback = function(name)
+					quest.name = name or 'Quest #' .. quest.id
+				end
+			}
+			return SEARCH_LOADING_TEXT
+		else
+			return name
+		end
+	end
 end
 
 local function EnrichAchievement(achievement)
@@ -69,14 +117,18 @@ local function EnrichPet(pet)
 	pet.icon = icon
 	pet.collected = (C_PetJournal.GetNumCollectedInfo(pet.id) or 0) > 0
 end
+local function EnrichQuest(quest)
+	quest.name = GetQuestName(quest)
+end
 function DB:EnrichData()
 	local map = {
 		ach = EnrichAchievement,
 		pet = EnrichPet,
 		item = EnrichItem,
-		npc = EnrichNPC
+		npc = EnrichNPC,
+		quest = EnrichQuest
 	}
-	local counter, maxLoadToYield = 0, 150
+	local counter, maxLoadToYield = 0, 100
 	local co = coroutine.create(function()
 		for dataType,tbl in pairs(DB.data or {}) do
 			if map[dataType] then
@@ -99,6 +151,7 @@ function DB:EnrichData()
 			collectgarbage()
 			MasterCollector.Ready = true
 			MasterCollector.Window:Get("MasterCollectorCurrentZone"):Reload()
+			MasterCollector:RefreshWindows(true)
 		else
 			coroutine.resume(co)
 		end
