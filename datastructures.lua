@@ -1,9 +1,5 @@
 local MasterCollector = select(2, ...)
 local L = MasterCollector.L
--- set local functions for blizz API calls for slightly faster processing
-local GetPetInfoBySpeciesID = C_PetJournal.GetPetInfoBySpeciesID
-local GetQuestTitle = QuestUtils_GetQuestName
-local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 local IsOnQuest = C_QuestLog.IsOnQuest
 
 MasterCollector.playerData = {}
@@ -179,46 +175,6 @@ local function GetQuestTextColor(obj)
 	if obj.repeatable then return colors.blue end
 end
 
--- set a background frame that listens to load requests for quest data
-local QuestNames = setmetatable({}, {
-	__index = function(self, key)
-		if not rawget(self, key) then
-			local name = GetQuestTitle(key)
-			if not name or name=='' then
-				RequestLoadQuestByID(key)
-				rawset(self, key, SEARCH_LOADING_TEXT)
-				return SEARCH_LOADING_TEXT
-			else
-				rawset(self, key, name)
-				return name
-			end
-		else
-			return string.format(L.Text.QUEST_PENDING_NAME, key)
-		end
-	end
-})
-local pendingQuestTitles = CreateFrame("FRAME", 'MasterCollectorQuestTitleQueueFrame', UIParent)
-pendingQuestTitles:RegisterEvent("QUEST_DATA_LOAD_RESULT")
-pendingQuestTitles:SetScript("OnEvent", function(self, event, ...)
-	-- Once blizzard returns the quest data, we can inspect the result to see if it's a valid entry or not
-	-- Quests that have a nil or false "success" return tell us that either blizzard has removed the quest completely OR
-	--   the quest itself doesn't have a name (e.g. tracking quests). 
-	if event == "QUEST_DATA_LOAD_RESULT" and rawget(QuestNames, ...) then -- only bother with results from quest load requests made by this addon
-		local questID, success = ...
-		-- For some reason, Blizzard sends QUEST_DATA_LOAD_RESULT for every step completion in a world quest for all world/bonus quests on the map.
-		-- If the quest already has a name that isn't the loading text, we can skip this event
-		if QuestNames[questID] ~= SEARCH_LOADING_TEXT then return end
-		
-		if success then
-			rawset(QuestNames, questID, GetQuestTitle(questID))
-		else
-			rawset(QuestNames, questID, MasterCollector.L.Quests[questID] or string.format(L.Text.QUEST_PENDING_NAME, questID))
-		end
-		MasterCollector:RefreshWindows(true)
-	end
-end)
-
-
 -- All metatables describing data structures should be added below
 MasterCollector.structs = {}
 MasterCollector.structs.panel = {
@@ -242,14 +198,7 @@ MasterCollector.structs.panel = {
 }
 MasterCollector.structs.ach = {
 	__index = function(self, key)
-		if key == "text" then
-			local name = select(2, GetAchievementInfo(self.id))
-			if name then
-				rawset(self, 'name', format('|cffffff00%s|r', name))
-				return self.name
-			end
-			return format('|cffffff00%s|r', 'Achievement #' .. self.id)
-		elseif key == "eligible" then
+		if key == "eligible" then
 			self.eligible = IsEligible(self)
 		elseif key == "type" then
 			return "achievement"
@@ -257,8 +206,6 @@ MasterCollector.structs.ach = {
 			return determineVisibility(self)
 		elseif key == "collected" then
 			return select(4, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
-		elseif key == "icon" then
-			return select(10, GetAchievementInfo(self.id)) -- TODO: setting for track by character, not just account?
 		else
 			return rawget(self, key)
 		end
@@ -324,18 +271,12 @@ MasterCollector.structs.npc = {
 }
 MasterCollector.structs.pet = {
 	__index = function(self, key)
-		if not rawget(self, "loaded") then
-			local name, icon, _, npcID = GetPetInfoBySpeciesID(self.id)
-			self.text = name
-			self.npcID = npcID
-			self.icon = icon
-			self.loaded = true
-			self.collected = C_PetJournal.GetNumCollectedInfo(self.id) > 0
-		end
 		if key == "visible" then
 			return determineVisibility(self)
 		elseif key == "eligible" then
 			self.eligible = IsEligible(self)
+		elseif key == 'text' then
+			return 'Pet Species #'..self.id
 		else
 			return rawget(self, key)
 		end
@@ -348,15 +289,15 @@ MasterCollector.structs.quest = {
 		elseif key == "eligible" then
 			self.eligible = IsEligible(self)
 		elseif key == "type" then return "quest"
+		elseif key == "name" then return "Quest #"..self.id
 		elseif key == "sortkey" then
-			return QuestNames[self.id]
+			return self.name
 		elseif key == "text" then
 			local color = GetQuestTextColor(self)
-			local name = QuestNames[self.id]
 			if color then
-				return string.format("%s%s|r", color, name)
+				return string.format("%s%s|r", color, self.name)
 			else
-				return name
+				return self.name
 			end
 		elseif key == "collected" then
 			if self.IsMissed and self.IsMissed() then
@@ -376,26 +317,6 @@ MasterCollector.structs.quest = {
 			return self.icon
 		elseif key == "repeatable" then
 			return self.flags and (self.flags.daily or self.flags.weekly or self.flags.always or self.flags.annual or self.flags.calling or self.flags.wq)
-		else
-			return rawget(self, key)
-		end
-	end
-}
-MasterCollector.structs.toy = {
-	__index = function(self, key)
-		if key == "visible" then
-			return determineVisibility(self)
-		elseif key == "collected" then
-			return PlayerHasToy(self.id)
-		elseif key == "eligible" then
-			self.eligible = IsEligible(self)
-		elseif key == "text" then
-			local item = Item:CreateFromItemID(self.id)
-			item:ContinueOnItemLoad(function()
-				rawset(self, 'icon', item:GetItemIcon())
-				rawset(self, 'text', item:GetItemName())
-			end)
-			return 'Item #' .. self.id
 		else
 			return rawget(self, key)
 		end
