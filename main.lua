@@ -85,7 +85,7 @@ function MasterCollector:Start()
 	currentZoneWindow.displayFrame:RegisterEvent("ZONE_CHANGED")
 	currentZoneWindow.displayFrame:RegisterEvent("NEW_WMO_CHUNK")
 	currentZoneWindow.displayFrame:SetScript("OnEvent", function(self, event, ...)
-		if event == "PLAYER_ENTERING_WORLD" then
+		if event == "PLAYER_ENTERING_WORLD" and MasterCollector.DB.EnrichData then
 			MasterCollector.DB:EnrichData()
 		end
 		if MasterCollector.Ready and ("ZONE_CHANGED" or "ZONE_CHANGED_NEW_AREA" or "ZONE_CHANGED_INDOORS" or "NEW_WMO_CHUNK") then
