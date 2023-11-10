@@ -41,6 +41,9 @@ events.ACHIEVEMENT_EARNED = function(achievementID, alreadyEarned)
 		MasterCollector:RefreshWindows()
 	end
 end
+events.NEW_MOUNT_ADDED = function(mountID)
+	MasterCollector:RefreshWindows()
+end
 events.TRANSMOG_COLLECTION_SOURCE_ADDED = function(itemModifiedAppearanceID)
 	if not itemModifiedAppearanceID then return end
 	print('TRANSMOG_COLLECTION_SOURCE_ADDED:', itemModifiedAppearanceID)
