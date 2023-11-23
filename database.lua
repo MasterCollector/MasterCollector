@@ -52,7 +52,7 @@ HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
 end)
 local function GetQuestName(quest)
 	if MasterCollector.L.Quests[quest.id] then
-		return quest.name
+		return MasterCollector.L.Quests[quest.id]
 	elseif quest.flags and quest.flags.hidden then
 		return 'Tracking Quest# ' .. quest.id
 	else
