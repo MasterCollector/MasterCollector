@@ -96,43 +96,46 @@ events.UNIT_AURA = function(unit, auraUpdates)
 		MasterCollector:RefreshWindows()
 	end
 end
+events.PLAYER_ENTERING_WORLD = function(initialLogin, reload)
+	MasterCollector.playerData.professions = {}
+	for _,v in pairs({GetProfessions()}) do
+		local _,_,level,_,_,_,skill,_,specialization = GetProfessionInfo(v)
+		MasterCollector.playerData.professions[skill]=level
+	end
+	
+	local  completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
+	for _,v in pairs(completedQuestIDs) do
+		local quest = MasterCollector.DB:GetObjectData("quest", v)
+		if quest then quest.collected = true end
+	end
+	
+	MasterCollector.playerData.auraInstances = {}
+	AuraUtil.ForEachAura("player", AuraUtil.AuraFilters.Helpful, nil, function(...)
+		local spellID = select(10,...)
+		if(MasterCollector.L.constants.SpellIDsForRefresh[spellID]) then
+			local auraInfo = C_UnitAuras.GetPlayerAuraBySpellID(spellID)
+			if auraInfo and auraInfo.auraInstanceID then
+				MasterCollector.playerData.auraInstances[auraInfo.auraInstanceID] = true
+			end
+		end
+	end)
+	
+	MasterCollector.playerData.covenant = C_Covenants.GetActiveCovenantID()
+	MasterCollector.playerData.renown = C_CovenantSanctumUI.GetRenownLevel()
+end
 events.ADDON_LOADED = function(loadedAddonName)
 	if loadedAddonName == addonName then
 		MasterCollector.playerData.class = select(3, UnitClass("player"))
 		MasterCollector.playerData.race = select(3, UnitRace("player"))
 		MasterCollector.playerData.sex = UnitSex("player")
 		MasterCollector.playerData.level = UnitLevel("player")
-		MasterCollector.playerData.covenant = C_Covenants.GetActiveCovenantID()
-		MasterCollector.playerData.renown = C_CovenantSanctumUI.GetRenownLevel()
-		MasterCollector.playerData.auraInstances = {}
 		
-		AuraUtil.ForEachAura("player", AuraUtil.AuraFilters.Helpful, nil, function(...)
-			local spellID = select(10,...)
-			if(MasterCollector.L.constants.SpellIDsForRefresh[spellID]) then
-				local auraInfo = C_UnitAuras.GetPlayerAuraBySpellID(spellID)
-				if auraInfo and auraInfo.auraInstanceID then
-					MasterCollector.playerData.auraInstances[auraInfo.auraInstanceID] = true
-				end
-			end
-		end)
 		-- set a faction identifier. We translate blizzard's english code value to a number to compare against faction-level race restrictions
 		local factionCode = select(1, UnitFactionGroup("player"))
 		if factionCode == 'Horde' then
 			MasterCollector.playerData.faction = -2
 		elseif factionCode == 'Alliance' then
 			MasterCollector.playerData.faction = -1
-		end
-		
-		MasterCollector.playerData.professions = {}
-		for _,v in pairs({GetProfessions()}) do
-		   local _,_,level,_,_,_,skill = GetProfessionInfo(v)
-		   MasterCollector.playerData.professions[skill]=level
-		end
-		
-		local  completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
-		for _,v in pairs(completedQuestIDs) do
-			local quest = MasterCollector.DB:GetObjectData("quest", v)
-			if quest then quest.collected = true end
 		end
 		
 		MasterCollector:InitializeSettings()
