@@ -261,8 +261,10 @@ MasterCollector.structs.npc = {
 			if self.children and #self.children > 0 then
 				local collected = true
 				for i=1,#self.children do
-					if not (self.children[i].flags and self.children[i].flags.removed) then
-						collected = self.children[i].collected
+					if self.children[i].eligible and
+					    not (self.children[i].flags and self.children[i].flags.removed) 
+						and self.children[i].visible then
+							collected = self.children[i].collected
 					end
 					if not collected then break end
 				end
