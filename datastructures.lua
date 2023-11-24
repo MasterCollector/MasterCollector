@@ -34,6 +34,13 @@ local function IsClassMet(obj)
 	end
 end
 local function IsProfessionMet(obj)
+	if obj.baseType and obj.baseType == "item" then
+		local _,_,_,_,_,class,subclass = GetItemInfoInstant(obj.id)
+		if class == 9 then -- recipe
+			return MasterCollector.playerData.professions[MasterCollector.Constants.ItemSubclassEnumEnumToBaseSkill[subclass]]
+		end
+	end
+
 	if obj.requirements then
 		if not obj.requirements.prof then return true end
 		local professionData = MasterCollector.playerData.professions

@@ -76,7 +76,7 @@ events.UNIT_AURA = function(unit, auraUpdates)
 	local refreshNeeded = false
 	if auraUpdates.addedAuras then
 	   for _,v in pairs(auraUpdates.addedAuras) do
-		  if MasterCollector.L.constants.SpellIDsForRefresh[v.spellId] then
+		  if MasterCollector.Constants.SpellIDsForRefresh[v.spellId] then
 			 MasterCollector.playerData.auraInstances[v.auraInstanceID] = true
 			 refreshNeeded = true
 			 break
@@ -100,7 +100,10 @@ events.PLAYER_ENTERING_WORLD = function(initialLogin, reload)
 	MasterCollector.playerData.professions = {}
 	for _,v in pairs({GetProfessions()}) do
 		local _,_,level,_,_,_,skill,_,specialization = GetProfessionInfo(v)
-		MasterCollector.playerData.professions[skill]=level
+		MasterCollector.playerData.professions[skill]={
+			level = level,
+			profession = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skill).profession
+		}
 	end
 	
 	local  completedQuestIDs = C_QuestLog.GetAllCompletedQuestIDs()
@@ -112,7 +115,7 @@ events.PLAYER_ENTERING_WORLD = function(initialLogin, reload)
 	MasterCollector.playerData.auraInstances = {}
 	AuraUtil.ForEachAura("player", AuraUtil.AuraFilters.Helpful, nil, function(...)
 		local spellID = select(10,...)
-		if(MasterCollector.L.constants.SpellIDsForRefresh[spellID]) then
+		if(MasterCollector.Constants.SpellIDsForRefresh[spellID]) then
 			local auraInfo = C_UnitAuras.GetPlayerAuraBySpellID(spellID)
 			if auraInfo and auraInfo.auraInstanceID then
 				MasterCollector.playerData.auraInstances[auraInfo.auraInstanceID] = true
