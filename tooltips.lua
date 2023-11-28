@@ -84,16 +84,20 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 				for k,v in pairs(data.requirements) do
 					if k == "quest" then
 						if type(v) ~= "table" then v = {v} end
+						local questNewLine = false
 						for row,questID in pairs(v) do
 							local quest = MasterCollector.DB:GetObjectData("quest", questID) or {text=string.format(L.Text.QUEST_PENDING_NAME, questID)}
-							if row == 1 then
-								tooltip:AddDoubleLine("Quests: ", quest.text)
-							else
-								tooltip:AddDoubleLine(" ", quest.text)
+							if quest.eligible then
+								if not questNewLine then
+									tooltip:AddDoubleLine("Quests: ", quest.text)
+									questNewLine = true
+								else
+									tooltip:AddDoubleLine(" ", quest.text)
+								end
+								
+								if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+								if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 							end
-							
-							if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
-							if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 						end
 					elseif k == "script" then
 						if type(v) ~= "table" then v = {v} end
