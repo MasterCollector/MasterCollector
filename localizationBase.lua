@@ -3,7 +3,12 @@ local L = {}
 MasterCollector.L = L
 
 L.Text = {
-	QUEST_PENDING_NAME = LOOT_JOURNAL_LEGENDARIES_SOURCE_QUEST .. ' #%d' -- Using a known global constant here will auto-translate. Not the best key but it works
+	QUEST_PENDING_NAME = LOOT_JOURNAL_LEGENDARIES_SOURCE_QUEST .. ' #%d', -- Using a known global constant here will auto-translate. Not the best key but it works
+	QUEST_REMOVED = "Removed Quest #%s",
+	QUEST_HIDDEN = "Tracking Quest #%s",
+	QUEST_HIDDEN_DAILY = "Daily tracker",
+	QUEST_HIDDEN_WEEKLY = "Weekly tracker",
+	QUEST_UNKNOWN_NAME = "Quest #%s",
 }
 L.Settings = {
 	Filters = {

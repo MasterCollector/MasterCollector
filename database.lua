@@ -41,7 +41,7 @@ HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
 			PendingQuestNames[questID] = nil
 		else
 			if PendingQuestNames[questID].attempts >= 2 then
-				PendingQuestNames[questID].callback("Quest #"..questID)
+				PendingQuestNames[questID].callback()
 				PendingQuestNames[questID] = nil
 				return
 			end
@@ -53,22 +53,32 @@ end)
 local function GetQuestName(quest)
 	if MasterCollector.L.Quests[quest.id] then
 		return MasterCollector.L.Quests[quest.id]
-	elseif quest.flags and quest.flags.hidden then
-		return 'Tracking Quest# ' .. quest.id
-	else
-		local name = GetQuestTitle(quest.id)
-		if not name or name=='' then
-			RequestLoadQuestByID(quest.id)
-			PendingQuestNames[quest.id] = {
-				attempts = 0,
-				callback = function(name)
-					quest.name = name or 'Quest #' .. quest.id
-				end
-			}
-			return SEARCH_LOADING_TEXT
-		else
-			return name
+	elseif quest.flags then
+		if quest.flags.removed then
+			return string.format(MasterCollector.L.Text.QUEST_REMOVED, quest.id)
+		elseif quest.flags.hidden then
+			if quest.flags.daily then
+				return MasterCollector.L.Text.QUEST_HIDDEN_DAILY
+			elseif quest.flags.weekly then
+				return MasterCollector.L.Text.QUEST_HIDDEN_WEEKLY
+			else
+				return MasterCollector.L.Text.QUEST_HIDDEN
+			end
 		end
+	end
+	
+	local name = GetQuestTitle(quest.id)
+	if not name or name=='' then
+		RequestLoadQuestByID(quest.id)
+		PendingQuestNames[quest.id] = {
+			attempts = 0,
+			callback = function(name)
+				quest.name = name or string.format(MasterCollector.L.Text.QUEST_UNKNOWN_NAME, quest.id)
+			end
+		}
+		return SEARCH_LOADING_TEXT
+	else
+		return name
 	end
 end
 
