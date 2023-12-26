@@ -87,9 +87,14 @@ function MasterCollector:Start()
 	currentZoneWindow.displayFrame:SetScript("OnEvent", function(self, event, ...)
 		if event == "PLAYER_ENTERING_WORLD" and MasterCollector.DB.EnrichData then
 			MasterCollector.DB:EnrichData()
+			currentZoneWindow.displayFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
 		end
-		if MasterCollector.Ready and ("ZONE_CHANGED" or "ZONE_CHANGED_NEW_AREA" or "ZONE_CHANGED_INDOORS" or "NEW_WMO_CHUNK") then
-			currentZoneWindow.Reload()
+		if MasterCollector.Ready then
+			if event == "ZONE_CHANGED_NEW_AREA" then
+				currentZoneWindow.Reload()
+			else
+				currentZoneWindow:Refresh()
+			end
 		end
 	end)
 end
