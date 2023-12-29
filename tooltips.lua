@@ -102,7 +102,7 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 					elseif k == "script" then
 						if type(v) ~= "table" then v = {v} end
 						local scriptName, params = v[1], v[2]
-						if scriptName == "IsOnQuestOrComplete" then
+						if scriptName == "IsOnQuestOrComplete" or scriptName == "IsOnQuest" then
 							local quest = MasterCollector.DB:GetObjectData("quest", tonumber(params)) or {text=string.format(L.Text.QUEST_PENDING_NAME, params)}
 							tooltip:AddDoubleLine(MasterCollector.L.Scripts[scriptName], quest.text)
 						end

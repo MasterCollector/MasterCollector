@@ -38,7 +38,13 @@ local missable = {
 		-- breadcrumbs below. These should be easy to automate since they lead to another quest, but having them here works for now
 		[239] = [[return C_QuestLog.IsQuestFlaggedCompleted(11)]],
 		[1097] = [[return C_QuestLog.IsQuestFlaggedCompleted(353)]],
+		[9498] = [[return C_QuestLog.IsQuestFlaggedCompleted(9340)]],
+		[9499] = [[return C_QuestLog.IsQuestFlaggedCompleted(9340)]],
 		[10279] = [[return C_QuestLog.IsQuestFlaggedCompleted(10277)]],
+		[10289] = [[return C_QuestLog.IsQuestFlaggedCompleted(10291)]],
+		[10403] = [[return C_QuestLog.IsQuestFlaggedCompleted(10367)]],
+		[10442] = [[return C_QuestLog.IsQuestFlaggedCompleted(9372)]],
+		[10443] = [[return C_QuestLog.IsQuestFlaggedCompleted(9372)]],
 		[13635] = [[return C_QuestLog.IsQuestFlaggedCompleted(26145)]],
 		[13636] = [[return C_QuestLog.IsQuestFlaggedCompleted(26843)]],
 		[13866] = [[return C_QuestLog.IsQuestFlaggedCompleted(13612)]],

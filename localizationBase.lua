@@ -70,4 +70,5 @@ L.Quests = {
 
 L.Scripts = {
 	["IsOnQuestOrComplete"] = "Must be on or have completed quest ",
+	["IsOnQuest"] = "Must be on quest ",
 }
