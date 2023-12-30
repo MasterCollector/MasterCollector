@@ -35,11 +35,20 @@ local missable = {
 		-- lvl 30 riding quests
 		[32674] = [[for _,spellID in pairs({34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
 		[32675] = [[for _,spellID in pairs({34090,34091,90265}) do if IsSpellKnown(spellID) then return true end end return false ]],
+		-- complex conditions that invalidate quests. Not confident in handling these as "missed" because they were never collectible in the first place
+		-- Zangarmarsh
+		[9742] = [[return select(3,GetFactionInfoByID(970))>=5]], -- sporegarr friendly
+		[9744] = [[return select(3,GetFactionInfoByID(970))>=5]], -- sporegarr friendly
+		[9807] = [[return select(3,GetFactionInfoByID(970))>=5]], -- sporegarr friendly
+		[9809] = [[return select(3,GetFactionInfoByID(970))>=5]], -- sporegarr friendly
 		-- breadcrumbs below. These should be easy to automate since they lead to another quest, but having them here works for now
 		[239] = [[return C_QuestLog.IsQuestFlaggedCompleted(11)]],
 		[1097] = [[return C_QuestLog.IsQuestFlaggedCompleted(353)]],
 		[9498] = [[return C_QuestLog.IsQuestFlaggedCompleted(9340)]],
 		[9499] = [[return C_QuestLog.IsQuestFlaggedCompleted(9340)]],
+		[9697] = [[return C_QuestLog.IsQuestFlaggedCompleted(9701)]],
+		[9778] = [[return C_QuestLog.IsQuestFlaggedCompleted(9728)]],
+		[9957] = [[return C_QuestLog.IsQuestFlaggedCompleted(9968)]],
 		[10279] = [[return C_QuestLog.IsQuestFlaggedCompleted(10277)]],
 		[10289] = [[return C_QuestLog.IsQuestFlaggedCompleted(10291)]],
 		[10403] = [[return C_QuestLog.IsQuestFlaggedCompleted(10367)]],
