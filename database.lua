@@ -129,6 +129,23 @@ local function EnrichPet(pet)
 end
 local function EnrichQuest(quest)
 	quest.name = GetQuestName(quest)
+	
+	if quest.requirements and quest.requirements.quest then
+		local backRef
+		if type(quest.requirements.quest) == "table" then
+			for index=1,#quest.requirements.quest do
+				backRef = DB:MergeObject("quest", quest.requirements.quest[index], {}, MasterCollector.structs["quest"])
+				quest.requirements.quest[index] = backRef
+				if not backRef.leadsTo then backRef.leadsTo = {} end
+				table.insert(backRef.leadsTo, quest)
+			end
+		else
+			backRef = DB:MergeObject("quest", quest.requirements.quest, {}, MasterCollector.structs["quest"])
+			quest.requirements.quest = backRef
+			if not backRef.leadsTo then backRef.leadsTo = {} end
+			table.insert(backRef.leadsTo, quest)
+		end
+	end
 end
 function DB:EnrichData()
 	local map = {
