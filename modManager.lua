@@ -73,27 +73,29 @@ events.QUEST_ACCEPTED = function()
 end
 events.QUEST_REMOVED = events.QUEST_ACCEPTED
 events.UNIT_AURA = function(unit, auraUpdates)
-	local refreshNeeded = false
-	if auraUpdates.addedAuras then
-	   for _,v in pairs(auraUpdates.addedAuras) do
-		  if MasterCollector.Constants.SpellIDsForRefresh[v.spellId] then
-			 MasterCollector.playerData.auraInstances[v.auraInstanceID] = true
-			 refreshNeeded = true
-			 break
-		  end
-	   end
-	end
-	if not refreshNeeded and auraUpdates.removedAuraInstanceIDs then
-	   for _,instanceID in pairs(auraUpdates.removedAuraInstanceIDs) do
-		  if MasterCollector.playerData.auraInstances[instanceID] then
-			 MasterCollector.playerData.auraInstances[instanceID] = nil
-			 refreshNeeded = true
-			 break
-		  end
-	   end
-	end
-	if refreshNeeded then
-		MasterCollector:RefreshWindows()
+	if unit == "player" then
+		local refreshNeeded = false
+		if auraUpdates.addedAuras then
+		   for _,v in pairs(auraUpdates.addedAuras) do
+			  if MasterCollector.Constants.SpellIDsForRefresh[v.spellId] then
+				 MasterCollector.playerData.auraInstances[v.auraInstanceID] = true
+				 refreshNeeded = true
+				 break
+			  end
+		   end
+		end
+		if not refreshNeeded and auraUpdates.removedAuraInstanceIDs then
+		   for _,instanceID in pairs(auraUpdates.removedAuraInstanceIDs) do
+			  if MasterCollector.playerData.auraInstances[instanceID] then
+				 MasterCollector.playerData.auraInstances[instanceID] = nil
+				 refreshNeeded = true
+				 break
+			  end
+		   end
+		end
+		if refreshNeeded then
+			MasterCollector:RefreshWindows()
+		end
 	end
 end
 events.PLAYER_ENTERING_WORLD = function(initialLogin, reload)
