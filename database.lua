@@ -28,6 +28,9 @@ local function GetCreatureNameFromID(id)
 	return HarvesterTooltip.TextLeft1:GetText() or "NPC #"..id
 end
 
+local function GetQuestTitle(questID)
+	return C_TaskQuest.GetQuestInfoByQuestID(questID) or C_QuestLog.GetTitleForQuestID(questID) or nil;
+end
 local PendingQuestNames = {}
 HarvesterTooltip:RegisterEvent("QUEST_DATA_LOAD_RESULT")
 HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
@@ -50,9 +53,6 @@ HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
-local function GetQuestTitle(questID)
-	return C_TaskQuest.GetQuestInfoByQuestID(questID) or C_QuestLog.GetTitleForQuestID(questID) or nil;
-end
 local function GetQuestName(quest)
 	if MasterCollector.L.Quests[quest.id] then
 		return MasterCollector.L.Quests[quest.id]
