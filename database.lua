@@ -2,7 +2,7 @@ local MasterCollector = select(2,...)
 
 local C_Timer = C_Timer
 local C_PetJournal = C_PetJournal
-local GetQuestTitle = QuestUtils_GetQuestName
+local C_TaskQuest, C_QuestLog = C_TaskQuest, C_QuestLog
 local RequestLoadQuestByID = C_QuestLog.RequestLoadQuestByID
 
 local DB = {
@@ -50,6 +50,9 @@ HarvesterTooltip:SetScript("OnEvent", function(self, event, ...)
 		end
 	end
 end)
+local function GetQuestTitle(questID)
+	return C_TaskQuest.GetQuestInfoByQuestID(questID) or C_QuestLog.GetTitleForQuestID(questID) or nil;
+end
 local function GetQuestName(quest)
 	if MasterCollector.L.Quests[quest.id] then
 		return MasterCollector.L.Quests[quest.id]
