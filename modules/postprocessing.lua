@@ -170,6 +170,7 @@ local missable = {
 		[28749] = [[return C_QuestLog.IsQuestFlaggedCompleted(27159)]],
 		[39182] = [[return C_QuestLog.IsQuestFlaggedCompleted(9968)]],
 		[39188] = [[return C_QuestLog.IsQuestFlaggedCompleted(9968)]],
+		[39198] = [[return C_QuestLog.IsQuestFlaggedCompleted(10486)]],
 		[49550] = [[return C_QuestLog.IsQuestFlaggedCompleted(10562)]],
 		[69896] = [[return C_QuestLog.IsQuestFlaggedCompleted(66435)]],
 		[76566] = [[return C_QuestLog.IsQuestFlaggedCompleted(76567)]],
