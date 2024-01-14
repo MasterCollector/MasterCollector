@@ -65,7 +65,7 @@ local function GetQuestName(quest)
 			elseif quest.flags.weekly then
 				return MasterCollector.L.Text.QUEST_HIDDEN_WEEKLY
 			else
-				return MasterCollector.L.Text.QUEST_HIDDEN
+				return string.format(MasterCollector.L.Text.QUEST_HIDDEN, quest.id)
 			end
 		end
 	end
