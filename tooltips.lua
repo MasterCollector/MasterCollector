@@ -65,17 +65,15 @@ local function AppendQuestRequirement(quest, first)
 		if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 	end
 end
-local function AppendLeadsTo(quest, first)
-	if quest.eligible then
-		if first then
-			tooltip:AddDoubleLine("Leads To Quest(s): ", quest.text)
-		else
-			tooltip:AddDoubleLine(" ", quest.text)
-		end
-		
-		if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
-		if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+local function AppendLeadsTo(quest, printHeader)
+	if printHeader then
+		tooltip:AddDoubleLine("Leads To Quest(s): ", quest.text)
+	else
+		tooltip:AddDoubleLine(" ", quest.text)
 	end
+	
+	if quest.icon then tooltip:AddTexture(quest.icon, {margin={right=4},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
+	if quest.collected then tooltip:AddTexture("Interface\\AddOns\\MasterCollector\\assets\\Collected", {margin={right=16},region=Enum.TooltipTextureRelativeRegion.RightLine}) end
 end
 
 local function OnTooltipSetQuest(tooltip, rowFrame)
@@ -135,8 +133,12 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 		end
 		
 		if data.leadsTo then
+			local printFirstLine = true
 			for index=1, #data.leadsTo do
-				AppendLeadsTo(data.leadsTo[index], index==1)
+				if data.leadsTo[index].eligible then
+					AppendLeadsTo(data.leadsTo[index], printFirstLine)
+					if printFirstLine then printFirstLine = false end
+				end
 			end
 		end
 	end
