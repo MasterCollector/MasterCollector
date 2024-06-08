@@ -109,8 +109,12 @@ local function OnTooltipSetQuest(tooltip, rowFrame)
 						if getmetatable(v) then
 							AppendQuestRequirement(v, true)
 						else
+							local printFirstLine = true
 							for index=1, #v do
-								AppendQuestRequirement(v[index], index==1)
+								if v[index].eligible then
+									AppendQuestRequirement(v[index], printFirstLine)
+									if printFirstLine then printFirstLine = false end
+								end
 							end
 						end
 					elseif k == "script" then
