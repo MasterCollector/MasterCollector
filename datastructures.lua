@@ -150,6 +150,7 @@ local function GetQuestTextColor(obj)
 		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end
 		if obj.requirements.quest then
 			local quests = obj.requirements.quest
+			if getmetatable(quests) then quests = {quests} end
 			for i=1,#quests do
 				if quests[i] and not quests[i].collected and quests[i].eligible and not IsQuestOptional(quests[i]) then
 					return colors.red
