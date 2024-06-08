@@ -150,11 +150,8 @@ local function GetQuestTextColor(obj)
 		if obj.requirements.covenant and obj.requirements.covenant ~= playerData.covenant then return colors.red end
 		if obj.requirements.quest then
 			local quests = obj.requirements.quest
-			if type(quests) ~= "table" then quests = {quests} end
-			local quest
 			for i=1,#quests do
-				quest = MasterCollector.DB:GetObjectData("quest", quests[i])
-				if quest and not quest.collected and quest.eligible and not IsQuestOptional(quest) then
+				if quests[i] and not quests[i].collected and quests[i].eligible and not IsQuestOptional(quests[i]) then
 					return colors.red
 				end
 			end
